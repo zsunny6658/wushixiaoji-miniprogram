@@ -10,7 +10,7 @@
   padding: var(--spacing-sm);
   background: var(--color-warning-light);
   border-radius: var(--radius-sm);
-  color: #92400E;
+  color: var(--quad-q2-label);
   font-size: var(--font-body-sm);
   margin-bottom: var(--spacing-md);
 }

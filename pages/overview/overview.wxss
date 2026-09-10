@@ -116,18 +116,18 @@
   font-size: var(--font-body-sm);
   margin-top: var(--spacing-xs);
 }
-.q1 { background: #FEE2E2; }
-.q1 .quad-num { color: #DC2626; }
-.q1 .quad-label { color: #991B1B; }
-.q2 { background: #FEF3C7; }
-.q2 .quad-num { color: #D97706; }
-.q2 .quad-label { color: #92400E; }
-.q3 { background: #E0E7FF; }
-.q3 .quad-num { color: #4F46E5; }
-.q3 .quad-label { color: #3730A3; }
-.q4 { background: #E2E8F0; }
-.q4 .quad-num { color: #475569; }
-.q4 .quad-label { color: #475569; }
+.q1 { background: var(--quad-q1-bg); }
+.q1 .quad-num { color: var(--quad-q1-num); }
+.q1 .quad-label { color: var(--quad-q1-label); }
+.q2 { background: var(--quad-q2-bg); }
+.q2 .quad-num { color: var(--quad-q2-num); }
+.q2 .quad-label { color: var(--quad-q2-label); }
+.q3 { background: var(--quad-q3-bg); }
+.q3 .quad-num { color: var(--quad-q3-num); }
+.q3 .quad-label { color: var(--quad-q3-label); }
+.q4 { background: var(--quad-q4-bg); }
+.q4 .quad-num { color: var(--quad-q4-num); }
+.q4 .quad-label { color: var(--quad-q4-label); }
 
 /* 今日摘要 */
 .summary-card {

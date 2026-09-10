@@ -51,6 +51,24 @@ page {
   --bg-hover: #F1F5F9;
   --border: #E2E8F0;
 
+  /* 四象限专用色 */
+  --quad-q1-bg: #FEE2E2;
+  --quad-q1-num: #DC2626;
+  --quad-q1-label: #991B1B;
+  --quad-q2-bg: #FEF3C7;
+  --quad-q2-num: #D97706;
+  --quad-q2-label: #92400E;
+  --quad-q3-bg: #E0E7FF;
+  --quad-q3-num: #4F46E5;
+  --quad-q3-label: #3730A3;
+  --quad-q4-bg: #E2E8F0;
+  --quad-q4-num: #475569;
+  --quad-q4-label: #475569;
+
+  /* 品牌专用色 */
+  --wechat-green: #07C160;
+  --text-white: #FFFFFF;
+
   /* 字体栈（系统字体，不用 Web 字体） */
   --font-family: -apple-system, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
 

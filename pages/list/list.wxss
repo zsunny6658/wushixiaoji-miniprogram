@@ -191,7 +191,7 @@
 .checkbox.checked {
   border-color: var(--color-primary);
   background: var(--color-primary);
-  color: #fff;
+  color: var(--text-white);
 }
 
 /* 快速完成按钮 */
@@ -264,7 +264,7 @@
   height: 100rpx;
   border-radius: var(--radius-full);
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-  color: #fff;
+  color: var(--text-white);
   font-size: 56rpx;
   display: flex;
   align-items: center;

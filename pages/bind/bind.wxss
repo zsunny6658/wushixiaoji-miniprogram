@@ -2,7 +2,7 @@
 
 .bind-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, var(--color-primary-light) 0%, #F8FAFC 60%, #FFFFFF 100%);
+  background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--bg-page) 60%, var(--bg-card) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -69,7 +69,7 @@
   font-size: var(--font-body-lg);
   font-weight: 600;
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-  color: #FFFFFF;
+  color: var(--text-white);
   border: 0;
   transition: all 0.15s;
   box-shadow: 0 8rpx 24rpx rgba(74, 144, 217, 0.25);

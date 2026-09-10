@@ -12,7 +12,7 @@
   align-items: center;
   padding: 24rpx 32rpx;
   background: linear-gradient(135deg, var(--color-primary) 0%, #6C8AFF 100%);
-  color: #fff;
+  color: var(--text-white);
   font-size: var(--font-body);
   font-weight: 600;
 }
@@ -24,7 +24,7 @@
 .status-right { display: flex; align-items: center; }
 .overdue-badge {
   background: var(--color-error);
-  color: #fff;
+  color: var(--text-white);
   padding: 4rpx 16rpx;
   border-radius: var(--radius-full);
   font-size: var(--font-caption);
@@ -165,7 +165,7 @@
 .action-main {
   flex: 1.5;
   background: linear-gradient(135deg, var(--color-primary) 0%, #6C8AFF 100%);
-  color: #fff;
+  color: var(--text-white);
   font-weight: 700;
 }
 .action-unpick {
