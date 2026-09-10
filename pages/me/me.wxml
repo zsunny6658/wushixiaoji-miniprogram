@@ -1,0 +1,188 @@
+<view class="page">
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-bg"></view>
+    <view class="user-content">
+      <view class="user-avatar-wrap">
+        <view class="user-avatar">{{meFirstChar}}</view>
+      </view>
+      <view class="user-details">
+        <text class="user-name">{{meName}}</text>
+        <view class="user-meta">
+          <text class="user-role">{{roleLabel}}</text>
+          <text class="user-divider">·</text>
+          <text class="user-family">{{familyName}}</text>
+        </view>
+      </view>
+      <view class="user-action" bindtap="onEditProfile" hover-class="hover-press">
+        <text class="action-icon">✏️</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 家庭切换 -->
+  <view class="section-card" wx:if="{{families.length > 1}}">
+    <text class="section-label">当前家庭</text>
+    <view class="family-switcher">
+      <view class="family-item {{item.id === familyId ? 'active' : ''}}" wx:for="{{families}}" wx:key="id" bindtap="switchFamily" data-id="{{item.id}}" hover-class="hover-press">
+        <text class="family-dot {{item.id === familyId ? 'active' : ''}}"></text>
+        <text class="family-name">{{item.name}}</text>
+        <text class="family-check" wx:if="{{item.id === familyId}}">✓</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-card">
+    <!-- 账户 -->
+    <text class="menu-group-title">账户</text>
+    <view class="cell" bindtap="onEditProfile" hover-class="cell-hover">
+      <view class="cell-left">
+        <text class="cell-icon">👤</text>
+        <text class="cell-title">编辑个人资料</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+    <view class="cell" bindtap="onChangePassword" hover-class="cell-hover">
+      <view class="cell-left">
+        <text class="cell-icon">🔒</text>
+        <text class="cell-title">修改密码</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+
+    <!-- 家庭管理（管理员） -->
+    <block wx:if="{{isAdmin}}">
+      <text class="menu-group-title">家庭管理</text>
+      <view class="cell" bindtap="onManageMembers" hover-class="cell-hover">
+        <view class="cell-left">
+          <text class="cell-icon">👥</text>
+          <text class="cell-title">家庭成员</text>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+      <view class="cell" bindtap="onManageTokens" hover-class="cell-hover">
+        <view class="cell-left">
+          <text class="cell-icon">🔑</text>
+          <text class="cell-title">CLI Token</text>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+      <view class="cell" bindtap="onManageWebhooks" hover-class="cell-hover">
+        <view class="cell-left">
+          <text class="cell-icon">🔗</text>
+          <text class="cell-title">Webhook</text>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+      <view class="cell" bindtap="onFamilySettings" hover-class="cell-hover">
+        <view class="cell-left">
+          <text class="cell-icon">⚙️</text>
+          <text class="cell-title">家庭配置</text>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+    </block>
+
+    <!-- 偏好 -->
+    <text class="menu-group-title">偏好</text>
+    <picker range="{{viewOptions}}" value="{{viewIndex}}" bindchange="onViewChange">
+      <view class="cell" hover-class="cell-hover">
+        <view class="cell-left">
+          <text class="cell-icon">📋</text>
+          <text class="cell-title">默认视图</text>
+        </view>
+        <view class="cell-right">
+          <text class="cell-value">{{viewOptions[viewIndex]}}</text>
+          <text class="cell-arrow">›</text>
+        </view>
+      </view>
+    </picker>
+    <picker range="{{groupOptions}}" value="{{groupIndex}}" bindchange="onGroupChange">
+      <view class="cell" hover-class="cell-hover">
+        <view class="cell-left">
+          <text class="cell-icon">📂</text>
+          <text class="cell-title">分组方式</text>
+        </view>
+        <view class="cell-right">
+          <text class="cell-value">{{groupOptions[groupIndex]}}</text>
+          <text class="cell-arrow">›</text>
+        </view>
+      </view>
+    </picker>
+
+    <!-- 数据 -->
+    <text class="menu-group-title">数据</text>
+    <view class="cell" bindtap="onRefresh" hover-class="cell-hover">
+      <view class="cell-left">
+        <text class="cell-icon">🔄</text>
+        <text class="cell-title">刷新数据</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+    <view class="cell" bindtap="onClearPicked" hover-class="cell-hover">
+      <view class="cell-left">
+        <text class="cell-icon">🗑️</text>
+        <text class="cell-title">清理已完成</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+    <view class="cell" bindtap="onExport" hover-class="cell-hover">
+      <view class="cell-left">
+        <text class="cell-icon">📋</text>
+        <text class="cell-title">复制全部取件码</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+
+    <!-- 关于 -->
+    <text class="menu-group-title">关于</text>
+    <view class="cell">
+      <view class="cell-left">
+        <text class="cell-icon">📦</text>
+        <text class="cell-title">家庭快递取件归集平台</text>
+      </view>
+    </view>
+    <view class="cell">
+      <view class="cell-left">
+        <text class="cell-icon">🔗</text>
+        <text class="cell-title">服务地址</text>
+      </view>
+      <text class="cell-url">{{baseUrl}}</text>
+    </view>
+    <view class="cell">
+      <view class="cell-left">
+        <text class="cell-icon">📝</text>
+        <text class="cell-title cell-desc">多家庭隔离 · 四级角色 · CLI/Webhook 自动化</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 创建家庭 -->
+  <view class="create-btn" wx:if="{{isAdmin}}" bindtap="onShowCreateFamily" hover-class="hover-press">
+    <text class="create-icon">＋</text>
+    <text>创建新家庭</text>
+  </view>
+
+  <!-- 退出登录 -->
+  <button class="logout-btn" bindtap="onLogout">退出登录</button>
+
+  <!-- 底部间距 -->
+  <view class="me-bottom-spacer"></view>
+</view>
+
+<!-- 创建家庭弹窗 -->
+<view class="modal" wx:if="{{showCreateFamily}}">
+  <view class="modal-mask" bindtap="onCancelCreateFamily"></view>
+  <view class="modal-panel">
+    <view class="modal-head">
+      <text class="modal-title">创建家庭</text>
+      <text class="modal-close" bindtap="onCancelCreateFamily">✕</text>
+    </view>
+    <input class="modal-input" placeholder="家庭名称（如：郑家）" placeholder-class="placeholder" value="{{newFamilyName}}" bindinput="onNewFamilyName" />
+    <view class="modal-foot">
+      <button class="modal-btn modal-btn-cancel" bindtap="onCancelCreateFamily">取消</button>
+      <button class="modal-btn modal-btn-confirm" bindtap="onCreateFamily">创建</button>
+    </view>
+  </view>
+</view>

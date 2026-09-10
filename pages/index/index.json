@@ -1,0 +1,5 @@
+{
+  "navigationBarTitleText": "快递取件",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50
+}

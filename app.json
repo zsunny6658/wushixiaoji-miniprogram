@@ -1,0 +1,56 @@
+{
+  "pages": [
+    "pages/overview/overview",
+    "pages/list/list",
+    "pages/quadrant/quadrant",
+    "pages/me/me",
+    "pages/login/login",
+    "pages/bind/bind",
+    "pages/add/add",
+    "pages/detail/detail",
+    "pages/index/index",
+    "pages/members/members",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#4A90D9",
+    "navigationBarTitleText": "屋事小记",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F7FA",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#9CA3AF",
+    "selectedColor": "#4A90D9",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "position": "bottom",
+    "list": [
+      {
+        "pagePath": "pages/overview/overview",
+        "text": "概览",
+        "iconPath": "images/overview.png",
+        "selectedIconPath": "images/overview-active.png"
+      },
+      {
+        "pagePath": "pages/list/list",
+        "text": "小记",
+        "iconPath": "images/list.png",
+        "selectedIconPath": "images/list-active.png"
+      },
+      {
+        "pagePath": "pages/quadrant/quadrant",
+        "text": "四象限",
+        "iconPath": "images/quadrant.png",
+        "selectedIconPath": "images/quadrant-active.png"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我的",
+        "iconPath": "images/settings.png",
+        "selectedIconPath": "images/settings-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

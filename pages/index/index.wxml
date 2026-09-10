@@ -1,0 +1,217 @@
+<view class="container">
+  <!-- 统计 -->
+  <view class="stats">
+    <view class="stat pri"><b>{{stats.pickup || 0}}</b><span>待取快递</span></view>
+    <view class="stat todo"><b>{{stats.todo || 0}}</b><span>待办备忘</span></view>
+    <view class="stat warn"><b>{{stats.overdue || 0}}</b><span>逾期/到期</span></view>
+    <view class="stat ok"><b>{{stats.picked || 0}}</b><span>已完成</span></view>
+  </view>
+
+  <!-- 视图切换（右上角） -->
+  <view class="view-bar" wx:if="{{viewMode === 'list'}}">
+    <text class="view-label">视图</text>
+    <view class="view-tabs">
+      <view class="tab active" bindtap="switchView" data-view="list">📋 列表</view>
+      <view class="tab" bindtap="switchView" data-view="quadrant">🎯 四象限</view>
+    </view>
+  </view>
+  <view class="view-bar" wx:else>
+    <text class="view-label">视图</text>
+    <view class="view-tabs">
+      <view class="tab" bindtap="switchView" data-view="list">📋 列表</view>
+      <view class="tab active" bindtap="switchView" data-view="quadrant">🎯 四象限</view>
+    </view>
+  </view>
+
+  <!-- 列表模式：类型 tab + 状态 tab + 筛选 -->
+  <block wx:if="{{viewMode === 'list'}}">
+    <view class="toolbar">
+      <view class="tabs" style="flex:1;">
+        <view class="tab {{recordType === 'all' ? 'active' : ''}}" bindtap="switchType" data-type="all">📋 全部</view>
+        <view class="tab {{recordType === 'pickup' ? 'active' : ''}}" bindtap="switchType" data-type="pickup">📦 取件</view>
+        <view class="tab {{recordType === 'todo' ? 'active' : ''}}" bindtap="switchType" data-type="todo">📝 备忘</view>
+      </view>
+      <view class="tabs" style="flex:1;">
+        <view class="tab {{filter === 'all' ? 'active' : ''}}" bindtap="switchFilter" data-filter="all">全部</view>
+        <view class="tab {{filter === 'pending' ? 'active' : ''}}" bindtap="switchFilter" data-filter="pending">待处理</view>
+        <view class="tab {{filter === 'picked' ? 'active' : ''}}" bindtap="switchFilter" data-filter="picked">已完成</view>
+        <view class="tab {{filter === 'overdue' ? 'active' : ''}}" bindtap="switchFilter" data-filter="overdue">逾期</view>
+      </view>
+    </view>
+
+    <view class="toolbar">
+      <input class="search" placeholder="搜索取件码/驿站/成员" value="{{search}}" bindinput="onSearch" />
+      <picker class="mini-select" range="{{impOptions}}" value="{{impIndex}}" bindchange="onImpChange">
+        <view>{{impOptions[impIndex]}}</view>
+      </picker>
+      <picker class="mini-select" range="{{urgOptions}}" value="{{urgIndex}}" bindchange="onUrgChange">
+        <view>{{urgOptions[urgIndex]}}</view>
+      </picker>
+      <picker class="mini-select" range="{{groupOptions}}" value="{{groupIndex}}" bindchange="onGroupChange">
+        <view>{{groupOptions[groupIndex]}}</view>
+      </picker>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty" wx:if="{{!list.length}}">
+      <text class="emo">{{emptyEmoji}}</text>
+      <text style="font-size:32rpx; font-weight:600; color:#333;">{{emptyTitle}}</text>
+      <text style="font-size:24rpx; color:#999;">{{emptyDesc}}</text>
+    </view>
+
+    <!-- 分组或列表 -->
+    <block wx:else>
+      <block wx:if="{{group === 'none' || recordType === 'todo'}}">
+        <view class="cards">
+          <view class="card {{item.status === 'picked' ? 'picked' : ''}} {{item.overdue ? 'urgent' : ''}}" wx:for="{{list}}" wx:key="id"
+                bindtap="onCardTap" data-id="{{item.id}}">
+            <view class="card-top">
+              <view class="code-box">
+                <view class="code-label">{{item.type === 'pickup' ? '取件码' : '备忘内容'}}</view>
+                <view class="code-value">{{item.code}}</view>
+              </view>
+              <view class="type-badge {{item.type}}">{{item.type === 'pickup' ? '取件' : '备忘'}}</view>
+              <view class="owner-badge" wx:if="{{item.owner}}" style="background:{{item.ownerColor}};">{{item.owner}}</view>
+            </view>
+            <view class="station-line" wx:if="{{item.type === 'pickup' && item.station}}">
+              <text>📍</text><text>{{item.station}}</text>
+            </view>
+            <view class="meta">
+              <view class="meta-item" wx:if="{{item.type === 'pickup' && item.company}}">🚚 {{item.company}}</view>
+              <view class="meta-item" wx:if="{{item.trackingNo}}">#{{item.trackingNo}}</view>
+              <view class="meta-item {{item.overdue ? 'time-warn' : ''}}" wx:if="{{item.arrivedAt}}">
+                {{item.type === 'pickup' ? '🕐 到货' : '⏰'}} {{item.arrivedLabel}}
+              </view>
+              <view class="meta-item imp-{{item.importance}}">{{item.impLabel}}</view>
+              <view class="meta-item urg-{{item.urgency}}">{{item.urgLabel}}</view>
+              <view class="meta-item note" wx:if="{{item.note}}">📝 {{item.note}}</view>
+              <view class="meta-item" wx:if="{{item.status === 'picked' && item.owner}}">👤 {{item.owner}}</view>
+              <view class="meta-item" wx:if="{{item.status === 'picked'}}">✅ {{item.pickedBy || ''}} {{item.pickedAtLabel}}</view>
+            </view>
+            <view class="card-actions">
+              <button class="btn btn-sm {{item.status === 'pending' ? 'btn-primary' : ''}}" bindtap="onTogglePick" data-id="{{item.id}}">
+                {{item.status === 'pending' ? '✓ 完成' : '↩ 撤销'}}
+              </button>
+              <button class="btn btn-sm" bindtap="onEdit" data-id="{{item.id}}">编辑</button>
+              <button class="btn btn-sm" bindtap="onCopy" data-code="{{item.code}}">复制</button>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <block wx:else>
+        <view class="group" wx:for="{{groups}}" wx:key="key">
+          <view class="group-head">
+            <view class="dot"></view>
+            <text style="font-weight:600;">{{item.key}}</text>
+            <text class="count">{{item.items.length}}</text>
+          </view>
+          <view class="cards">
+            <view class="card {{pkg.status === 'picked' ? 'picked' : ''}} {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{item.items}}" wx:for-item="pkg" wx:key="id"
+                  bindtap="onCardTap" data-id="{{pkg.id}}">
+              <view class="card-top">
+                <view class="code-box">
+                  <view class="code-label">{{pkg.type === 'pickup' ? '取件码' : '备忘内容'}}</view>
+                  <view class="code-value">{{pkg.code}}</view>
+                </view>
+                <view class="type-badge {{pkg.type}}">{{pkg.type === 'pickup' ? '取件' : '备忘'}}</view>
+                <view class="owner-badge" wx:if="{{pkg.owner}}" style="background:{{pkg.ownerColor}};">{{pkg.owner}}</view>
+              </view>
+              <view class="station-line" wx:if="{{pkg.type === 'pickup' && pkg.station}}">
+                <text>📍</text><text>{{pkg.station}}</text>
+              </view>
+              <view class="meta">
+                <view class="meta-item" wx:if="{{pkg.type === 'pickup' && pkg.company}}">🚚 {{pkg.company}}</view>
+                <view class="meta-item" wx:if="{{pkg.trackingNo}}">#{{pkg.trackingNo}}</view>
+                <view class="meta-item {{pkg.overdue ? 'time-warn' : ''}}" wx:if="{{pkg.arrivedAt}}">
+                  {{pkg.type === 'pickup' ? '🕐 到货' : '⏰'}} {{pkg.arrivedLabel}}
+                </view>
+                <view class="meta-item imp-{{pkg.importance}}">{{pkg.impLabel}}</view>
+                <view class="meta-item urg-{{pkg.urgency}}">{{pkg.urgLabel}}</view>
+                <view class="meta-item note" wx:if="{{pkg.note}}">📝 {{pkg.note}}</view>
+                <view class="meta-item" wx:if="{{pkg.status === 'picked' && pkg.owner}}">👤 {{pkg.owner}}</view>
+                <view class="meta-item" wx:if="{{pkg.status === 'picked'}}">✅ {{pkg.pickedBy || ''}} {{pkg.pickedAtLabel}}</view>
+              </view>
+              <view class="card-actions">
+                <button class="btn btn-sm {{pkg.status === 'pending' ? 'btn-primary' : ''}}" bindtap="onTogglePick" data-id="{{pkg.id}}">
+                  {{pkg.status === 'pending' ? '✓ 完成' : '↩ 撤销'}}
+                </button>
+                <button class="btn btn-sm" bindtap="onEdit" data-id="{{pkg.id}}">编辑</button>
+                <button class="btn btn-sm" bindtap="onCopy" data-code="{{pkg.code}}">复制</button>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </block>
+  </block>
+
+  <!-- 四象限视图 -->
+  <block wx:if="{{viewMode === 'quadrant'}}">
+    <view class="quadrants">
+      <view class="quadrant q1">
+        <view class="quadrant-head">
+          <text class="quadrant-icon">🔴</text>
+          <text class="quadrant-title">重要且紧急</text>
+          <text class="quadrant-hint">立即处理</text>
+          <text class="quadrant-count">{{quadrantCounts.q1}}</text>
+        </view>
+        <view class="cards" wx:if="{{quadrants.q1.length}}">
+          <view class="card {{pkg.status === 'picked' ? 'picked' : ''}}" wx:for="{{quadrants.q1}}" wx:key="id" bindtap="onEdit" data-id="{{pkg.id}}">
+            <view class="code-value">{{pkg.code}}</view>
+            <view class="meta"><view class="meta-item">{{pkg.station || pkg.type}}</view></view>
+          </view>
+        </view>
+        <view class="quadrant-empty" wx:else>暂无</view>
+      </view>
+      <view class="quadrant q2">
+        <view class="quadrant-head">
+          <text class="quadrant-icon">🟡</text>
+          <text class="quadrant-title">重要不紧急</text>
+          <text class="quadrant-hint">规划安排</text>
+          <text class="quadrant-count">{{quadrantCounts.q2}}</text>
+        </view>
+        <view class="cards" wx:if="{{quadrants.q2.length}}">
+          <view class="card" wx:for="{{quadrants.q2}}" wx:key="id" bindtap="onEdit" data-id="{{pkg.id}}">
+            <view class="code-value">{{pkg.code}}</view>
+            <view class="meta"><view class="meta-item">{{pkg.station || pkg.type}}</view></view>
+          </view>
+        </view>
+        <view class="quadrant-empty" wx:else>暂无</view>
+      </view>
+      <view class="quadrant q3">
+        <view class="quadrant-head">
+          <text class="quadrant-icon">🔵</text>
+          <text class="quadrant-title">不重要但紧急</text>
+          <text class="quadrant-hint">委托/快速处理</text>
+          <text class="quadrant-count">{{quadrantCounts.q3}}</text>
+        </view>
+        <view class="cards" wx:if="{{quadrants.q3.length}}">
+          <view class="card" wx:for="{{quadrants.q3}}" wx:key="id" bindtap="onEdit" data-id="{{pkg.id}}">
+            <view class="code-value">{{pkg.code}}</view>
+            <view class="meta"><view class="meta-item">{{pkg.station || pkg.type}}</view></view>
+          </view>
+        </view>
+        <view class="quadrant-empty" wx:else>暂无</view>
+      </view>
+      <view class="quadrant q4">
+        <view class="quadrant-head">
+          <text class="quadrant-icon">⚪</text>
+          <text class="quadrant-title">不重要不紧急</text>
+          <text class="quadrant-hint">可忽略</text>
+          <text class="quadrant-count">{{quadrantCounts.q4}}</text>
+        </view>
+        <view class="cards" wx:if="{{quadrants.q4.length}}">
+          <view class="card" wx:for="{{quadrants.q4}}" wx:key="id" bindtap="onEdit" data-id="{{pkg.id}}">
+            <view class="code-value">{{pkg.code}}</view>
+            <view class="meta"><view class="meta-item">{{pkg.station || pkg.type}}</view></view>
+          </view>
+        </view>
+        <view class="quadrant-empty" wx:else>暂无</view>
+      </view>
+    </view>
+  </block>
+
+  <!-- FAB -->
+  <view class="fab" bindtap="onAdd">＋</view>
+</view>

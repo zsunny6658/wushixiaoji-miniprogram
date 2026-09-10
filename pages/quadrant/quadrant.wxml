@@ -1,0 +1,87 @@
+<view class="page">
+  <!-- 单象限详情视图（从概览钻取） -->
+  <view wx:if="{{focusQuad}}">
+    <view class="back-btn" bindtap="onGoBack">
+      <text class="back-arrow">‹</text>
+      <text>返回四象限</text>
+    </view>
+    <view class="focus-header {{focusQuad}}">
+      <view class="focus-top">
+        <text class="focus-icon">{{focusQuad === 'q1' ? '🔴' : focusQuad === 'q2' ? '🟡' : focusQuad === 'q3' ? '🔵' : '⚪'}}</text>
+        <text class="focus-title">{{focusTitle}}</text>
+      </view>
+      <view class="focus-stats">
+        <text class="focus-count">{{quadrants[focusQuad].length}}</text>
+        <text class="focus-unit">条待办</text>
+      </view>
+      <text class="focus-hint">{{focusHint}}</text>
+    </view>
+    <view class="card-list" wx:if="{{quadrants[focusQuad].length}}">
+      <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants[focusQuad]}}" wx:key="id" bindtap="onEdit" data-id="{{pkg.id}}">
+        <view class="qcard-main">
+          <text class="qcard-code">{{pkg.code}}</text>
+          <view class="qcard-meta">
+            <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
+            <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+            <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+          </view>
+        </view>
+        <text class="qcard-arrow">›</text>
+      </view>
+    </view>
+    <view class="empty-state" wx:else>
+      <text class="empty-icon">✅</text>
+      <text class="empty-text">这个象限没有待办</text>
+    </view>
+  </view>
+
+  <!-- 四象限总览 -->
+  <view wx:else>
+    <view class="quad-summary">
+      <text class="summary-label">待处理总数</text>
+      <text class="summary-count">{{totalCount}}</text>
+    </view>
+    <view class="quad-grid">
+      <view class="quad-cell q1" bindtap="onGoQuadrantDetail" data-quad="q1">
+        <text class="cell-icon">🔴</text>
+        <text class="cell-num">{{quadrants.q1.length}}</text>
+        <text class="cell-title">重要且紧急</text>
+        <text class="cell-hint">立即处理</text>
+      </view>
+      <view class="quad-cell q2" bindtap="onGoQuadrantDetail" data-quad="q2">
+        <text class="cell-icon">🟡</text>
+        <text class="cell-num">{{quadrants.q2.length}}</text>
+        <text class="cell-title">重要不紧急</text>
+        <text class="cell-hint">规划安排</text>
+      </view>
+      <view class="quad-cell q3" bindtap="onGoQuadrantDetail" data-quad="q3">
+        <text class="cell-icon">🔵</text>
+        <text class="cell-num">{{quadrants.q3.length}}</text>
+        <text class="cell-title">不重要但紧急</text>
+        <text class="cell-hint">快速处理</text>
+      </view>
+      <view class="quad-cell q4" bindtap="onGoQuadrantDetail" data-quad="q4">
+        <text class="cell-icon">⚪</text>
+        <text class="cell-num">{{quadrants.q4.length}}</text>
+        <text class="cell-title">不重要不紧急</text>
+        <text class="cell-hint">可忽略</text>
+      </view>
+    </view>
+    <view class="recent-section" wx:if="{{recentItems.length}}">
+      <view class="section-head">
+        <text class="section-title">最近添加</text>
+        <text class="section-more" bindtap="onGoAll">查看全部 ›</text>
+      </view>
+      <view class="qcard" wx:for="{{recentItems}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
+        <view class="qcard-main">
+          <text class="qcard-code">{{item.code}}</text>
+          <view class="qcard-meta">
+            <text class="qcard-type">{{item.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
+            <text class="qcard-time" wx:if="{{item.arrivedLabel}}">⏰{{item.arrivedLabel}}</text>
+          </view>
+        </view>
+        <text class="qcard-arrow">›</text>
+      </view>
+    </view>
+  </view>
+</view>

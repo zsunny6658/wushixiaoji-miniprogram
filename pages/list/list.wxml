@@ -1,0 +1,153 @@
+<view class="page">
+  <!-- 类型 + 状态 tab -->
+  <view class="toolbar">
+    <view class="segmented segmented-fill">
+      <view class="seg-item {{recordType === 'all' ? 'seg-active' : ''}}" bindtap="switchType" data-type="all">全部</view>
+      <view class="seg-item {{recordType === 'pickup' ? 'seg-active' : ''}}" bindtap="switchType" data-type="pickup">取件</view>
+      <view class="seg-item {{recordType === 'todo' ? 'seg-active' : ''}}" bindtap="switchType" data-type="todo">备忘</view>
+    </view>
+  </view>
+  <view class="toolbar">
+    <view class="segmented">
+      <view class="seg-item {{filter === 'all' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="all">全部</view>
+      <view class="seg-item {{filter === 'pending' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="pending">待办</view>
+      <view class="seg-item {{filter === 'picked' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="picked">完成</view>
+      <view class="seg-item {{filter === 'overdue' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="overdue">逾期</view>
+    </view>
+  </view>
+
+  <!-- 搜索 + 筛选 -->
+  <view class="toolbar">
+    <input class="search-input" placeholder="搜索取件码/驿站" value="{{search}}" bindinput="onSearch" />
+  </view>
+  <view class="toolbar filters">
+    <picker class="mini-select" range="{{impOptions}}" value="{{impIndex}}" bindchange="onImpChange">
+      <view class="mini-select-inner">{{impOptions[impIndex]}}</view>
+    </picker>
+    <picker class="mini-select" range="{{urgOptions}}" value="{{urgIndex}}" bindchange="onUrgChange">
+      <view class="mini-select-inner">{{urgOptions[urgIndex]}}</view>
+    </picker>
+    <picker class="mini-select" range="{{groupOptions}}" value="{{groupIndex}}" bindchange="onGroupChange">
+      <view class="mini-select-inner">{{groupOptions[groupIndex]}}</view>
+    </picker>
+  </view>
+
+  <!-- 批量操作栏 -->
+  <view class="batch-bar" wx:if="{{batchMode && list.length}}">
+    <view class="batch-left">
+      <text class="batch-count">已选 {{batchCount}}/{{list.length}}</text>
+      <text class="batch-select-all" bindtap="onSelectAll">{{batchCount === list.length ? '取消全选' : '全选'}}</text>
+    </view>
+    <view class="batch-actions">
+      <button class="btn btn-sm btn-primary" wx:if="{{batchCount > 0}}" bindtap="onBatchPick">✓ 批量完成</button>
+      <button class="btn btn-sm btn-danger" wx:if="{{batchCount > 0}}" bindtap="onBatchDelete">删除</button>
+    </view>
+    <text class="batch-exit" bindtap="onExitBatch">退出</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!list.length}}">
+    <text class="empty-icon">{{emptyEmoji}}</text>
+    <text class="empty-text">{{emptyTitle}}</text>
+    <text class="empty-desc">{{emptyDesc}}</text>
+  </view>
+
+  <!-- 分组或列表 -->
+  <block wx:else>
+    <block wx:if="{{group === 'none' || recordType === 'todo'}}">
+      <view class="cards">
+        <view class="card {{item.status === 'picked' ? 'picked' : ''}} {{item.overdue ? 'urgent' : ''}} {{batchMode && item.batchSelected ? 'selected' : ''}}" wx:for="{{list}}" wx:key="id" bindtap="onCardTap" data-id="{{item.id}}" hover-class="hover-press">
+          <view class="card-inner">
+            <view class="batch-check" wx:if="{{batchMode}}" data-id="{{item.id}}">
+              <text class="checkbox {{item.batchSelected ? 'checked' : ''}}">{{item.batchSelected ? '✓' : ''}}</text>
+            </view>
+            <view class="card-body">
+              <view class="card-top">
+                <view class="code-box">
+                  <view class="code-label">{{item.type === 'pickup' ? '取件码' : '备忘内容'}}</view>
+                  <view class="code-value">{{item.code}}</view>
+                </view>
+                <view class="card-badges">
+                  <view class="tag tag-primary" wx:if="{{item.type === 'pickup'}}">取件</view>
+                  <view class="tag tag-warning" wx:if="{{item.type === 'todo'}}">备忘</view>
+                  <view class="tag tag-neutral" wx:if="{{item.tagLabel}}">{{item.tagLabel}}</view>
+                  <view class="tag tag-info" wx:if="{{item.owner}}">{{item.owner}}</view>
+                  <view class="badge" wx:if="{{item.occCount > 1}}">{{item.occCount}}</view>
+                </view>
+              </view>
+              <view class="station-line" wx:if="{{item.type === 'pickup' && item.station}}">
+                <text class="station-icon">📍</text><text>{{item.station}}</text>
+              </view>
+              <view class="meta">
+                <view class="meta-item" wx:if="{{item.type === 'pickup' && item.company}}">{{item.company}}</view>
+                <view class="meta-item" wx:if="{{item.trackingNo}}">#{{item.trackingNo}}</view>
+                <view class="meta-item {{item.overdue ? 'time-warn' : ''}}" wx:if="{{item.arrivedAt}}">
+                  {{item.type === 'pickup' ? '🕐' : '⏰'}} {{item.arrivedLabel}}
+                </view>
+                <view class="meta-item imp-{{item.importance}}">{{item.impLabel}}</view>
+                <view class="meta-item urg-{{item.urgency}}">{{item.urgLabel}}</view>
+                <view class="meta-item note" wx:if="{{item.note}}">📝 {{item.note}}</view>
+              </view>
+            </view>
+            <view class="card-quick" wx:if="{{!batchMode}}" catchtap="onQuickPick" data-id="{{item.id}}">
+              <text class="quick-icon">{{item.status === 'picked' ? '↩' : '✓'}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view class="group" wx:for="{{groups}}" wx:key="key">
+        <view class="group-head">
+          <view class="group-dot"></view>
+          <text class="group-title">{{item.key}}</text>
+          <text class="group-count">{{item.items.length}}</text>
+        </view>
+        <view class="cards">
+          <view class="card {{pkg.status === 'picked' ? 'picked' : ''}} {{pkg.overdue ? 'urgent' : ''}} {{batchMode && pkg.batchSelected ? 'selected' : ''}}" wx:for="{{item.items}}" wx:for-item="pkg" wx:key="id" bindtap="onCardTap" data-id="{{pkg.id}}" hover-class="hover-press">
+            <view class="card-inner">
+              <view class="batch-check" wx:if="{{batchMode}}" data-id="{{pkg.id}}">
+                <text class="checkbox {{pkg.batchSelected ? 'checked' : ''}}">{{pkg.batchSelected ? '✓' : ''}}</text>
+              </view>
+              <view class="card-body">
+                <view class="card-top">
+                  <view class="code-box">
+                    <view class="code-label">{{pkg.type === 'pickup' ? '取件码' : '备忘内容'}}</view>
+                    <view class="code-value">{{pkg.code}}</view>
+                  </view>
+                  <view class="card-badges">
+                    <view class="tag tag-primary" wx:if="{{pkg.type === 'pickup'}}">取件</view>
+                    <view class="tag tag-warning" wx:if="{{pkg.type === 'todo'}}">备忘</view>
+                    <view class="tag tag-neutral" wx:if="{{pkg.tagLabel}}">{{pkg.tagLabel}}</view>
+                    <view class="tag tag-info" wx:if="{{pkg.owner}}">{{pkg.owner}}</view>
+                    <view class="badge" wx:if="{{pkg.occCount > 1}}">{{pkg.occCount}}</view>
+                  </view>
+                </view>
+                <view class="station-line" wx:if="{{pkg.type === 'pickup' && pkg.station}}">
+                  <text class="station-icon">📍</text><text>{{pkg.station}}</text>
+                </view>
+                <view class="meta">
+                  <view class="meta-item" wx:if="{{pkg.type === 'pickup' && pkg.company}}">{{pkg.company}}</view>
+                  <view class="meta-item" wx:if="{{pkg.trackingNo}}">#{{pkg.trackingNo}}</view>
+                  <view class="meta-item {{pkg.overdue ? 'time-warn' : ''}}" wx:if="{{pkg.arrivedAt}}">
+                    {{pkg.type === 'pickup' ? '🕐' : '⏰'}} {{pkg.arrivedLabel}}
+                  </view>
+                  <view class="meta-item imp-{{pkg.importance}}">{{pkg.impLabel}}</view>
+                  <view class="meta-item urg-{{pkg.urgency}}">{{pkg.urgLabel}}</view>
+                  <view class="meta-item note" wx:if="{{pkg.note}}">📝 {{pkg.note}}</view>
+                </view>
+              </view>
+              <view class="card-quick" wx:if="{{!batchMode}}" catchtap="onQuickPick" data-id="{{pkg.id}}">
+                <text class="quick-icon">{{pkg.status === 'picked' ? '↩' : '✓'}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </block>
+
+  <!-- FAB -->
+  <view class="fab {{batchMode ? 'fab-batch' : ''}}" bindtap="{{batchMode ? 'onExitBatch' : 'onToggleBatch'}}">{{batchMode ? '✕' : '＋'}}</view>
+</view>

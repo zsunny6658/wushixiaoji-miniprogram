@@ -1,0 +1,58 @@
+<view class="login-page">
+  <!-- 微信登录视图 -->
+  <view class="login-header" wx:if="{{view === 'wx'}}">
+    <view class="login-icon">📦</view>
+    <view class="login-title">屋事小记</view>
+    <view class="login-sub">输入家庭成员口令，即可查看与完成你的备忘记录</view>
+  </view>
+
+  <view class="login-card">
+    <!-- 微信一键登录 -->
+    <button class="wx-login-btn" wx:if="{{view === 'wx'}}" bindtap="onWxLogin">
+      <text>{{wxLoading ? '登录中...' : '微信一键登录'}}</text>
+    </button>
+
+    <!-- 邮箱登录 -->
+    <view wx:if="{{view === 'email'}}">
+      <view class="login-header">
+        <view class="login-title">邮箱登录</view>
+        <view class="login-sub">输入邮箱和密码登录，或使用验证码</view>
+      </view>
+
+      <!-- 密码/验证码 Tab -->
+      <view class="auth-tabs">
+        <view class="auth-tab {{emailTab === 'password' ? 'active' : ''}}" bindtap="onEmailTab" data-tab="password">密码登录</view>
+        <view class="auth-tab {{emailTab === 'code' ? 'active' : ''}}" bindtap="onEmailTab" data-tab="code">验证码登录</view>
+      </view>
+
+      <input class="login-input" placeholder="邮箱地址" placeholder-class="login-placeholder"
+             type="text" value="{{email}}" bindinput="onEmailInput" />
+
+      <!-- 密码登录 -->
+      <input class="login-input" wx:if="{{emailTab === 'password'}}" placeholder="密码" placeholder-class="login-placeholder"
+             password="true" value="{{emailPass}}" bindinput="onEmailPassInput" />
+
+      <!-- 验证码登录 -->
+      <view class="code-row" wx:if="{{emailTab === 'code'}}">
+        <input class="login-input code-input" placeholder="验证码" placeholder-class="login-placeholder"
+               type="number" value="{{emailCode}}" bindinput="onEmailCodeInput" />
+        <button class="code-btn" bindtap="onSendCode" disabled="{{codeSending || codeSent}}">
+          {{codeSending ? '发送中' : (codeSent ? countdown + 's后重试' : '获取验证码')}}
+        </button>
+      </view>
+
+      <button class="login-btn" bindtap="onEmailLogin">登录</button>
+      <view class="login-back" bindtap="onBackToWx">← 返回微信登录</view>
+    </view>
+
+    <!-- 微信视图底部：切换到邮箱登录 -->
+    <view wx:if="{{view === 'wx'}}" class="login-divider">
+      <view class="login-divider-line"></view>
+      <text class="login-divider-text">其他登录方式</text>
+      <view class="login-divider-line"></view>
+    </view>
+    <view class="login-alt" wx:if="{{view === 'wx'}}" bindtap="onShowEmail">
+      <text>用邮箱密码登录 →</text>
+    </view>
+  </view>
+</view>

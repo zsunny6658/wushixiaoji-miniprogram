@@ -1,0 +1,64 @@
+<view class="page">
+  <!-- 问候语 -->
+  <view class="greeting">
+    <view class="greeting-text">{{greetingText}}</view>
+    <view class="greeting-date">{{todayStr}}</view>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats">
+    <view class="stat-card s-pickup" bindtap="onGoPickup" hover-class="hover-press">
+      <view class="stat-num">{{stats.pickup || 0}}</view>
+      <view class="stat-label">📦 待取快递</view>
+    </view>
+    <view class="stat-card s-todo" bindtap="onGoTodo" hover-class="hover-press">
+      <view class="stat-num">{{stats.todo || 0}}</view>
+      <view class="stat-label">📝 待办备忘</view>
+    </view>
+    <view class="stat-card s-overdue" bindtap="onGoOverdue" hover-class="hover-press">
+      <view class="stat-num">{{stats.overdue || 0}}</view>
+      <view class="stat-label">⚠️ 逾期/到期</view>
+    </view>
+    <view class="stat-card s-done" bindtap="onGoDone" hover-class="hover-press">
+      <view class="stat-num">{{stats.picked || 0}}</view>
+      <view class="stat-label">✅ 已完成</view>
+    </view>
+  </view>
+
+  <!-- 四象限看板 -->
+  <view class="section">
+    <view class="section-head">
+      <text class="section-title">🎯 优先级看板</text>
+      <text class="section-more" bindtap="onGoQuadrant">查看全部 ›</text>
+    </view>
+    <view class="quad-grid">
+      <view class="quad-box q1" bindtap="onGoQuadrantDetail" data-quad="q1" hover-class="hover-press">
+        <text class="quad-num">{{quadrantCounts.q1}}</text>
+        <text class="quad-label">重要且紧急</text>
+      </view>
+      <view class="quad-box q2" bindtap="onGoQuadrantDetail" data-quad="q2" hover-class="hover-press">
+        <text class="quad-num">{{quadrantCounts.q2}}</text>
+        <text class="quad-label">重要不紧急</text>
+      </view>
+      <view class="quad-box q3" bindtap="onGoQuadrantDetail" data-quad="q3" hover-class="hover-press">
+        <text class="quad-num">{{quadrantCounts.q3}}</text>
+        <text class="quad-label">不重要但紧急</text>
+      </view>
+      <view class="quad-box q4" bindtap="onGoQuadrantDetail" data-quad="q4" hover-class="hover-press">
+        <text class="quad-num">{{quadrantCounts.q4}}</text>
+        <text class="quad-label">不重要不紧急</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日摘要 -->
+  <view class="section" wx:if="{{todaySummary}}">
+    <view class="summary-card">
+      <view class="summary-icon">📋</view>
+      <view class="summary-body">
+        <view class="summary-title">{{todaySummary.title}}</view>
+        <view class="summary-desc">{{todaySummary.desc}}</view>
+      </view>
+    </view>
+  </view>
+</view>

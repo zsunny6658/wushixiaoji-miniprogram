@@ -1,0 +1,109 @@
+<view class="container">
+  <!-- 编辑模式提示 -->
+  <view class="edit-tip" wx:if="{{editId}}">编辑模式：修改 {{editTitle}}</view>
+
+  <!-- 智能解析区 -->
+  <view class="smart-section">
+    <view class="smart-title">✨ 智能识别</view>
+    <textarea class="smart-textarea" placeholder="粘贴快递短信 / 备忘文本，自动识别" value="{{smartText}}" bindinput="onSmartText"></textarea>
+    <button class="btn btn-primary btn-block" bindtap="onSmartParse">智能识别</button>
+  </view>
+
+  <!-- 表单 -->
+  <view class="form-section">
+    <view class="form-grid">
+      <view class="field">
+        <text class="field-label">记录类型</text>
+        <picker range="{{typeOptions}}" value="{{typeIndex}}" bindchange="onTypeChange">
+          <view class="field-picker">
+            <text class="field-picker-value">{{typeOptions[typeIndex]}}</text>
+            <text class="field-picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+
+      <block wx:if="{{type === 'pickup'}}">
+        <view class="field">
+          <text class="field-label">取件驿站 <text class="req">*</text></text>
+          <input class="field-input" placeholder="如：菜鸟驿站" value="{{form.station}}" bindinput="onField" data-field="station" />
+        </view>
+        <view class="field">
+          <text class="field-label">取件码 <text class="req">*</text></text>
+          <input class="field-input" placeholder="如：8-3-2201" value="{{form.code}}" bindinput="onField" data-field="code" />
+        </view>
+        <view class="field">
+          <text class="field-label">快递公司</text>
+          <input class="field-input" placeholder="如：中通快递" value="{{form.company}}" bindinput="onField" data-field="company" />
+        </view>
+        <view class="field">
+          <text class="field-label">快递单号</text>
+          <input class="field-input" placeholder="如：78123456789" value="{{form.trackingNo}}" bindinput="onField" data-field="trackingNo" />
+        </view>
+      </block>
+
+      <block wx:if="{{type === 'todo'}}">
+        <view class="field">
+          <text class="field-label">备忘内容 <text class="req">*</text></text>
+          <input class="field-input" placeholder="如：买排骨、陪妈体检" value="{{form.code}}" bindinput="onField" data-field="code" />
+        </view>
+      </block>
+
+      <view class="field">
+        <text class="field-label">时间</text>
+        <picker mode="date" value="{{dateStr}}" bindchange="onDateChange" end="{{endDate}}">
+          <view class="field-picker">
+            <text class="field-picker-value">{{dateStr}}</text>
+            <text class="field-picker-arrow">▼</text>
+          </view>
+        </picker>
+        <picker mode="time" value="{{timeStr}}" bindchange="onTimeChange">
+          <view class="field-picker field-picker-second">
+            <text class="field-picker-value">{{timeStr}}</text>
+            <text class="field-picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="field-label">归属成员</text>
+        <picker range="{{memberOptions}}" value="{{memberIndex}}" bindchange="onMemberChange">
+          <view class="field-picker">
+            <text class="field-picker-value">{{memberOptions[memberIndex]}}</text>
+            <text class="field-picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="field-label">重要性</text>
+        <picker range="{{impOptions}}" value="{{impIndex}}" bindchange="onImpChange">
+          <view class="field-picker">
+            <text class="field-picker-value">{{impOptions[impIndex]}}</text>
+            <text class="field-picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="field-label">紧迫性</text>
+        <picker range="{{urgOptions}}" value="{{urgIndex}}" bindchange="onUrgChange">
+          <view class="field-picker">
+            <text class="field-picker-value">{{urgOptions[urgIndex]}}</text>
+            <text class="field-picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="field-label">备注</text>
+        <input class="field-input" placeholder="补充说明" value="{{form.note}}" bindinput="onField" data-field="note" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="footer-actions">
+    <button class="btn btn-primary footer-save" bindtap="onSave">保存</button>
+    <button class="btn btn-danger" wx:if="{{editId}}" bindtap="onDelete">删除</button>
+  </view>
+</view>

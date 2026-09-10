@@ -1,0 +1,103 @@
+/* pages/settings/settings.wxss - 设置页 */
+
+.page {
+  min-height: 100vh;
+  background: var(--bg-page);
+  padding: var(--spacing-md);
+  padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
+}
+
+/* 用户信息卡片 */
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+.user-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name {
+  display: block;
+  font-size: var(--font-subtitle);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.user-role {
+  display: block;
+  font-size: var(--font-body-sm);
+  color: var(--text-secondary);
+  margin-top: 4rpx;
+}
+
+/* Token/Webhook 条目卡片 */
+.item-card {
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+.item-card:last-child { margin-bottom: 0; }
+.item-head {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+.item-name {
+  font-size: var(--font-body);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.item-tag {
+  font-size: var(--font-caption);
+  padding: 2rpx 8rpx;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+.item-value {
+  display: block;
+  font-size: var(--font-caption);
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  word-break: break-all;
+  margin-bottom: var(--spacing-xs);
+}
+.item-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-xs);
+}
+
+/* 空提示 */
+.empty-tip {
+  text-align: center;
+  padding: var(--spacing-lg);
+  font-size: var(--font-body-sm);
+  color: var(--text-tertiary);
+}
+
+/* 关于文本 */
+.about-text {
+  font-size: var(--font-body-sm);
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.page-bottom {
+  height: env(safe-area-inset-bottom);
+}

@@ -1,0 +1,102 @@
+/* pages/add/add.wxss - 新增/编辑页 */
+
+.container {
+  padding: var(--spacing-md);
+  min-height: 100vh;
+}
+
+/* 编辑模式提示 */
+.edit-tip {
+  padding: var(--spacing-sm);
+  background: var(--color-warning-light);
+  border-radius: var(--radius-sm);
+  color: #92400E;
+  font-size: var(--font-body-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+/* 智能解析区 */
+.smart-section {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  box-shadow: var(--shadow-1);
+}
+.smart-title {
+  font-size: var(--font-body);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+.smart-textarea {
+  width: 100%;
+  min-height: 160rpx;
+  border: 2rpx solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+  font-size: var(--font-body);
+  box-sizing: border-box;
+  margin-bottom: var(--spacing-sm);
+  background: var(--bg-page);
+  transition: border-color 0.15s;
+}
+.smart-textarea:focus { border-color: var(--color-primary); }
+
+/* 表单区域 */
+.form-section {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-1);
+}
+.form-grid { display: block; }
+.field {
+  margin-bottom: var(--spacing-md);
+}
+.field:last-child { margin-bottom: 0; }
+.field-label {
+  display: block;
+  font-size: var(--font-body-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+}
+.field-input,
+.field-picker {
+  width: 100%;
+  border: 2rpx solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+  font-size: var(--font-body);
+  box-sizing: border-box;
+  background: var(--bg-card);
+  transition: border-color 0.15s;
+}
+.field-input:focus { border-color: var(--color-primary); }
+.field-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.field-picker-value {
+  color: var(--text-primary);
+}
+.field-picker-arrow {
+  color: var(--text-tertiary);
+  font-size: 24rpx;
+}
+.field-picker-second {
+  margin-top: var(--spacing-xs);
+}
+.req { color: var(--color-error); margin-left: 4rpx; }
+
+/* 底部操作 */
+.footer-actions {
+  padding: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-sm);
+}
+.footer-save {
+  flex: 1;
+}

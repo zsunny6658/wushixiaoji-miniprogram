@@ -1,0 +1,54 @@
+<view class="container">
+  <!-- 成员列表 -->
+  <view class="member-card">
+    <view class="section-head">
+      <text class="section-title">家庭成员</text>
+      <text class="section-count">{{members.length}} 人</text>
+    </view>
+
+    <view wx:if="{{!members.length}}" class="empty-state">
+      <text class="empty-text">还没有成员，添加一位吧</text>
+    </view>
+
+    <block wx:else>
+      <view class="member-item" wx:for="{{members}}" wx:key="id">
+        <view class="member-left">
+          <view class="member-avatar" style="background:{{item.color}};">{{item.avatar}}</view>
+          <view>
+            <view class="member-name">{{item.name}}</view>
+            <view class="member-email">{{item.email || '未绑定邮箱'}}</view>
+          </view>
+        </view>
+        <view class="member-actions">
+          <button class="btn btn-sm" bindtap="onResend" data-id="{{item.id}}" data-name="{{item.name}}">重发口令</button>
+          <button class="btn btn-sm btn-danger" bindtap="onDelete" data-id="{{item.id}}" data-name="{{item.name}}">删除</button>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 添加成员 -->
+  <view class="add-section" wx:if="{{isAdmin || isFamilyAdmin}}">
+    <text class="add-title">添加成员</text>
+    <view class="form-item">
+      <input class="form-input" placeholder="成员名（如：外婆）" value="{{newName}}" bindinput="onNewName" />
+    </view>
+    <view class="form-item">
+      <input class="form-input" placeholder="邮箱（用于下发入口口令）" value="{{newEmail}}" bindinput="onNewEmail" type="email" />
+    </view>
+    <button class="btn btn-primary btn-block" bindtap="onAddMember">生成口令并通知</button>
+  </view>
+
+  <!-- 生成的口令 -->
+  <view class="passcode-card" wx:if="{{passcode}}">
+    <view class="passcode-title">🎉 已生成入口口令</view>
+    <view class="passcode-value">{{passcode}}</view>
+    <view class="passcode-actions">
+      <button class="btn btn-sm passcode-action" bindtap="onCopyPasscode">复制口令</button>
+      <button class="btn btn-sm btn-primary passcode-action" bindtap="onResendLast">再次发送</button>
+    </view>
+    <view class="passcode-hint">
+      成员在登录页点「家庭成员」，输入此口令即可进入。
+    </view>
+  </view>
+</view>

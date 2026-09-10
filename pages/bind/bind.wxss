@@ -1,0 +1,162 @@
+/* pages/bind/bind.wxss - 绑定家庭页 */
+
+.bind-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--color-primary-light) 0%, #F8FAFC 60%, #FFFFFF 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 50rpx;
+  box-sizing: border-box;
+}
+
+.bind-header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+.bind-icon { font-size: 96rpx; margin-bottom: var(--spacing-sm); }
+.bind-title {
+  font-size: var(--font-title);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  letter-spacing: -0.02em;
+}
+.bind-desc {
+  font-size: var(--font-body-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.bind-card {
+  width: 100%;
+  max-width: 600rpx;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-2);
+}
+
+.bind-input-wrap { margin-bottom: var(--spacing-md); }
+.bind-input-label {
+  display: block;
+  font-size: var(--font-body-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+}
+.bind-input {
+  width: 100%;
+  border: 2rpx solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24rpx 28rpx;
+  font-size: var(--font-body-lg);
+  box-sizing: border-box;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: 8rpx;
+  transition: border-color 0.15s;
+}
+.bind-input:focus { border-color: var(--color-primary); }
+.bind-placeholder { color: var(--text-tertiary); letter-spacing: 0; text-align: left; }
+
+.bind-btn {
+  width: 100%;
+  padding: 26rpx;
+  border-radius: var(--radius-md);
+  font-size: var(--font-body-lg);
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: #FFFFFF;
+  border: 0;
+  transition: all 0.15s;
+  box-shadow: 0 8rpx 24rpx rgba(74, 144, 217, 0.25);
+}
+.bind-btn:active { transform: scale(0.97); opacity: 0.9; }
+.bind-btn::after { border: none; }
+
+.bind-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: var(--spacing-lg) 0;
+}
+.bind-divider-line { flex: 1; height: 1rpx; background: var(--border); }
+.bind-divider-text {
+  font-size: var(--font-body-sm);
+  color: var(--text-tertiary);
+  padding: 0 var(--spacing-md);
+}
+
+.bind-btn-secondary {
+  width: 100%;
+  padding: 24rpx;
+  border-radius: var(--radius-md);
+  font-size: var(--font-body);
+  font-weight: 500;
+  background: var(--bg-hover);
+  color: var(--color-primary);
+  border: 2rpx solid var(--color-primary);
+  transition: all 0.15s;
+}
+.bind-btn-secondary::after { border: none; }
+.bind-btn-secondary:active { transform: scale(0.97); opacity: 0.9; }
+
+/* 弹窗 */
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-mask {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+.modal-panel {
+  position: relative;
+  width: 600rpx;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  animation: modalIn 0.2s ease-out;
+}
+@keyframes modalIn { from { opacity: 0; transform: scale(0.95); } }
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+.modal-title {
+  font-size: var(--font-subtitle);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.modal-close {
+  font-size: 40rpx;
+  color: var(--text-tertiary);
+  padding: 8rpx;
+  cursor: pointer;
+}
+.modal-desc {
+  font-size: var(--font-body-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+.modal-actions { margin-top: var(--spacing-md); }
+
+.bind-footer {
+  position: fixed;
+  bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
+  left: 0; right: 0;
+  text-align: center;
+  font-size: var(--font-body);
+  color: var(--color-primary);
+  cursor: pointer;
+}

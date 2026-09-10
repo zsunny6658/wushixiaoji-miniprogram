@@ -1,0 +1,206 @@
+<view class="page">
+  <!-- ============ 个人设置 ============ -->
+  <block wx:if="{{action === 'profile'}}">
+    <view class="section">
+      <text class="section-title">个人资料</text>
+      <view class="form-item">
+        <text class="form-label">用户名</text>
+        <input class="form-input" value="{{profile.username}}" data-field="username" bindinput="onProfileInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">显示名</text>
+        <input class="form-input" value="{{profile.displayName}}" data-field="displayName" bindinput="onProfileInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">邮箱</text>
+        <input class="form-input" type="email" value="{{profile.email}}" data-field="email" bindinput="onProfileInput" />
+      </view>
+      <button class="btn-primary" bindtap="onSaveProfile">保存</button>
+    </view>
+  </block>
+
+  <!-- ============ 修改密码 ============ -->
+  <block wx:elif="{{action === 'password'}}">
+    <view class="section">
+      <text class="section-title">修改密码</text>
+      <view class="form-item">
+        <text class="form-label">原密码</text>
+        <input class="form-input" password="true" value="{{pwdForm.oldPassword}}" data-field="oldPassword" bindinput="onPwdInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">新密码</text>
+        <input class="form-input" password="true" value="{{pwdForm.newPassword}}" data-field="newPassword" bindinput="onPwdInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">确认新密码</text>
+        <input class="form-input" password="true" value="{{pwdForm.confirm}}" data-field="confirm" bindinput="onPwdInput" />
+      </view>
+      <button class="btn-primary" bindtap="onSavePassword">修改密码</button>
+    </view>
+  </block>
+
+  <!-- ============ CLI Token 管理 ============ -->
+  <block wx:elif="{{action === 'tokens'}}">
+    <view class="section">
+      <text class="section-title">创建 Token</text>
+      <view class="form-item">
+        <text class="form-label">名称</text>
+        <input class="form-input" placeholder="如：青龙签到" value="{{newTokenName}}" bindinput="onNewTokenName" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">过期时间</text>
+        <input class="form-input" placeholder="可选，如 2026-12-31" value="{{newTokenExpiry}}" bindinput="onNewTokenExpiry" />
+      </view>
+      <button class="btn-primary" bindtap="onCreateToken">生成 Token</button>
+    </view>
+
+    <view class="section">
+      <text class="section-title">Token 列表（{{tokens.length}}）</text>
+      <view wx:if="{{!tokens.length}}" class="empty-tip">暂无 Token</view>
+      <view class="item-card" wx:for="{{tokens}}" wx:key="id">
+        <view class="item-head">
+          <text class="item-name">{{item.name}}</text>
+          <text class="item-tag" wx:if="{{item.isFamilyCode}}">家庭码</text>
+          <text class="item-tag" wx:elif="{{item.expiresAt}}">到期 {{item.expiresAt}}</text>
+          <text class="item-tag" wx:else>永久</text>
+        </view>
+        <text class="item-value mono">{{item.value}}</text>
+        <view class="item-actions" wx:if="{{!item.isFamilyCode}}">
+          <button class="btn-sm btn-danger" bindtap="onDeleteToken" data-id="{{item.id}}">删除</button>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- ============ Webhook 管理 ============ -->
+  <block wx:elif="{{action === 'webhooks'}}">
+    <view class="section">
+      <text class="section-title">创建 Webhook</text>
+      <view class="form-item">
+        <text class="form-label">名称</text>
+        <input class="form-input" placeholder="如：邮箱转发" value="{{newWebhookName}}" bindinput="onNewWebhookName" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">过期时间</text>
+        <input class="form-input" placeholder="可选，如 2026-12-31" value="{{newWebhookExpiry}}" bindinput="onNewWebhookExpiry" />
+      </view>
+      <button class="btn-primary" bindtap="onCreateWebhook">生成 Webhook</button>
+    </view>
+
+    <view class="section">
+      <text class="section-title">Webhook 列表（{{webhooks.length}}）</text>
+      <view wx:if="{{!webhooks.length}}" class="empty-tip">暂无 Webhook</view>
+      <view class="item-card" wx:for="{{webhooks}}" wx:key="id">
+        <view class="item-head">
+          <text class="item-name">{{item.name}}</text>
+          <text class="item-tag" wx:if="{{item.isFamilyCode}}">家庭码</text>
+          <text class="item-tag" wx:elif="{{item.expiresAt}}">到期 {{item.expiresAt}}</text>
+          <text class="item-tag" wx:else>永久</text>
+        </view>
+        <text class="item-value mono">{{item.token}}</text>
+        <view class="item-actions" wx:if="{{!item.isFamilyCode}}">
+          <button class="btn-sm btn-danger" bindtap="onDeleteWebhook" data-id="{{item.id}}">删除</button>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- ============ 家庭配置（邮件/AI） ============ -->
+  <block wx:elif="{{action === 'mail'}}">
+    <view class="section">
+      <text class="section-title">邮件配置（SMTP）</text>
+      <view class="form-item">
+        <text class="form-label">SMTP 服务器</text>
+        <input class="form-input" placeholder="smtp.qq.com" value="{{config.smtpHost}}" data-field="smtpHost" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">端口</text>
+        <input class="form-input" type="number" value="{{config.smtpPort}}" data-field="smtpPort" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">用户名</text>
+        <input class="form-input" value="{{config.smtpUser}}" data-field="smtpUser" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">密码/授权码</text>
+        <input class="form-input" value="{{config.smtpPass}}" data-field="smtpPass" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">发件人地址</text>
+        <input class="form-input" type="email" value="{{config.smtpFrom}}" data-field="smtpFrom" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">发件人名称</text>
+        <input class="form-input" value="{{config.smtpFromName}}" data-field="smtpFromName" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item form-row">
+        <text class="form-label">启用 SSL</text>
+        <switch checked="{{config.smtpSecure}}" data-field="smtpSecure" bindchange="onConfigSwitch" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">测试邮箱</text>
+        <input class="form-input" type="email" placeholder="接收测试邮件的地址" value="{{testEmailTo}}" data-field="testEmailTo" bindinput="onTestEmailInput" />
+      </view>
+      <view class="btn-row">
+        <button class="btn-primary" bindtap="onTestEmail">发送测试邮件</button>
+        <button class="btn-secondary" bindtap="onSaveConfig">保存配置</button>
+      </view>
+    </view>
+
+    <view class="section">
+      <text class="section-title">AI 配置</text>
+      <view class="form-item">
+        <text class="form-label">服务商</text>
+        <input class="form-input" placeholder="openai / deepseek / qwen / ollama" value="{{config.aiProvider}}" data-field="aiProvider" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">模型</text>
+        <input class="form-input" placeholder="gpt-4o / deepseek-chat" value="{{config.aiModel}}" data-field="aiModel" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">API Base URL</text>
+        <input class="form-input" placeholder="https://api.openai.com/v1" value="{{config.aiBaseUrl}}" data-field="aiBaseUrl" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">API Key</text>
+        <input class="form-input" value="{{config.aiApiKey}}" data-field="aiApiKey" bindinput="onConfigInput" />
+      </view>
+      <view class="btn-row">
+        <button class="btn-primary" bindtap="onTestAI">测试连通性</button>
+        <button class="btn-secondary" bindtap="onSaveConfig">保存配置</button>
+      </view>
+    </view>
+  </block>
+
+  <!-- ============ 默认：完整设置页 ============ -->
+  <block wx:else>
+    <!-- 用户信息 -->
+    <view class="section">
+      <view class="user-card">
+        <view class="user-avatar">{{meFirstChar}}</view>
+        <view class="user-info">
+          <text class="user-name">{{meName}}</text>
+          <text class="user-role">{{roleLabel}} · {{familyName}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 家庭 -->
+    <view class="section" wx:if="{{isAdmin}}">
+      <text class="section-title">家庭</text>
+      <text class="section-desc">当前家庭：{{familyName}}</text>
+    </view>
+
+    <!-- 关于 -->
+    <view class="section">
+      <text class="section-title">关于</text>
+      <view class="about-text">
+        家庭快递取件归集平台<br/>
+        多家庭隔离 · 四级角色 · CLI/Webhook 自动化<br/>
+        服务地址：{{baseUrl}}
+      </view>
+    </view>
+  </block>
+
+  <view class="page-bottom"></view>
+</view>

@@ -1,0 +1,177 @@
+/* pages/login/login.wxss - 登录页 */
+
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--color-primary-light) 0%, #F8FAFC 60%, #FFFFFF 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 50rpx;
+  box-sizing: border-box;
+}
+.login-header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+.login-icon {
+  font-size: 96rpx;
+  margin-bottom: var(--spacing-sm);
+}
+.login-title {
+  font-size: var(--font-title);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  letter-spacing: -0.02em;
+}
+.login-sub {
+  font-size: var(--font-body-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.login-card {
+  width: 100%;
+  max-width: 600rpx;
+}
+
+/* 微信登录按钮 */
+.wx-login-btn {
+  width: 100%;
+  padding: 28rpx;
+  border-radius: var(--radius-md);
+  font-size: var(--font-body-lg);
+  font-weight: 600;
+  background: #07C160;
+  color: #FFFFFF;
+  border: 0;
+  margin-bottom: var(--spacing-sm);
+  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.2);
+  transition: all 0.15s;
+}
+.wx-login-btn:active { transform: scale(0.97); opacity: 0.9; }
+.wx-login-btn::after { border: none; }
+
+/* 分隔线 */
+.login-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: var(--spacing-lg) 0;
+}
+.login-divider-line {
+  flex: 1;
+  height: 1rpx;
+  background: var(--border);
+}
+.login-divider-text {
+  font-size: var(--font-body-sm);
+  color: var(--text-tertiary);
+  padding: 0 var(--spacing-md);
+}
+.login-alt {
+  text-align: center;
+  padding: var(--spacing-sm);
+  color: var(--color-primary);
+  font-size: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* 邮箱登录 */
+.auth-tabs {
+  display: flex;
+  background: var(--bg-hover);
+  border-radius: var(--radius-full);
+  padding: 4rpx;
+  margin-bottom: var(--spacing-md);
+}
+.auth-tab {
+  flex: 1;
+  padding: 18rpx 0;
+  text-align: center;
+  font-size: var(--font-body);
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.auth-tab.active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-1);
+  font-weight: 600;
+}
+
+.login-input {
+  width: 100%;
+  border: 2rpx solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24rpx 28rpx;
+  font-size: var(--font-body-lg);
+  box-sizing: border-box;
+  margin-bottom: var(--spacing-sm);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  transition: border-color 0.15s;
+}
+.login-input:focus { border-color: var(--color-primary); }
+.login-placeholder { color: var(--text-tertiary); }
+
+.code-row {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: stretch;
+}
+.code-input {
+  flex: 1;
+  margin-bottom: var(--spacing-sm);
+  text-align: center;
+  letter-spacing: 4rpx;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+.code-btn {
+  flex: 0 0 auto;
+  padding: 0 24rpx;
+  border-radius: var(--radius-md);
+  font-size: var(--font-body-sm);
+  font-weight: 500;
+  background: var(--bg-card);
+  color: var(--color-primary);
+  border: 2rpx solid var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+  transition: all 0.15s;
+}
+.code-btn[disabled] {
+  color: var(--text-tertiary);
+  border-color: var(--border);
+  cursor: not-allowed;
+}
+.code-btn::after { border: none; }
+
+.login-btn {
+  width: 100%;
+  padding: 26rpx;
+  border-radius: var(--radius-md);
+  font-size: var(--font-body-lg);
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: #FFFFFF;
+  border: 0;
+  margin-top: var(--spacing-xs);
+  transition: all 0.15s;
+  box-shadow: 0 8rpx 24rpx rgba(74, 144, 217, 0.25);
+}
+.login-btn:active { transform: scale(0.97); opacity: 0.9; }
+.login-btn::after { border: none; }
+
+.login-back {
+  text-align: center;
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm);
+  color: var(--color-primary);
+  font-size: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+}
