@@ -7,6 +7,7 @@ App({
     families: [],
     token: '',
     me: '',
+    meEmail: '',
     role: '',
     isAdmin: false,
     familyId: '',
@@ -47,6 +48,7 @@ App({
       // me 是对象 {id, name, color, role, familyId, familyName}
       if (data.me) {
         that.globalData.me = data.me.name || '';
+        that.globalData.meEmail = data.me.email || '';
         that.globalData.role = data.me.role || 'member';
         that.globalData.isAdmin = ['owner', 'admin', 'family_admin'].indexOf(data.me.role) >= 0;
       }

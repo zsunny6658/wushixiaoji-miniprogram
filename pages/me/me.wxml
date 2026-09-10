@@ -8,6 +8,7 @@
       </view>
       <view class="user-details">
         <text class="user-name">{{meName}}</text>
+        <text class="user-email" wx:if="{{meEmail}}">{{meEmail}}</text>
         <view class="user-meta">
           <text class="user-role">{{roleLabel}}</text>
           <text class="user-divider">·</text>
@@ -86,18 +87,6 @@
 
     <!-- 偏好 -->
     <text class="menu-group-title">偏好</text>
-    <picker range="{{viewOptions}}" value="{{viewIndex}}" bindchange="onViewChange">
-      <view class="cell" hover-class="cell-hover">
-        <view class="cell-left">
-          <text class="cell-icon">📋</text>
-          <text class="cell-title">默认视图</text>
-        </view>
-        <view class="cell-right">
-          <text class="cell-value">{{viewOptions[viewIndex]}}</text>
-          <text class="cell-arrow">›</text>
-        </view>
-      </view>
-    </picker>
     <picker range="{{groupOptions}}" value="{{groupIndex}}" bindchange="onGroupChange">
       <view class="cell" hover-class="cell-hover">
         <view class="cell-left">

@@ -57,6 +57,15 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.user-email {
+  display: block;
+  font-size: var(--font-body-sm);
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .user-meta {
   display: flex;
   align-items: center;

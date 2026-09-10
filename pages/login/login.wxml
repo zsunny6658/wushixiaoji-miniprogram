@@ -2,7 +2,7 @@
   <!-- 微信登录视图 -->
   <view class="login-header" wx:if="{{view === 'wx'}}">
     <view class="login-icon">📦</view>
-    <view class="login-title">屋事小记</view>
+    <view class="login-title">取件小记</view>
     <view class="login-sub">输入家庭成员口令，即可查看与完成你的备忘记录</view>
   </view>
 

@@ -24,8 +24,19 @@
     <view class="section">
       <text class="section-title">修改密码</text>
       <view class="form-item">
-        <text class="form-label">原密码</text>
+        <text class="form-label">验证方式</text>
+        <view class="pwd-mode-switch">
+          <view class="pwd-mode-btn {{pwdMode === 'password' ? 'pwd-mode-active' : ''}}" data-mode="password" bindtap="onPwdModeChange">原密码</view>
+          <view class="pwd-mode-btn {{pwdMode === 'passcode' ? 'pwd-mode-active' : ''}}" data-mode="passcode" bindtap="onPwdModeChange">家庭码</view>
+        </view>
+      </view>
+      <view class="form-item" wx:if="{{pwdMode === 'password'}}">
+        <text class="form-label">当前密码</text>
         <input class="form-input" password="true" value="{{pwdForm.oldPassword}}" data-field="oldPassword" bindinput="onPwdInput" />
+      </view>
+      <view class="form-item" wx:if="{{pwdMode === 'passcode'}}">
+        <text class="form-label">家庭码</text>
+        <input class="form-input" value="{{pwdForm.familyPasscode}}" data-field="familyPasscode" bindinput="onPwdInput" />
       </view>
       <view class="form-item">
         <text class="form-label">新密码</text>
@@ -50,6 +61,15 @@
       <view class="form-item">
         <text class="form-label">过期时间</text>
         <input class="form-input" placeholder="可选，如 2026-12-31" value="{{newTokenExpiry}}" bindinput="onNewTokenExpiry" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">权限范围</text>
+        <view class="perm-tags">
+          <view wx:for="{{permOptions}}" wx:key="id" class="perm-tag {{newTokenPerms.indexOf(item.id) >= 0 ? 'perm-tag-active' : ''}}" data-id="{{item.id}}" bindtap="onTokenPermChange">
+            <text class="perm-tag-label">{{item.label}}</text>
+            <text class="perm-tag-desc">{{item.desc}}</text>
+          </view>
+        </view>
       </view>
       <button class="btn-primary" bindtap="onCreateToken">生成 Token</button>
     </view>
@@ -83,6 +103,15 @@
       <view class="form-item">
         <text class="form-label">过期时间</text>
         <input class="form-input" placeholder="可选，如 2026-12-31" value="{{newWebhookExpiry}}" bindinput="onNewWebhookExpiry" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">权限范围</text>
+        <view class="perm-tags">
+          <view wx:for="{{permOptions}}" wx:key="id" class="perm-tag {{newWebhookPerms.indexOf(item.id) >= 0 ? 'perm-tag-active' : ''}}" data-id="{{item.id}}" bindtap="onWebhookPermChange">
+            <text class="perm-tag-label">{{item.label}}</text>
+            <text class="perm-tag-desc">{{item.desc}}</text>
+          </view>
+        </view>
       </view>
       <button class="btn-primary" bindtap="onCreateWebhook">生成 Webhook</button>
     </view>
@@ -194,10 +223,13 @@
     <!-- 关于 -->
     <view class="section">
       <text class="section-title">关于</text>
-      <view class="about-text">
-        家庭快递取件归集平台<br/>
-        多家庭隔离 · 四级角色 · CLI/Webhook 自动化<br/>
-        服务地址：{{baseUrl}}
+      <view class="about-card">
+        <view class="about-logo">📦</view>
+        <text class="about-name">取件小记</text>
+        <text class="about-desc">家庭快递取件码共享平台</text>
+        <view class="about-divider"></view>
+        <view class="about-row"><text class="about-label">版本</text><text class="about-value">v1.1.1</text></view>
+        <view class="about-row"><text class="about-label">服务地址</text><text class="about-value">{{baseUrl}}</text></view>
       </view>
     </view>
   </block>

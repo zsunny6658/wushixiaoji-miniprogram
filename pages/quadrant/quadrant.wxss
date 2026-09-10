@@ -6,64 +6,6 @@
   padding: var(--spacing-md);
 }
 
-/* 返回按钮 */
-.back-btn {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  padding: 12rpx 16rpx;
-  margin-bottom: var(--spacing-sm);
-  font-size: var(--font-body);
-  color: var(--color-primary);
-  font-weight: 500;
-  cursor: pointer;
-}
-.back-arrow { font-size: 36rpx; font-weight: 300; }
-
-/* 单象限头部 */
-.focus-header {
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-  box-shadow: var(--shadow-1);
-}
-.focus-header.q1 { background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%); }
-.focus-header.q2 { background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); }
-.focus-header.q3 { background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%); }
-.focus-header.q4 { background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%); }
-
-.focus-top {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
-}
-.focus-icon { font-size: 44rpx; }
-.focus-title {
-  font-size: var(--font-subtitle);
-  font-weight: 700;
-  color: var(--text-primary);
-}
-.focus-stats {
-  display: flex;
-  align-items: baseline;
-  gap: 8rpx;
-  margin-bottom: 8rpx;
-}
-.focus-count {
-  font-size: var(--font-display);
-  font-weight: 800;
-  color: var(--text-primary);
-}
-.focus-unit {
-  font-size: var(--font-body-sm);
-  color: var(--text-secondary);
-}
-.focus-hint {
-  font-size: var(--font-body-sm);
-  color: var(--text-secondary);
-}
-
 /* 总数统计 */
 .quad-summary {
   display: flex;
@@ -86,49 +28,62 @@
   color: var(--color-primary);
 }
 
-/* 四象限网格 - 2x2 布局 */
-.quad-grid {
+/* 象限 tab 切换 */
+.quad-tabs {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
+  gap: 8rpx;
   margin-bottom: var(--spacing-md);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
-.quad-cell {
-  width: calc(50% - var(--spacing-sm) / 2);
-  box-sizing: border-box;
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md) 20rpx;
+.qt-tab {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  min-height: 200rpx;
-  justify-content: center;
-  transition: transform 0.15s;
+  gap: 2rpx;
+  padding: 14rpx 18rpx;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 2rpx solid var(--border);
+  transition: all 0.15s;
+  cursor: pointer;
 }
-.quad-cell:active { transform: scale(0.97); }
-.quad-cell.q1 { background: linear-gradient(135deg, #FEE2E2 0%, #FCA5A5 100%); }
-.quad-cell.q2 { background: linear-gradient(135deg, #FEF3C7 0%, #FCD34D 100%); }
-.quad-cell.q3 { background: linear-gradient(135deg, #DBEAFE 0%, #93C5FD 100%); }
-.quad-cell.q4 { background: linear-gradient(135deg, #F1F5F9 0%, #CBD5E1 100%); }
-
-.cell-icon { font-size: 36rpx; margin-bottom: 4rpx; }
-.cell-num {
-  font-size: var(--font-heading);
-  font-weight: 800;
+.qt-tab:active { transform: scale(0.95); }
+.qt-label {
+  font-size: var(--font-caption);
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.qt-count {
+  font-size: var(--font-body-sm);
+  font-weight: 700;
   color: var(--text-primary);
-  line-height: 1;
 }
-.cell-title {
+.qt-active {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+.qt-active .qt-label { color: var(--color-primary); }
+.qt-active .qt-count { color: var(--color-primary); }
+
+/* 筛选提示 */
+.quad-filter-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0 4rpx;
+  margin-bottom: var(--spacing-sm);
+}
+.quad-filter-title {
   font-size: var(--font-body-sm);
   font-weight: 600;
   color: var(--text-primary);
-  margin-top: 6rpx;
 }
-.cell-hint {
+.quad-filter-hint {
   font-size: var(--font-caption);
-  color: var(--text-secondary);
-  margin-top: 4rpx;
+  color: var(--text-tertiary);
 }
 
 /* 卡片列表 */
@@ -193,17 +148,18 @@
   flex-shrink: 0;
 }
 
-/* 最近添加 */
-.recent-section { margin-top: 8rpx; }
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-sm);
-  padding: 0 4rpx;
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 80rpx var(--spacing-md);
 }
-.section-more {
-  font-size: var(--font-caption);
-  color: var(--color-primary);
-  cursor: pointer;
+.empty-icon {
+  display: block;
+  font-size: 80rpx;
+  margin-bottom: var(--spacing-sm);
+}
+.empty-text {
+  display: block;
+  font-size: var(--font-body);
+  color: var(--text-secondary);
 }

@@ -18,7 +18,7 @@
 
   <!-- 搜索 + 筛选 -->
   <view class="toolbar">
-    <input class="search-input" placeholder="搜索取件码/驿站" value="{{search}}" bindinput="onSearch" />
+    <input class="search-input" placeholder="{{recordType === 'todo' ? '搜索备忘内容' : '搜索取件码/驿站'}}" value="{{search}}" bindinput="onSearch" />
   </view>
   <view class="toolbar filters">
     <picker class="mini-select" range="{{impOptions}}" value="{{impIndex}}" bindchange="onImpChange">

@@ -64,10 +64,11 @@ function urgLabel(urg) {
 function sortPackages(pkgs) {
   pkgs.sort(function (a, b) {
     if (a.status !== b.status) return a.status === 'pending' ? -1 : 1;
+    if (!!a.overdue !== !!b.overdue) return a.overdue ? -1 : 1;
     var ai = IMP_RANK[a.importance], bi = IMP_RANK[b.importance];
-    if (ai !== bi) return ai - bi;
     var au = URG_RANK[a.urgency], bu = URG_RANK[b.urgency];
     if (au !== bu) return au - bu;
+    if (ai !== bi) return ai - bi;
     return (b.arrivedAt || '').localeCompare(a.arrivedAt || '');
   });
   return pkgs;

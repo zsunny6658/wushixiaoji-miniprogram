@@ -6,6 +6,7 @@ Page({
   data: {
     meName: '',
     meFirstChar: '?',
+    meEmail: '',
     roleLabel: '成员',
     familyName: '',
     isAdmin: false,
@@ -36,6 +37,7 @@ Page({
     this.setData({
       meName: me || '未登录',
       meFirstChar: me ? me.charAt(0) : '?',
+      meEmail: gd.meEmail || '',
       roleLabel: roleMap[role] || role,
       isAdmin: !!gd.isAdmin,
       familyId: gd.familyId || '',
