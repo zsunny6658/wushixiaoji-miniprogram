@@ -26,12 +26,12 @@
   <!-- 列表模式：类型 tab + 状态 tab + 筛选 -->
   <block wx:if="{{viewMode === 'list'}}">
     <view class="toolbar">
-      <view class="tabs" style="flex:1;">
+      <view class="tabs tabs-fill">
         <view class="tab {{recordType === 'all' ? 'active' : ''}}" bindtap="switchType" data-type="all">📋 全部</view>
         <view class="tab {{recordType === 'pickup' ? 'active' : ''}}" bindtap="switchType" data-type="pickup">📦 取件</view>
         <view class="tab {{recordType === 'todo' ? 'active' : ''}}" bindtap="switchType" data-type="todo">📝 备忘</view>
       </view>
-      <view class="tabs" style="flex:1;">
+      <view class="tabs tabs-fill">
         <view class="tab {{filter === 'all' ? 'active' : ''}}" bindtap="switchFilter" data-filter="all">全部</view>
         <view class="tab {{filter === 'pending' ? 'active' : ''}}" bindtap="switchFilter" data-filter="pending">待处理</view>
         <view class="tab {{filter === 'picked' ? 'active' : ''}}" bindtap="switchFilter" data-filter="picked">已完成</view>
@@ -55,8 +55,8 @@
     <!-- 空状态 -->
     <view class="empty" wx:if="{{!list.length}}">
       <text class="emo">{{emptyEmoji}}</text>
-      <text style="font-size:32rpx; font-weight:600; color:#333;">{{emptyTitle}}</text>
-      <text style="font-size:24rpx; color:#999;">{{emptyDesc}}</text>
+      <text class="empty-title">{{emptyTitle}}</text>
+      <text class="empty-desc">{{emptyDesc}}</text>
     </view>
 
     <!-- 分组或列表 -->
@@ -103,7 +103,7 @@
         <view class="group" wx:for="{{groups}}" wx:key="key">
           <view class="group-head">
             <view class="dot"></view>
-            <text style="font-weight:600;">{{item.key}}</text>
+            <text class="group-key">{{item.key}}</text>
             <text class="count">{{item.items.length}}</text>
           </view>
           <view class="cards">
