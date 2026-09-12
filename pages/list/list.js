@@ -42,6 +42,7 @@ Page({
   },
   onShow: function () {
     if (!app.globalData.token) { wx.reLaunch({ url: '/pages/login/login' }); return; }
+    if (this.getTabBar) this.getTabBar().setData({ active: 1 });
     var that = this;
     app.refreshState(function () { that.computeList(); });
   },
@@ -53,6 +54,7 @@ Page({
   computeList: function () {
     var gd = app.globalData;
     var pkgs = (gd.packages || []).map(function (p) { return helpers.decorate(p, gd.members); });
+
 
     if (this.data.recordType !== 'all') pkgs = pkgs.filter(function (p) { return p.type === this.data.recordType; }.bind(this));
     if (this.data.filter === 'pending') pkgs = pkgs.filter(function (p) { return p.status === 'pending'; });

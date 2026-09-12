@@ -23,6 +23,7 @@
     "selectedColor": "#4A90D9",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
+    "custom": true,
     "position": "bottom",
     "list": [
       {

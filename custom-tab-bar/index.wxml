@@ -1,0 +1,23 @@
+<view class="tab-bar">
+  <view class="tab-item {{active === 0 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="0">
+    <text class="tab-icon">🏠</text>
+    <text class="tab-text">概览</text>
+  </view>
+  <view class="tab-item {{active === 1 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="1">
+    <text class="tab-icon">📋</text>
+    <text class="tab-text">小记</text>
+  </view>
+  <view class="tab-center">
+    <view class="center-btn" catchtap="openAdd">
+      <text class="center-plus">+</text>
+    </view>
+  </view>
+  <view class="tab-item {{active === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">
+    <text class="tab-icon">🎯</text>
+    <text class="tab-text">四象限</text>
+  </view>
+  <view class="tab-item {{active === 3 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="3">
+    <text class="tab-icon">👤</text>
+    <text class="tab-text">我的</text>
+  </view>
+</view>

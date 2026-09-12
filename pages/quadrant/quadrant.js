@@ -14,6 +14,7 @@ Page({
 
   onShow: function () {
     if (!app.globalData.token) { wx.reLaunch({ url: '/pages/login/login' }); return; }
+    if (this.getTabBar) this.getTabBar().setData({ active: 2 });
     var that = this;
     // 从概览钻取时读取 _focusQuad
     var quad = app.globalData._focusQuad || '';

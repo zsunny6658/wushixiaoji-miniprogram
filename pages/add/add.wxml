@@ -6,7 +6,23 @@
   <view class="smart-section">
     <view class="smart-title">✨ 智能识别</view>
     <textarea class="smart-textarea" placeholder="粘贴快递短信 / 备忘文本，自动识别" value="{{smartText}}" bindinput="onSmartText"></textarea>
-    <button class="btn btn-primary btn-block" bindtap="onSmartParse">智能识别</button>
+    <button class="btn btn-primary btn-block" bindtap="onSmartParse">📝 文本识别</button>
+
+    <!-- 图片识别区 -->
+    <view class="image-section">
+      <view class="image-list" wx:if="{{imageTempPaths.length}}">
+        <view class="image-item" wx:for="{{imageTempPaths}}" wx:key="*this">
+          <image class="image-thumb" src="{{item}}" mode="aspectFill" />
+          <view class="image-remove" catchtap="onRemoveImage" data-idx="{{index}}">✕</view>
+        </view>
+      </view>
+      <view class="image-actions">
+        <button class="btn btn-outline btn-sm" bindtap="onChooseImage">📷 选择图片</button>
+        <button class="btn btn-primary btn-sm" bindtap="onParseImage" disabled="{{imageParsing || !imageTempPaths.length}}">
+          {{imageParsing ? '识别中...' : '🔍 图片识别'}}
+        </button>
+      </view>
+    </view>
   </view>
 
   <!-- 表单 -->

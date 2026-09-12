@@ -39,7 +39,7 @@
   <view class="card-list" wx:if="{{displayList.length}}">
     <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{displayList}}" wx:key="id" bindtap="onEdit" data-id="{{pkg.id}}">
       <view class="qcard-main">
-        <text class="qcard-code">{{pkg.code}}</text>
+        <text class="qcard-code">{{pkg.summaryText}}</text>
         <view class="qcard-meta">
           <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
           <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>

@@ -64,29 +64,23 @@
             <view class="card-body">
               <view class="card-top">
                 <view class="code-box">
-                  <view class="code-label">{{item.type === 'pickup' ? '取件码' : '备忘内容'}}</view>
-                  <view class="code-value">{{item.code}}</view>
+                <view class="code-label">{{item.type === 'pickup' ? '取件码' : '备忘'}}</view>
+                <view class="code-value">{{item.summaryText}}</view>
                 </view>
                 <view class="card-badges">
                   <view class="tag tag-primary" wx:if="{{item.type === 'pickup'}}">取件</view>
                   <view class="tag tag-warning" wx:if="{{item.type === 'todo'}}">备忘</view>
-                  <view class="tag tag-neutral" wx:if="{{item.tagLabel}}">{{item.tagLabel}}</view>
-                  <view class="tag tag-info" wx:if="{{item.owner}}">{{item.owner}}</view>
+                <view class="tag tag-neutral" wx:if="{{item.type === 'todo' && item.tagLabel}}">{{item.tagLabel}}</view>
+                <view class="tag tag-info" wx:if="{{item.type === 'pickup' && item.owner}}">{{item.owner}}</view>
                   <view class="badge" wx:if="{{item.occCount > 1}}">{{item.occCount}}</view>
                 </view>
               </view>
-              <view class="station-line" wx:if="{{item.type === 'pickup' && item.station}}">
-                <text class="station-icon">📍</text><text>{{item.station}}</text>
-              </view>
               <view class="meta">
-                <view class="meta-item" wx:if="{{item.type === 'pickup' && item.company}}">{{item.company}}</view>
-                <view class="meta-item" wx:if="{{item.trackingNo}}">#{{item.trackingNo}}</view>
                 <view class="meta-item {{item.overdue ? 'time-warn' : ''}}" wx:if="{{item.arrivedAt}}">
                   {{item.type === 'pickup' ? '🕐' : '⏰'}} {{item.arrivedLabel}}
                 </view>
                 <view class="meta-item imp-{{item.importance}}">{{item.impLabel}}</view>
                 <view class="meta-item urg-{{item.urgency}}">{{item.urgLabel}}</view>
-                <view class="meta-item note" wx:if="{{item.note}}">📝 {{item.note}}</view>
               </view>
             </view>
             <view class="card-quick" wx:if="{{!batchMode}}" catchtap="onQuickPick" data-id="{{item.id}}">
@@ -114,28 +108,22 @@
                 <view class="card-top">
                   <view class="code-box">
                     <view class="code-label">{{pkg.type === 'pickup' ? '取件码' : '备忘内容'}}</view>
-                    <view class="code-value">{{pkg.code}}</view>
+                    <view class="code-value">{{pkg.summaryText}}</view>
                   </view>
                   <view class="card-badges">
                     <view class="tag tag-primary" wx:if="{{pkg.type === 'pickup'}}">取件</view>
                     <view class="tag tag-warning" wx:if="{{pkg.type === 'todo'}}">备忘</view>
-                    <view class="tag tag-neutral" wx:if="{{pkg.tagLabel}}">{{pkg.tagLabel}}</view>
-                    <view class="tag tag-info" wx:if="{{pkg.owner}}">{{pkg.owner}}</view>
+                    <view class="tag tag-neutral" wx:if="{{pkg.type === 'todo' && pkg.tagLabel}}">{{pkg.tagLabel}}</view>
+                    <view class="tag tag-info" wx:if="{{pkg.type === 'pickup' && pkg.owner}}">{{pkg.owner}}</view>
                     <view class="badge" wx:if="{{pkg.occCount > 1}}">{{pkg.occCount}}</view>
                   </view>
                 </view>
-                <view class="station-line" wx:if="{{pkg.type === 'pickup' && pkg.station}}">
-                  <text class="station-icon">📍</text><text>{{pkg.station}}</text>
-                </view>
                 <view class="meta">
-                  <view class="meta-item" wx:if="{{pkg.type === 'pickup' && pkg.company}}">{{pkg.company}}</view>
-                  <view class="meta-item" wx:if="{{pkg.trackingNo}}">#{{pkg.trackingNo}}</view>
                   <view class="meta-item {{pkg.overdue ? 'time-warn' : ''}}" wx:if="{{pkg.arrivedAt}}">
                     {{pkg.type === 'pickup' ? '🕐' : '⏰'}} {{pkg.arrivedLabel}}
                   </view>
                   <view class="meta-item imp-{{pkg.importance}}">{{pkg.impLabel}}</view>
                   <view class="meta-item urg-{{pkg.urgency}}">{{pkg.urgLabel}}</view>
-                  <view class="meta-item note" wx:if="{{pkg.note}}">📝 {{pkg.note}}</view>
                 </view>
               </view>
               <view class="card-quick" wx:if="{{!batchMode}}" catchtap="onQuickPick" data-id="{{pkg.id}}">

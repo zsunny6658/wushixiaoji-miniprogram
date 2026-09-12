@@ -88,7 +88,17 @@ function decorate(p, members) {
   d.occCount = p.occurrenceCount || 1;
   d.tagLabel = tagLabel(p.tag);
   d.sourceLabel = p.source || '';
+  d.summaryText = summaryText(p);
   return d;
+}
+
+function summaryText(p) {
+  var code = p && p.code ? String(p.code) : '';
+  var title = p && p.title ? String(p.title) : '';
+  if (title && title !== code) return title;
+  if (!code) return '';
+  if (code.length <= 24) return code;
+  return code.slice(0, 24) + '…';
 }
 
 function tagLabel(tag) {
@@ -106,6 +116,7 @@ module.exports = {
   urgLabel: urgLabel,
   sortPackages: sortPackages,
   decorate: decorate,
+  summaryText: summaryText,
   tagLabel: tagLabel,
   COLORS: COLORS,
   IMP_RANK: IMP_RANK,

@@ -42,6 +42,49 @@
 }
 .smart-textarea:focus { border-color: var(--color-primary); }
 
+/* 图片识别区 */
+.image-section {
+  margin-top: var(--spacing-sm);
+}
+.image-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+.image-item {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.image-thumb {
+  width: 100%;
+  height: 100%;
+}
+.image-remove {
+  position: absolute;
+  top: 4rpx;
+  right: 4rpx;
+  width: 48rpx;
+  height: 48rpx;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+}
+.image-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+.image-actions .btn {
+  flex: 1;
+}
+
 /* 表单区域 */
 .form-section {
   background: var(--bg-card);

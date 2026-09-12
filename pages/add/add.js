@@ -14,6 +14,9 @@ Page({
     typeOptions: ['📦 取件码', '📝 文本备忘'],
     form: { station: '', code: '', company: '', trackingNo: '', note: '' },
     smartText: '',
+    imageTempPaths: [],
+    imageBase64List: [],
+    imageParsing: false,
     dateStr: today(),
     timeStr: nowTime(),
     endDate: '2099-12-31',
@@ -107,6 +110,105 @@ Page({
     }, function () { wx.hideLoading(); });
   },
 
+  onChooseImage: function () {
+    var that = this;
+    wx.chooseImage({
+      count: 3,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        var paths = res.tempFilePaths;
+        var current = that.data.imageTempPaths;
+        var combined = current.concat(paths);
+        that.setData({ imageTempPaths: combined });
+        that.loadImagesAsBase64(combined);
+      }
+    });
+  },
+
+  loadImagesAsBase64: function (paths) {
+    var that = this;
+    var fs = wx.getFileSystemManager();
+    var base64List = [];
+    var loaded = 0;
+    var total = paths.length;
+    paths.forEach(function (path) {
+      fs.readFile({
+        filePath: path,
+        encoding: 'base64',
+        success: function (res) {
+          var ext = path.match(/\.(\w+)$/);
+          var mime = ext && ext[1] === 'jpg' ? 'image/jpeg' : 'image/png';
+          base64List.push('data:' + mime + ';base64,' + res.data);
+          loaded++;
+          if (loaded === total) {
+            that.setData({ imageBase64List: base64List });
+          }
+        },
+        fail: function () {
+          loaded++;
+          if (loaded === total) {
+            that.setData({ imageBase64List: base64List });
+          }
+        }
+      });
+    });
+  },
+
+  onRemoveImage: function (e) {
+    var idx = e.currentTarget.dataset.idx;
+    var paths = this.data.imageTempPaths.slice();
+    var b64s = this.data.imageBase64List.slice();
+    paths.splice(idx, 1);
+    b64s.splice(idx, 1);
+    this.setData({ imageTempPaths: paths, imageBase64List: b64s });
+  },
+
+  onParseImage: function () {
+    var that = this;
+    if (!this.data.imageBase64List.length) {
+      wx.showToast({ title: '请先选择图片', icon: 'none' });
+      return;
+    }
+    this.setData({ imageParsing: true });
+    wx.showLoading({ title: '识别中...' });
+    api.parseImage(this.data.imageBase64List, 'auto', function (data) {
+      wx.hideLoading();
+      that.setData({ imageParsing: false });
+      if (data.fallback) {
+        wx.showToast({ title: '图片识别暂不可用，请尝试文本', icon: 'none' });
+        return;
+      }
+      var records = data.records || [];
+      if (records.length === 0) {
+        wx.showToast({ title: '未识别到内容', icon: 'none' });
+        return;
+      }
+      if (records.length > 1) {
+        api.addPackages(records, function () {
+          wx.showToast({ title: '已导入 ' + records.length + ' 条', icon: 'success' });
+          setTimeout(function () { wx.navigateBack(); }, 800);
+        });
+        return;
+      }
+      var r = records[0];
+      var d = new Date(r.arrivedAt || Date.now());
+      that.setData({
+        type: r.type || 'pickup',
+        typeIndex: (r.type === 'todo') ? 1 : 0,
+        form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '' },
+        dateStr: r.arrivedAt ? d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2) : today(),
+        timeStr: r.arrivedAt ? ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2) : nowTime(),
+        impIndex: ['high', 'medium', 'low'].indexOf(r.importance || 'medium'),
+        urgIndex: ['urgent', 'normal'].indexOf(r.urgency || 'normal')
+      });
+      wx.showToast({ title: '已识别', icon: 'success' });
+    }, function () {
+      wx.hideLoading();
+      that.setData({ imageParsing: false });
+    });
+  },
+
   onSave: function () {
     var f = this.data.form;
     if (this.data.type === 'pickup' && (!f.station || !f.code)) {
@@ -136,12 +238,16 @@ Page({
         wx.hideLoading();
         wx.showToast({ title: '已保存', icon: 'success' });
         setTimeout(function () { wx.navigateBack(); }, 600);
+      }, function () {
+        wx.hideLoading();
       });
     } else {
       api.addPackages([data], function () {
         wx.hideLoading();
         wx.showToast({ title: '已保存', icon: 'success' });
         setTimeout(function () { wx.navigateBack(); }, 600);
+      }, function () {
+        wx.hideLoading();
       });
     }
   },

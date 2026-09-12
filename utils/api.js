@@ -88,6 +88,9 @@ var API = {
   parse: function (text, type, cb, errCb) {
     this.request('POST', '/api/parse', { text: text, type: type || 'auto' }, cb, errCb);
   },
+  parseImage: function (images, type, cb, errCb) {
+    this.request('POST', '/api/parse/image', { images: images, type: type || 'auto' }, cb, errCb);
+  },
 
   // 成员
   getMembers: function (cb, errCb) {
