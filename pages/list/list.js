@@ -43,6 +43,10 @@ Page({
   onShow: function () {
     if (!app.globalData.token) { wx.reLaunch({ url: '/pages/login/login' }); return; }
     if (this.getTabBar) this.getTabBar().setData({ active: 1 });
+    // 从概览钻取时读取筛选状态
+    var gd = app.globalData;
+    if (gd.recordType) this.setData({ recordType: gd.recordType });
+    if (gd.filter) this.setData({ filter: gd.filter });
     var that = this;
     app.refreshState(function () { that.computeList(); });
   },

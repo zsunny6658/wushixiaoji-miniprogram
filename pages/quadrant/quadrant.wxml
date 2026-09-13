@@ -14,9 +14,10 @@
       <scroll-view class="quad-list" scroll-y>
         <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q1}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
           <view class="qcard-main">
-            <text class="qcard-code">{{pkg.summaryText}}</text>
+            <text class="qcard-title">{{pkg.title || pkg.code}}</text>
             <view class="qcard-meta">
               <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
+              <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
               <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
               <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
             </view>
@@ -36,9 +37,10 @@
       <scroll-view class="quad-list" scroll-y>
         <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q2}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
           <view class="qcard-main">
-            <text class="qcard-code">{{pkg.summaryText}}</text>
+            <text class="qcard-title">{{pkg.title || pkg.code}}</text>
             <view class="qcard-meta">
               <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
+              <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
               <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
               <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
             </view>
@@ -58,9 +60,10 @@
       <scroll-view class="quad-list" scroll-y>
         <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q3}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
           <view class="qcard-main">
-            <text class="qcard-code">{{pkg.summaryText}}</text>
+            <text class="qcard-title">{{pkg.title || pkg.code}}</text>
             <view class="qcard-meta">
               <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
+              <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
               <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
               <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
             </view>
@@ -80,9 +83,10 @@
       <scroll-view class="quad-list" scroll-y>
         <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q4}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
           <view class="qcard-main">
-            <text class="qcard-code">{{pkg.summaryText}}</text>
+            <text class="qcard-title">{{pkg.title || pkg.code}}</text>
             <view class="qcard-meta">
               <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
+              <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
               <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
               <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
             </view>

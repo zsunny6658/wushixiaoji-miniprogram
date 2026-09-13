@@ -17,7 +17,8 @@
         <text class="occ-badge" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
         <text class="tag-badge" wx:if="{{pkg.tagLabel}}">{{pkg.tagLabel}}</text>
       </view>
-      <view class="main-value">{{pkg.code}}</view>
+      <view class="main-value">{{pkg.title || pkg.code}}</view>
+      <view class="sub-value" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</view>
       <view class="station" wx:if="{{pkg.type === 'pickup' && pkg.station}}">
         <text class="station-icon">📍</text>
         <text>{{pkg.station}}</text>

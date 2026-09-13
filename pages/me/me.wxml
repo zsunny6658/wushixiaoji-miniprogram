@@ -15,8 +15,8 @@
           <text class="user-family">{{familyName}}</text>
         </view>
       </view>
-      <view class="user-action" bindtap="onEditProfile" hover-class="hover-press">
-        <text class="action-icon">✏️</text>
+      <view class="user-action" hover-class="hover-press">
+        <text class="action-icon">👤</text>
       </view>
     </view>
   </view>
@@ -129,7 +129,7 @@
     <view class="cell">
       <view class="cell-left">
         <text class="cell-icon">📦</text>
-        <text class="cell-title">取件小记 v1.0.0</text>
+        <text class="cell-title">屋事小记 v1.0.0</text>
       </view>
     </view>
     <view class="cell">

@@ -85,11 +85,11 @@ Page({
     });
   },
 
-  // 跳转到小记页对应筛选
-  onGoPickup: function () { wx.switchTab({ url: '/pages/list/list' }); app.globalData.recordType = 'pickup'; app.globalData.filter = 'pending'; },
-  onGoTodo: function () { wx.switchTab({ url: '/pages/list/list' }); app.globalData.recordType = 'todo'; app.globalData.filter = 'pending'; },
-  onGoOverdue: function () { wx.switchTab({ url: '/pages/list/list' }); app.globalData.filter = 'overdue'; },
-  onGoDone: function () { wx.switchTab({ url: '/pages/list/list' }); app.globalData.filter = 'picked'; },
+  // 跳转到小记页对应筛选（先设状态再跳转，避免 switchTab 异步导致状态未生效）
+  onGoPickup: function () { app.globalData.recordType = 'pickup'; app.globalData.filter = 'pending'; wx.switchTab({ url: '/pages/list/list' }); },
+  onGoTodo: function () { app.globalData.recordType = 'todo'; app.globalData.filter = 'pending'; wx.switchTab({ url: '/pages/list/list' }); },
+  onGoOverdue: function () { app.globalData.filter = 'overdue'; app.globalData.recordType = 'all'; wx.switchTab({ url: '/pages/list/list' }); },
+  onGoDone: function () { app.globalData.filter = 'picked'; app.globalData.recordType = 'all'; wx.switchTab({ url: '/pages/list/list' }); },
   onGoQuadrant: function () { wx.switchTab({ url: '/pages/quadrant/quadrant' }); },
   onGoQuadrantDetail: function (e) {
     var quad = e.currentTarget.dataset.quad;
