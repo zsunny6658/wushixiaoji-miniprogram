@@ -154,6 +154,19 @@
   font-size: 20rpx;
   color: var(--text-secondary);
 }
+.qcard-assignee {
+  font-size: 20rpx;
+  color: var(--color-success);
+  font-weight: 600;
+}
+.qcard-src {
+  font-size: 20rpx;
+  color: var(--text-tertiary);
+  max-width: 200rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .qcard-time {
   font-size: 20rpx;
   color: var(--text-tertiary);

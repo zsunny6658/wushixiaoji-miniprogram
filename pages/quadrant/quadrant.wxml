@@ -18,6 +18,8 @@
             <view class="qcard-meta">
               <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
               <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
+              <text class="qcard-assignee" wx:if="{{pkg.type === 'todo' && pkg.assignee}}">@{{pkg.assignee}}</text>
+              <text class="qcard-src" wx:if="{{pkg.source}}">{{pkg.source}}</text>
               <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
               <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
             </view>
@@ -41,6 +43,8 @@
             <view class="qcard-meta">
               <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
               <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
+              <text class="qcard-assignee" wx:if="{{pkg.type === 'todo' && pkg.assignee}}">@{{pkg.assignee}}</text>
+              <text class="qcard-src" wx:if="{{pkg.source}}">{{pkg.source}}</text>
               <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
               <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
             </view>
@@ -64,6 +68,8 @@
             <view class="qcard-meta">
               <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
               <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
+              <text class="qcard-assignee" wx:if="{{pkg.type === 'todo' && pkg.assignee}}">@{{pkg.assignee}}</text>
+              <text class="qcard-src" wx:if="{{pkg.source}}">{{pkg.source}}</text>
               <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
               <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
             </view>
@@ -87,6 +93,8 @@
             <view class="qcard-meta">
               <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
               <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
+              <text class="qcard-assignee" wx:if="{{pkg.type === 'todo' && pkg.assignee}}">@{{pkg.assignee}}</text>
+              <text class="qcard-src" wx:if="{{pkg.source}}">{{pkg.source}}</text>
               <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
               <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
             </view>

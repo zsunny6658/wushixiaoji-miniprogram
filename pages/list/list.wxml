@@ -72,6 +72,8 @@
                   <view class="tag tag-warning" wx:if="{{item.type === 'todo'}}">备忘</view>
                 <view class="tag tag-neutral" wx:if="{{item.type === 'todo' && item.tagLabel}}">{{item.tagLabel}}</view>
                 <view class="tag tag-info" wx:if="{{item.type === 'pickup' && item.owner}}">{{item.owner}}</view>
+                <view class="tag tag-success" wx:if="{{item.type === 'todo' && item.assignee}}">@{{item.assignee}}</view>
+                <view class="tag tag-neutral" wx:if="{{item.createdBy}}">{{item.createdBy === 'cli' ? 'CLI' : item.createdBy === 'webhook' ? 'Webhook' : '手动'}}</view>
                   <view class="badge" wx:if="{{item.occCount > 1}}">{{item.occCount}}</view>
                 </view>
               </view>
@@ -115,6 +117,8 @@
                     <view class="tag tag-warning" wx:if="{{pkg.type === 'todo'}}">备忘</view>
                     <view class="tag tag-neutral" wx:if="{{pkg.type === 'todo' && pkg.tagLabel}}">{{pkg.tagLabel}}</view>
                     <view class="tag tag-info" wx:if="{{pkg.type === 'pickup' && pkg.owner}}">{{pkg.owner}}</view>
+                    <view class="tag tag-success" wx:if="{{pkg.type === 'todo' && pkg.assignee}}">@{{pkg.assignee}}</view>
+                    <view class="tag tag-neutral" wx:if="{{pkg.createdBy}}">{{pkg.createdBy === 'cli' ? 'CLI' : pkg.createdBy === 'webhook' ? 'Webhook' : '手动'}}</view>
                     <view class="badge" wx:if="{{pkg.occCount > 1}}">{{pkg.occCount}}</view>
                   </view>
                 </view>
