@@ -205,6 +205,7 @@ page {
   border: 2rpx solid var(--border);
   border-radius: var(--radius-md);
   font-size: var(--font-body);
+  line-height: 1.5;
   background: var(--bg-card);
   box-sizing: border-box;
   transition: border-color 0.15s;
