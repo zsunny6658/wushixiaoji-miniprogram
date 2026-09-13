@@ -263,13 +263,19 @@
   background: var(--bg-card);
   color: var(--color-error);
   border: none;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: 60rpx;
+  margin-bottom: calc(60rpx + env(safe-area-inset-bottom));
   transition: all 0.15s;
 }
 .logout-btn::after { border: none; }
 .logout-btn:active {
   background: var(--color-error-light);
   transform: scale(0.98);
+}
+
+/* 底部间距 */
+.me-bottom-spacer {
+  height: 20rpx;
 }
 
 /* 弹窗 */

@@ -8,8 +8,9 @@
     <text class="tab-text">小记</text>
   </view>
   <view class="tab-center">
-    <view class="center-btn" catchtap="openAdd" catchlongpress="onVoiceTap">
-      <text class="center-plus">+</text>
+    <view class="center-btn {{voiceRecording ? 'recording' : ''}}" catchtap="openAdd" catchlongpress="onVoiceTap" catchtouchend="onVoiceEnd">
+      <text class="center-plus {{voiceRecording ? 'center-rec-dot' : ''}}">{{voiceRecording ? '●' : '+'}}</text>
+      <text wx:if="{{voiceRecording}}" class="center-rec-label">松开结束</text>
     </view>
   </view>
   <view class="tab-item {{active === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">

@@ -58,3 +58,25 @@
   font-weight: bold;
   line-height: 1;
 }
+.center-rec-dot {
+  font-size: 32rpx;
+  color: #ff4d4f;
+}
+.center-rec-label {
+  position: absolute;
+  bottom: -28rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18rpx;
+  color: #fff;
+  white-space: nowrap;
+}
+.center-btn.recording {
+  background: #ff4d4f;
+  animation: recPulse 1s infinite;
+}
+@keyframes recPulse {
+  0% { box-shadow: 0 4rpx 12rpx rgba(255, 77, 79, 0.3); }
+  50% { box-shadow: 0 4rpx 24rpx rgba(255, 77, 79, 0.6); }
+  100% { box-shadow: 0 4rpx 12rpx rgba(255, 77, 79, 0.3); }
+}

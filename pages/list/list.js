@@ -27,26 +27,35 @@ Page({
   },
 
   onLoad: function () {
-    var gd = app.globalData;
+    api.setToken(app.globalData.token);
+    // 默认显示全部+待处理，不使用全局残留的筛选状态
     this.setData({
-      recordType: gd.recordType || 'all',
-      filter: gd.filter || 'all',
-      importanceFilter: gd.importanceFilter || 'all',
-      urgencyFilter: gd.urgencyFilter || 'all',
-      group: gd.group || 'none',
-      impIndex: ['all', 'high', 'medium', 'low'].indexOf(gd.importanceFilter || 'all'),
-      urgIndex: ['all', 'urgent', 'normal'].indexOf(gd.urgencyFilter || 'all'),
-      groupIndex: ['none', 'owner', 'type'].indexOf(gd.group || 'none')
+      recordType: 'all',
+      filter: 'all',
+      importanceFilter: 'all',
+      urgencyFilter: 'all',
+      group: app.globalData.group || 'none',
+      impIndex: 0,
+      urgIndex: 0,
+      groupIndex: ['none', 'owner', 'type'].indexOf(app.globalData.group || 'none')
     });
-    api.setToken(gd.token);
   },
   onShow: function () {
     if (!app.globalData.token) { wx.reLaunch({ url: '/pages/login/login' }); return; }
     if (this.getTabBar) this.getTabBar().setData({ active: 1 });
-    // 从概览钻取时读取筛选状态
+    // 从概览钻取时读取筛选状态（一次性标记，读取后清除）
     var gd = app.globalData;
-    if (gd.recordType) this.setData({ recordType: gd.recordType });
-    if (gd.filter) this.setData({ filter: gd.filter });
+    if (gd._deepLinkFilter) {
+      this.setData({
+        recordType: gd._deepLinkFilter.recordType || 'all',
+        filter: gd._deepLinkFilter.filter || 'all',
+        impIndex: ['all', 'high', 'medium', 'low'].indexOf(gd._deepLinkFilter.importance || 'all'),
+        urgIndex: ['all', 'urgent', 'normal'].indexOf(gd._deepLinkFilter.urgency || 'all'),
+        importanceFilter: gd._deepLinkFilter.importance || 'all',
+        urgencyFilter: gd._deepLinkFilter.urgency || 'all'
+      });
+      gd._deepLinkFilter = null;
+    }
     var that = this;
     app.refreshState(function () { that.computeList(); });
   },

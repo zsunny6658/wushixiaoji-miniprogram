@@ -100,8 +100,8 @@
       </view>
     </picker>
 
-    <!-- 数据 -->
-    <text class="menu-group-title">数据</text>
+    <!-- 工具 -->
+    <text class="menu-group-title">工具</text>
     <view class="cell" bindtap="onRefresh" hover-class="cell-hover">
       <view class="cell-left">
         <text class="cell-icon">🔄</text>

@@ -32,6 +32,10 @@ Component({
       this.startRecording();
     },
 
+    onVoiceEnd: function () {
+      this.stopRecording();
+    },
+
     startRecording: function () {
       var that = this;
       var recorder = wx.getRecorderManager();
@@ -81,13 +85,12 @@ Component({
       });
 
       that.setData({ voiceRecording: true });
-      wx.showLoading({ title: '正在录音，松开结束', icon: 'none', duration: 0 });
 
       recorder.start({
         duration: 60000,
         sampleRate: 16000,
         numberOfChannels: 1,
-        encodeBitRate: 48000,
+        encodeBitRate: 96000,
         format: 'mp3'
       });
 
