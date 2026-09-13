@@ -1,9 +1,10 @@
-/* pages/quadrant/quadrant.wxss - 四象限 */
+/* pages/quadrant/quadrant.wxss - 四象限 2x2 矩阵 */
 
 .page {
   min-height: 100vh;
   background: var(--bg-page);
   padding: var(--spacing-md);
+  box-sizing: border-box;
 }
 
 /* 总数统计 */
@@ -12,7 +13,7 @@
   align-items: baseline;
   justify-content: center;
   gap: 12rpx;
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
   background: var(--bg-card);
   border-radius: var(--radius-md);
   margin-bottom: var(--spacing-sm);
@@ -23,143 +24,148 @@
   color: var(--text-secondary);
 }
 .summary-count {
-  font-size: var(--font-heading);
+  font-size: var(--font-title);
   font-weight: 800;
   color: var(--color-primary);
 }
 
-/* 象限 tab 切换 */
-.quad-tabs {
-  display: flex;
-  gap: 8rpx;
-  margin-bottom: var(--spacing-md);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+/* 2x2 网格 */
+.quad-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--spacing-sm);
+  height: calc(100vh - 220rpx - env(safe-area-inset-bottom));
 }
-.qt-tab {
-  flex-shrink: 0;
+
+/* 每个象限格子 */
+.quad-cell {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2rpx;
-  padding: 14rpx 18rpx;
-  border-radius: var(--radius-sm);
   background: var(--bg-card);
-  border: 2rpx solid var(--border);
-  transition: all 0.15s;
-  cursor: pointer;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+  border-top: 4rpx solid;
+  min-height: 0;
 }
-.qt-tab:active { transform: scale(0.95); }
-.qt-label {
-  font-size: var(--font-caption);
-  color: var(--text-secondary);
-  font-weight: 500;
-  white-space: nowrap;
+.quad-cell.q1 { border-top-color: var(--quad-q1-num); background: var(--quad-q1-bg); }
+.quad-cell.q2 { border-top-color: var(--quad-q2-num); background: var(--quad-q2-bg); }
+.quad-cell.q3 { border-top-color: var(--quad-q3-num); background: var(--quad-q3-bg); }
+.quad-cell.q4 { border-top-color: var(--quad-q4-num); background: var(--quad-q4-bg); }
+
+/* 象限头部 */
+.quad-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
 }
-.qt-count {
+.quad-title {
   font-size: var(--font-body-sm);
   font-weight: 700;
-  color: var(--text-primary);
 }
-.qt-active {
-  background: var(--color-primary-light);
-  border-color: var(--color-primary);
-}
-.qt-active .qt-label { color: var(--color-primary); }
-.qt-active .qt-count { color: var(--color-primary); }
-
-/* 筛选提示 */
-.quad-filter-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: 0 4rpx;
-  margin-bottom: var(--spacing-sm);
-}
-.quad-filter-title {
+.quad-cell.q1 .quad-title { color: var(--quad-q1-label); }
+.quad-cell.q2 .quad-title { color: var(--quad-q2-label); }
+.quad-cell.q3 .quad-title { color: var(--quad-q3-label); }
+.quad-cell.q4 .quad-title { color: var(--quad-q4-label); }
+.quad-count {
+  min-width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  text-align: center;
+  border-radius: var(--radius-full);
   font-size: var(--font-body-sm);
-  font-weight: 600;
-  color: var(--text-primary);
+  font-weight: 700;
+  background: var(--bg-card);
+  padding: 0 8rpx;
+  box-sizing: border-box;
 }
-.quad-filter-hint {
+.quad-cell.q1 .quad-count { color: var(--quad-q1-num); }
+.quad-cell.q2 .quad-count { color: var(--quad-q2-num); }
+.quad-cell.q3 .quad-count { color: var(--quad-q3-num); }
+.quad-cell.q4 .quad-count { color: var(--quad-q4-num); }
+
+/* 行动建议 */
+.quad-hint {
   font-size: var(--font-caption);
-  color: var(--text-tertiary);
+  padding: 0 var(--spacing-md) var(--spacing-xs);
+  opacity: 0.8;
+}
+.quad-cell.q1 .quad-hint { color: var(--quad-q1-label); }
+.quad-cell.q2 .quad-hint { color: var(--quad-q2-label); }
+.quad-cell.q3 .quad-hint { color: var(--quad-q3-label); }
+.quad-cell.q4 .quad-hint { color: var(--quad-q4-label); }
+
+/* 象限内列表 */
+.quad-list {
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--spacing-xs) var(--spacing-xs);
 }
 
-/* 卡片列表 */
-.card-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10rpx;
-}
+/* 卡片 */
 .qcard {
   display: flex;
   align-items: center;
   background: var(--bg-card);
-  border-radius: var(--radius-md);
-  padding: 18rpx 20rpx;
-  box-shadow: var(--shadow-1);
+  border-radius: var(--radius-sm);
+  padding: 12rpx 16rpx;
+  margin-bottom: 6rpx;
+  box-shadow: 0 1rpx 4rpx rgba(0,0,0,0.06);
   cursor: pointer;
   transition: transform 0.15s;
 }
 .qcard:active { transform: scale(0.98); }
-.qcard.urgent { border-left: 5rpx solid var(--color-error); }
+.qcard.urgent { border-left: 4rpx solid var(--color-error); }
 .qcard-main {
   flex: 1;
   min-width: 0;
-  margin-right: 12rpx;
+  margin-right: 8rpx;
 }
 .qcard-code {
   display: block;
-  font-size: var(--font-body);
+  font-size: var(--font-body-sm);
   font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 1.4;
+  line-height: 1.3;
 }
 .qcard-meta {
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  margin-top: 4rpx;
+  gap: 8rpx;
+  margin-top: 2rpx;
   flex-wrap: wrap;
 }
 .qcard-type {
-  font-size: var(--font-caption);
+  font-size: 20rpx;
   color: var(--text-secondary);
 }
 .qcard-time {
-  font-size: var(--font-caption);
+  font-size: 20rpx;
   color: var(--text-tertiary);
 }
 .qcard-occ {
-  font-size: var(--font-caption);
+  font-size: 20rpx;
   font-weight: 700;
   color: var(--color-error);
   background: var(--color-error-light);
-  padding: 2rpx 8rpx;
-  border-radius: var(--radius-sm);
+  padding: 1rpx 6rpx;
+  border-radius: 4rpx;
 }
 .qcard-arrow {
-  font-size: 32rpx;
+  font-size: 28rpx;
   color: var(--text-tertiary);
   flex-shrink: 0;
 }
 
-/* 空状态 */
-.empty-state {
+/* 象限空状态 */
+.quad-empty {
   text-align: center;
-  padding: 80rpx var(--spacing-md);
-}
-.empty-icon {
-  display: block;
-  font-size: 80rpx;
-  margin-bottom: var(--spacing-sm);
-}
-.empty-text {
-  display: block;
-  font-size: var(--font-body);
-  color: var(--text-secondary);
+  padding: 40rpx 0;
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
 }

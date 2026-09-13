@@ -15,7 +15,7 @@ Page({
     baseUrl: 'https://parcel.zsunny.top',
     viewOptions: ['📋 列表', '🎯 四象限'],
     viewIndex: 0,
-    groupOptions: ['按驿站分组', '不分组', '按成员分组'],
+    groupOptions: ['不分组', '按成员', '按待办类型'],
     groupIndex: 0,
     showCreateFamily: false,
     newFamilyName: ''
@@ -46,7 +46,7 @@ Page({
       families: gd.families || [],
       baseUrl: gd.baseUrl || 'https://parcel.zsunny.top',
       viewIndex: (gd.viewMode === 'quadrant') ? 1 : 0,
-      groupIndex: ['station', 'none', 'owner'].indexOf(gd.group || 'station'),
+      groupIndex: ['none', 'owner', 'type'].indexOf(gd.group || 'none'),
       showCreateFamily: false
     });
   },
@@ -91,7 +91,7 @@ Page({
   },
   onGroupChange: function (e) {
     var i = parseInt(e.detail.value, 10);
-    var v = ['station', 'none', 'owner'][i];
+    var v = ['none', 'owner', 'type'][i];
     app.globalData.group = v;
     this.setData({ groupIndex: i });
   },

@@ -9,7 +9,7 @@ Page({
     filter: 'all',
     importanceFilter: 'all',
     urgencyFilter: 'all',
-    group: 'station',
+    group: 'none',
     search: '',
     list: [],
     groups: [],
@@ -17,7 +17,7 @@ Page({
     impIndex: 0,
     urgOptions: ['紧迫性：全部', '⚡ 紧急', '🕐 普通'],
     urgIndex: 0,
-    groupOptions: ['按驿站分组', '不分组', '按成员分组'],
+    groupOptions: ['不分组', '按成员', '按待办类型'],
     groupIndex: 0,
     emptyEmoji: '📋',
     emptyTitle: '当前没有记录',
@@ -33,10 +33,10 @@ Page({
       filter: gd.filter || 'all',
       importanceFilter: gd.importanceFilter || 'all',
       urgencyFilter: gd.urgencyFilter || 'all',
-      group: gd.group || 'station',
+      group: gd.group || 'none',
       impIndex: ['all', 'high', 'medium', 'low'].indexOf(gd.importanceFilter || 'all'),
       urgIndex: ['all', 'urgent', 'normal'].indexOf(gd.urgencyFilter || 'all'),
-      groupIndex: ['station', 'none', 'owner'].indexOf(gd.group || 'station')
+      groupIndex: ['none', 'owner', 'type'].indexOf(gd.group || 'none')
     });
     api.setToken(gd.token);
   },
@@ -73,8 +73,8 @@ Page({
     pkgs = helpers.sortPackages(pkgs);
 
     var groups = [];
-    if (this.data.group !== 'none' && this.data.recordType !== 'todo' && pkgs.length) {
-      var keyOf = this.data.group === 'owner' ? function (p) { return p.owner || '未指定'; } : function (p) { return p.station || '未知驿站'; };
+    if (this.data.group !== 'none' && pkgs.length) {
+      var keyOf = this.data.group === 'owner' ? function (p) { return p.owner || '未指定'; } : function (p) { return p.type === 'pickup' ? '📦 取件' : '📝 备忘'; };
       var map = {}, order = [];
       pkgs.forEach(function (p) {
         var k = keyOf(p);
@@ -117,7 +117,7 @@ Page({
   },
   onGroupChange: function (e) {
     var idx = parseInt(e.detail.value, 10);
-    var vals = ['station', 'none', 'owner'];
+    var vals = ['none', 'owner', 'type'];
     app.globalData.group = vals[idx];
     this.setData({ groupIndex: idx, group: vals[idx] });
     this.computeList();

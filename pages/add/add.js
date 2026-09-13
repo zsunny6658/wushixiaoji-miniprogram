@@ -22,6 +22,8 @@ Page({
     endDate: '2099-12-31',
     memberOptions: ['不指定'],
     memberIndex: 0,
+    assigneeIndex: 0,
+    assignerIndex: 0,
     impOptions: ['🔴 高', '🟡 中', '⚪ 低'],
     impIndex: 1,
     urgOptions: ['⚡ 紧急', '🕐 普通'],
@@ -32,6 +34,22 @@ Page({
     api.setToken(app.globalData.token);
     var members = (app.globalData.members || []).map(function (m) { return m.name; });
     this.setData({ memberOptions: ['不指定'].concat(members) });
+    // 从 tabBar 语音转写结果读取
+    if (app.globalData._pendingSmartText) {
+      this.setData({ smartText: app.globalData._pendingSmartText });
+      app.globalData._pendingSmartText = '';
+    }
+    if (app.globalData._pendingAddData) {
+      var r = app.globalData._pendingAddData;
+      this.setData({
+        type: r.type || 'pickup',
+        typeIndex: (r.type === 'todo') ? 1 : 0,
+        form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '' },
+        impIndex: ['high', 'medium', 'low'].indexOf(r.importance || 'medium'),
+        urgIndex: ['urgent', 'normal'].indexOf(r.urgency || 'normal')
+      });
+      app.globalData._pendingAddData = null;
+    }
     if (opts && opts.id) {
       var pkg = (app.globalData.packages || []).find(function (p) { return p.id === opts.id; });
       if (pkg) {
@@ -45,6 +63,8 @@ Page({
           dateStr: pkg.arrivedAt ? d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2) : today(),
           timeStr: pkg.arrivedAt ? ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2) : nowTime(),
           memberIndex: this.findMemberIndex(pkg.owner),
+          assigneeIndex: this.findMemberIndex(pkg.assignee),
+          assignerIndex: this.findMemberIndex(pkg.assigner),
           impIndex: ['high', 'medium', 'low'].indexOf(pkg.importance || 'medium'),
           urgIndex: ['urgent', 'normal'].indexOf(pkg.urgency || 'normal')
         });
@@ -72,6 +92,8 @@ Page({
   onDateChange: function (e) { this.setData({ dateStr: e.detail.value }); },
   onTimeChange: function (e) { this.setData({ timeStr: e.detail.value }); },
   onMemberChange: function (e) { this.setData({ memberIndex: parseInt(e.detail.value, 10) }); },
+  onAssigneeChange: function (e) { this.setData({ assigneeIndex: parseInt(e.detail.value, 10) }); },
+  onAssignerChange: function (e) { this.setData({ assignerIndex: parseInt(e.detail.value, 10) }); },
   onImpChange: function (e) { this.setData({ impIndex: parseInt(e.detail.value, 10) }); },
   onUrgChange: function (e) { this.setData({ urgIndex: parseInt(e.detail.value, 10) }); },
 
@@ -228,6 +250,8 @@ Page({
       trackingNo: f.trackingNo || '',
       arrivedAt: arrivedAt,
       owner: this.data.memberIndex === 0 ? '' : memberName,
+      assignee: this.data.assigneeIndex === 0 ? '' : this.data.memberOptions[this.data.assigneeIndex],
+      assigner: this.data.assignerIndex === 0 ? '' : this.data.memberOptions[this.data.assignerIndex],
       note: f.note || '',
       importance: ['high', 'medium', 'low'][this.data.impIndex] || 'medium',
       urgency: ['urgent', 'normal'][this.data.urgIndex] || 'normal'

@@ -8,7 +8,7 @@
     <text class="tab-text">小记</text>
   </view>
   <view class="tab-center">
-    <view class="center-btn" catchtap="openAdd">
+    <view class="center-btn" catchtap="openAdd" catchlongpress="onVoiceTap">
       <text class="center-plus">+</text>
     </view>
   </view>

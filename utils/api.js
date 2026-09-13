@@ -91,6 +91,9 @@ var API = {
   parseImage: function (images, type, cb, errCb) {
     this.request('POST', '/api/parse/image', { images: images, type: type || 'auto' }, cb, errCb);
   },
+  parseAudio: function (audio, cb, errCb) {
+    this.request('POST', '/api/parse/audio', { audio: audio }, cb, errCb);
+  },
 
   // 成员
   getMembers: function (cb, errCb) {

@@ -129,7 +129,7 @@
     <view class="cell">
       <view class="cell-left">
         <text class="cell-icon">📦</text>
-        <text class="cell-title">家庭快递取件归集平台</text>
+        <text class="cell-title">取件小记 v1.0.0</text>
       </view>
     </view>
     <view class="cell">
@@ -138,12 +138,6 @@
         <text class="cell-title">服务地址</text>
       </view>
       <text class="cell-url">{{baseUrl}}</text>
-    </view>
-    <view class="cell">
-      <view class="cell-left">
-        <text class="cell-icon">📝</text>
-        <text class="cell-title cell-desc">多家庭隔离 · 四级角色 · CLI/Webhook 自动化</text>
-      </view>
     </view>
   </view>
 

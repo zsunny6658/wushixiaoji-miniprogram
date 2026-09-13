@@ -1,58 +1,96 @@
 <view class="page">
-  <!-- 总数统计 -->
   <view class="quad-summary">
     <text class="summary-label">待处理总数</text>
     <text class="summary-count">{{totalCount}}</text>
   </view>
 
-  <!-- 象限 tab 切换 -->
-  <view class="quad-tabs">
-    <view class="qt-tab {{activeQuad === 'all' ? 'qt-active' : ''}}" bindtap="onSwitchQuad" data-quad="all">
-      <text class="qt-label">全部</text>
-      <text class="qt-count">{{totalCount}}</text>
-    </view>
-    <view class="qt-tab q1 {{activeQuad === 'q1' ? 'qt-active' : ''}}" bindtap="onSwitchQuad" data-quad="q1">
-      <text class="qt-label">🔴 重要紧急</text>
-      <text class="qt-count">{{quadrants.q1.length}}</text>
-    </view>
-    <view class="qt-tab q2 {{activeQuad === 'q2' ? 'qt-active' : ''}}" bindtap="onSwitchQuad" data-quad="q2">
-      <text class="qt-label">🟡 重要不紧急</text>
-      <text class="qt-count">{{quadrants.q2.length}}</text>
-    </view>
-    <view class="qt-tab q3 {{activeQuad === 'q3' ? 'qt-active' : ''}}" bindtap="onSwitchQuad" data-quad="q3">
-      <text class="qt-label">🔵 不重要紧急</text>
-      <text class="qt-count">{{quadrants.q3.length}}</text>
-    </view>
-    <view class="qt-tab q4 {{activeQuad === 'q4' ? 'qt-active' : ''}}" bindtap="onSwitchQuad" data-quad="q4">
-      <text class="qt-label">⚪ 不重要不紧急</text>
-      <text class="qt-count">{{quadrants.q4.length}}</text>
-    </view>
-  </view>
-
-  <!-- 当前筛选提示 -->
-  <view class="quad-filter-header" wx:if="{{activeQuad !== 'all'}}">
-    <text class="quad-filter-title">{{activeQuadLabel}}</text>
-    <text class="quad-filter-hint">{{activeQuadHint}}</text>
-  </view>
-
-  <!-- 记录列表 -->
-  <view class="card-list" wx:if="{{displayList.length}}">
-    <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{displayList}}" wx:key="id" bindtap="onEdit" data-id="{{pkg.id}}">
-      <view class="qcard-main">
-        <text class="qcard-code">{{pkg.summaryText}}</text>
-        <view class="qcard-meta">
-          <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
-          <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
-          <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
-        </view>
+  <view class="quad-grid">
+    <view class="quad-cell q1">
+      <view class="quad-head">
+        <text class="quad-title">🔴 重要紧急</text>
+        <text class="quad-count">{{quadrants.q1.length}}</text>
       </view>
-      <text class="qcard-arrow">›</text>
+      <view class="quad-hint">立即处理</view>
+      <scroll-view class="quad-list" scroll-y>
+        <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q1}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
+          <view class="qcard-main">
+            <text class="qcard-code">{{pkg.summaryText}}</text>
+            <view class="qcard-meta">
+              <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
+              <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+            </view>
+          </view>
+          <text class="qcard-arrow">›</text>
+        </view>
+        <view class="quad-empty" wx:if="{{quadrants.q1.length === 0}}">暂无</view>
+      </scroll-view>
     </view>
-  </view>
 
-  <!-- 空状态 -->
-  <view class="empty-state" wx:else>
-    <text class="empty-icon">✅</text>
-    <text class="empty-text">这个象限没有待办</text>
+    <view class="quad-cell q2">
+      <view class="quad-head">
+        <text class="quad-title">🟡 重要不紧急</text>
+        <text class="quad-count">{{quadrants.q2.length}}</text>
+      </view>
+      <view class="quad-hint">规划安排</view>
+      <scroll-view class="quad-list" scroll-y>
+        <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q2}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
+          <view class="qcard-main">
+            <text class="qcard-code">{{pkg.summaryText}}</text>
+            <view class="qcard-meta">
+              <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
+              <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+            </view>
+          </view>
+          <text class="qcard-arrow">›</text>
+        </view>
+        <view class="quad-empty" wx:if="{{quadrants.q2.length === 0}}">暂无</view>
+      </scroll-view>
+    </view>
+
+    <view class="quad-cell q3">
+      <view class="quad-head">
+        <text class="quad-title">🔵 不重要紧急</text>
+        <text class="quad-count">{{quadrants.q3.length}}</text>
+      </view>
+      <view class="quad-hint">快速处理</view>
+      <scroll-view class="quad-list" scroll-y>
+        <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q3}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
+          <view class="qcard-main">
+            <text class="qcard-code">{{pkg.summaryText}}</text>
+            <view class="qcard-meta">
+              <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
+              <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+            </view>
+          </view>
+          <text class="qcard-arrow">›</text>
+        </view>
+        <view class="quad-empty" wx:if="{{quadrants.q3.length === 0}}">暂无</view>
+      </scroll-view>
+    </view>
+
+    <view class="quad-cell q4">
+      <view class="quad-head">
+        <text class="quad-title">⚪ 不重要不紧急</text>
+        <text class="quad-count">{{quadrants.q4.length}}</text>
+      </view>
+      <view class="quad-hint">可忽略</view>
+      <scroll-view class="quad-list" scroll-y>
+        <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q4}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
+          <view class="qcard-main">
+            <text class="qcard-code">{{pkg.summaryText}}</text>
+            <view class="qcard-meta">
+              <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
+              <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+            </view>
+          </view>
+          <text class="qcard-arrow">›</text>
+        </view>
+        <view class="quad-empty" wx:if="{{quadrants.q4.length === 0}}">暂无</view>
+      </scroll-view>
+    </view>
   </view>
 </view>

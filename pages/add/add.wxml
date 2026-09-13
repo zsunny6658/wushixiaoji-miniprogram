@@ -91,6 +91,26 @@
       </view>
 
       <view class="field">
+        <text class="field-label">待办人</text>
+        <picker range="{{memberOptions}}" value="{{assigneeIndex}}" bindchange="onAssigneeChange">
+          <view class="field-picker">
+            <text class="field-picker-value">{{memberOptions[assigneeIndex]}}</text>
+            <text class="field-picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="field-label">发起人</text>
+        <picker range="{{memberOptions}}" value="{{assignerIndex}}" bindchange="onAssignerChange">
+          <view class="field-picker">
+            <text class="field-picker-value">{{memberOptions[assignerIndex]}}</text>
+            <text class="field-picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
         <text class="field-label">重要性</text>
         <picker range="{{impOptions}}" value="{{impIndex}}" bindchange="onImpChange">
           <view class="field-picker">

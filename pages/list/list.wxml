@@ -135,7 +135,4 @@
       </view>
     </block>
   </block>
-
-  <!-- FAB -->
-  <view class="fab {{batchMode ? 'fab-batch' : ''}}" bindtap="{{batchMode ? 'onExitBatch' : 'onToggleBatch'}}">{{batchMode ? '✕' : '＋'}}</view>
 </view>
