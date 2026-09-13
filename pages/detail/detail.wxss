@@ -74,6 +74,28 @@
   font-weight: 500;
 }
 
+/* 内容区 (todo 完整内容) */
+.content-section {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-1);
+  margin-bottom: var(--spacing-md);
+}
+.content-title {
+  font-size: var(--font-body-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 12rpx;
+}
+.content-text {
+  font-size: var(--font-body);
+  color: var(--text-primary);
+  line-height: 1.8;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
 /* 原始内容 */
 .raw-section {
   background: var(--bg-card);

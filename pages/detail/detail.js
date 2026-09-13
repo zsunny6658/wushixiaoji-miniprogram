@@ -26,14 +26,28 @@ Page({
   },
 
   loadDetail: function (id) {
+    var that = this;
     var gd = app.globalData;
     var pkgs = (gd.packages || []);
     var raw = pkgs.find(function (p) { return p.id === id; });
     if (!raw) {
-      wx.showToast({ title: '记录不存在', icon: 'none' });
-      setTimeout(function () { wx.navigateBack(); }, 1000);
+      // 缓存里没有，刷新后重试一次
+      app.refreshState(function () {
+        raw = (app.globalData.packages || []).find(function (p) { return p.id === id; });
+        if (!raw) {
+          wx.showToast({ title: '记录不存在', icon: 'none' });
+          setTimeout(function () { wx.navigateBack(); }, 1000);
+          return;
+        }
+        that.applyDetail(raw);
+      });
       return;
     }
+    this.applyDetail(raw);
+  },
+
+  applyDetail: function (raw) {
+    var gd = app.globalData;
     var decorated = helpers.decorate(raw, gd.members);
     this.setData({ pkg: decorated });
     wx.setNavigationBarTitle({ title: decorated.type === 'pickup' ? '取件详情' : '备忘详情' });

@@ -25,6 +25,12 @@
       </view>
     </view>
 
+    <!-- 内容区 (todo 的完整内容) -->
+    <view class="content-section" wx:if="{{pkg.type === 'todo'}}">
+      <view class="content-title">📝 内容</view>
+      <view class="content-text">{{pkg.code}}</view>
+    </view>
+
     <!-- 原始内容 -->
     <view class="raw-section" wx:if="{{pkg.raw}}">
       <view class="raw-title">📋 原始内容</view>
