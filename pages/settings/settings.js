@@ -106,19 +106,21 @@ Page({
     } else if (a === 'mail') {
       api.getConfig(this.data.familyId, function (data) {
         var c = (data && data.config) || {};
+        var s = c.smtp || {};
+        var a = c.ai || {};
         that.setData({
           config: {
-            smtpHost: c.smtpHost || '',
-            smtpPort: String(c.smtpPort || '465'),
-            smtpSecure: c.smtpSecure !== false,
-            smtpUser: c.smtpUser || '',
-            smtpPass: c.smtpPass || '',
-            smtpFrom: c.smtpFrom || '',
-            smtpFromName: c.smtpFromName || '',
-            aiProvider: c.aiProvider || '',
-            aiModel: c.aiModel || '',
-            aiBaseUrl: c.aiBaseUrl || '',
-            aiApiKey: c.aiApiKey || ''
+            smtpHost: s.host || '',
+            smtpPort: String(s.port || 587),
+            smtpSecure: s.secure !== false,
+            smtpUser: s.user || '',
+            smtpPass: '',
+            smtpFrom: s.from || '',
+            smtpFromName: '',
+            aiProvider: a.provider || '',
+            aiModel: a.textModel || '',
+            aiBaseUrl: a.baseURL || '',
+            aiApiKey: ''
           },
           mailConfigured: data && data.mailConfigured
         });
@@ -291,10 +293,23 @@ Page({
   },
   onSaveConfig: function () {
     var c = this.data.config;
-    var patch = {};
-    Object.keys(c).forEach(function (k) {
-      if (c[k] !== '') patch[k] = c[k];
-    });
+    var patch = {
+      smtp: {
+        host: c.smtpHost,
+        port: parseInt(c.smtpPort, 10) || 587,
+        secure: c.smtpSecure,
+        user: c.smtpUser,
+        pass: c.smtpPass || undefined,
+        from: c.smtpFrom
+      },
+      ai: {
+        enabled: true,
+        provider: c.aiProvider || 'openai',
+        baseURL: c.aiBaseUrl,
+        apiKey: c.aiApiKey || undefined,
+        textModel: c.aiModel
+      }
+    };
     api.updateConfig(patch, this.data.familyId, function () {
       wx.showToast({ title: '已保存', icon: 'success' });
     });

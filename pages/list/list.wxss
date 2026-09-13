@@ -23,6 +23,7 @@
   padding: 16rpx 24rpx;
   font-size: var(--font-body);
   line-height: 1.5;
+  height: 88rpx;
   background: var(--bg-card);
   box-sizing: border-box;
   transition: border-color 0.15s;
