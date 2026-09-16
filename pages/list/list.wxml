@@ -1,18 +1,27 @@
 <view class="page">
-  <!-- 类型 + 状态 tab -->
+  <!-- 类型 + 范围 + 状态 tab -->
   <view class="toolbar">
     <view class="segmented segmented-fill">
       <view class="seg-item {{recordType === 'all' ? 'seg-active' : ''}}" bindtap="switchType" data-type="all">全部</view>
       <view class="seg-item {{recordType === 'pickup' ? 'seg-active' : ''}}" bindtap="switchType" data-type="pickup">取件</view>
       <view class="seg-item {{recordType === 'todo' ? 'seg-active' : ''}}" bindtap="switchType" data-type="todo">备忘</view>
+      <view class="seg-item {{recordType === 'debt' ? 'seg-active' : ''}}" bindtap="switchType" data-type="debt">待还</view>
+    </view>
+  </view>
+  <view class="toolbar">
+    <view class="segmented segmented-fill">
+      <view class="seg-item {{scope === 'all' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="all">全部</view>
+      <view class="seg-item {{scope === 'family' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="family">👨‍👩‍👧 家庭</view>
+      <view class="seg-item {{scope === 'personal' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="personal">🔒 个人</view>
     </view>
   </view>
   <view class="toolbar">
     <view class="segmented">
-      <view class="seg-item {{filter === 'all' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="all">全部</view>
-      <view class="seg-item {{filter === 'pending' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="pending">待办</view>
-      <view class="seg-item {{filter === 'picked' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="picked">完成</view>
-      <view class="seg-item {{filter === 'overdue' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="overdue">逾期</view>
+      <view class="seg-item {{filter === 'all' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="all">全部<text class="seg-count">{{counts.all}}</text></view>
+      <view class="seg-item {{filter === 'pending' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="pending">待办<text class="seg-count">{{counts.pending}}</text></view>
+      <view class="seg-item {{filter === 'picked' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="picked">完成<text class="seg-count">{{counts.picked}}</text></view>
+      <view class="seg-item {{filter === 'overdue' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="overdue">逾期<text class="seg-count">{{counts.overdue}}</text></view>
+      <view class="seg-item {{filter === 'ignored' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="ignored">忽略<text class="seg-count">{{counts.ignored}}</text></view>
     </view>
   </view>
 
@@ -56,34 +65,27 @@
   <block wx:else>
     <block wx:if="{{group === 'none' || recordType === 'todo'}}">
       <view class="cards">
-        <view class="card {{item.status === 'picked' ? 'picked' : ''}} {{item.overdue ? 'urgent' : ''}} {{batchMode && item.batchSelected ? 'selected' : ''}}" wx:for="{{list}}" wx:key="id" bindtap="onCardTap" data-id="{{item.id}}" hover-class="hover-press">
+        <view class="card {{item.importance === 'high' ? 'flagged' : ''}} {{item.status === 'picked' ? 'picked' : ''}} {{item.overdue ? 'urgent' : ''}} {{batchMode && item.batchSelected ? 'selected' : ''}}" wx:for="{{list}}" wx:key="id" bindtap="onCardTap" data-id="{{item.id}}" hover-class="hover-press">
           <view class="card-inner">
             <view class="batch-check" wx:if="{{batchMode}}" data-id="{{item.id}}">
               <text class="checkbox {{item.batchSelected ? 'checked' : ''}}">{{item.batchSelected ? '✓' : ''}}</text>
             </view>
             <view class="card-body">
-              <view class="card-top">
-                <view class="code-box">
-                <view class="code-label">{{item.type === 'pickup' ? '取件码' : '备忘'}}</view>
-                <view class="code-value">{{item.summaryText}}</view>
+              <view class="card-meta-row">
+                <view class="card-type-group">
+                  <text class="tag tag-primary" wx:if="{{item.type === 'pickup'}}">取件</text>
+                  <text class="tag tag-warning" wx:if="{{item.type === 'todo'}}">备忘</text>
+                  <text class="tag tag-debt" wx:if="{{item.type === 'debt'}}">待还</text>
+                  <text class="tag tag-private" wx:if="{{item.isPrivate}}">🔒</text>
                 </view>
-                <view class="card-badges">
-                  <view class="tag tag-primary" wx:if="{{item.type === 'pickup'}}">取件</view>
-                  <view class="tag tag-warning" wx:if="{{item.type === 'todo'}}">备忘</view>
-                <view class="tag tag-neutral" wx:if="{{item.type === 'todo' && item.tagLabel}}">{{item.tagLabel}}</view>
-                <view class="tag tag-info" wx:if="{{item.type === 'pickup' && item.owner}}">{{item.owner}}</view>
-                <view class="tag tag-success" wx:if="{{item.type === 'todo' && item.assignee}}">@{{item.assignee}}</view>
-                <view class="tag tag-neutral" wx:if="{{item.createdBy}}">{{item.createdBy === 'cli' ? 'CLI' : item.createdBy === 'webhook' ? 'Webhook' : '手动'}}</view>
-                  <view class="badge" wx:if="{{item.occCount > 1}}">{{item.occCount}}</view>
+                <view class="card-info-group">
+                  <text class="meta-item {{item.overdue ? 'time-warn' : ''}}" wx:if="{{item.arrivedAt}}">{{item.type === 'pickup' ? '🕐' : (item.type === 'debt' ? '💳' : '⏰')}} {{item.arrivedLabel}}</text>
+                  <text class="meta-item imp-{{item.importance}}">{{item.impLabel}}</text>
+                  <text class="meta-item urg-{{item.urgency}}">{{item.urgLabel}}</text>
+                  <text class="tag tag-success" wx:if="{{item.assignee}}">@{{item.assignee}}</text>
                 </view>
               </view>
-              <view class="meta">
-                <view class="meta-item {{item.overdue ? 'time-warn' : ''}}" wx:if="{{item.arrivedAt}}">
-                  {{item.type === 'pickup' ? '🕐' : '⏰'}} {{item.arrivedLabel}}
-                </view>
-                <view class="meta-item imp-{{item.importance}}">{{item.impLabel}}</view>
-                <view class="meta-item urg-{{item.urgency}}">{{item.urgLabel}}</view>
-              </view>
+              <text class="code-value">{{item.summaryText}}</text>
             </view>
             <view class="card-quick" wx:if="{{!batchMode}}" catchtap="onQuickPick" data-id="{{item.id}}">
               <text class="quick-icon">{{item.status === 'picked' ? '↩' : '✓'}}</text>
@@ -101,34 +103,27 @@
           <text class="group-count">{{item.items.length}}</text>
         </view>
         <view class="cards">
-          <view class="card {{pkg.status === 'picked' ? 'picked' : ''}} {{pkg.overdue ? 'urgent' : ''}} {{batchMode && pkg.batchSelected ? 'selected' : ''}}" wx:for="{{item.items}}" wx:for-item="pkg" wx:key="id" bindtap="onCardTap" data-id="{{pkg.id}}" hover-class="hover-press">
+          <view class="card {{pkg.importance === 'high' ? 'flagged' : ''}} {{pkg.status === 'picked' ? 'picked' : ''}} {{pkg.overdue ? 'urgent' : ''}} {{batchMode && pkg.batchSelected ? 'selected' : ''}}" wx:for="{{item.items}}" wx:for-item="pkg" wx:key="id" bindtap="onCardTap" data-id="{{pkg.id}}" hover-class="hover-press">
             <view class="card-inner">
               <view class="batch-check" wx:if="{{batchMode}}" data-id="{{pkg.id}}">
                 <text class="checkbox {{pkg.batchSelected ? 'checked' : ''}}">{{pkg.batchSelected ? '✓' : ''}}</text>
               </view>
               <view class="card-body">
-                <view class="card-top">
-                  <view class="code-box">
-                    <view class="code-label">{{pkg.type === 'pickup' ? '取件码' : '备忘内容'}}</view>
-                    <view class="code-value">{{pkg.summaryText}}</view>
+                <view class="card-meta-row">
+                  <view class="card-type-group">
+                    <text class="tag tag-primary" wx:if="{{pkg.type === 'pickup'}}">取件</text>
+                    <text class="tag tag-warning" wx:if="{{pkg.type === 'todo'}}">备忘</text>
+                    <text class="tag tag-debt" wx:if="{{pkg.type === 'debt'}}">待还</text>
+                    <text class="tag tag-private" wx:if="{{pkg.isPrivate}}">🔒</text>
                   </view>
-                  <view class="card-badges">
-                    <view class="tag tag-primary" wx:if="{{pkg.type === 'pickup'}}">取件</view>
-                    <view class="tag tag-warning" wx:if="{{pkg.type === 'todo'}}">备忘</view>
-                    <view class="tag tag-neutral" wx:if="{{pkg.type === 'todo' && pkg.tagLabel}}">{{pkg.tagLabel}}</view>
-                    <view class="tag tag-info" wx:if="{{pkg.type === 'pickup' && pkg.owner}}">{{pkg.owner}}</view>
-                    <view class="tag tag-success" wx:if="{{pkg.type === 'todo' && pkg.assignee}}">@{{pkg.assignee}}</view>
-                    <view class="tag tag-neutral" wx:if="{{pkg.createdBy}}">{{pkg.createdBy === 'cli' ? 'CLI' : pkg.createdBy === 'webhook' ? 'Webhook' : '手动'}}</view>
-                    <view class="badge" wx:if="{{pkg.occCount > 1}}">{{pkg.occCount}}</view>
+                  <view class="card-info-group">
+                    <text class="meta-item {{pkg.overdue ? 'time-warn' : ''}}" wx:if="{{pkg.arrivedAt}}">{{pkg.type === 'pickup' ? '🕐' : (pkg.type === 'debt' ? '💳' : '⏰')}} {{pkg.arrivedLabel}}</text>
+                    <text class="meta-item imp-{{pkg.importance}}">{{pkg.impLabel}}</text>
+                    <text class="meta-item urg-{{pkg.urgency}}">{{pkg.urgLabel}}</text>
+                    <text class="tag tag-success" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
                   </view>
                 </view>
-                <view class="meta">
-                  <view class="meta-item {{pkg.overdue ? 'time-warn' : ''}}" wx:if="{{pkg.arrivedAt}}">
-                    {{pkg.type === 'pickup' ? '🕐' : '⏰'}} {{pkg.arrivedLabel}}
-                  </view>
-                  <view class="meta-item imp-{{pkg.importance}}">{{pkg.impLabel}}</view>
-                  <view class="meta-item urg-{{pkg.urgency}}">{{pkg.urgLabel}}</view>
-                </view>
+                <text class="code-value">{{pkg.summaryText}}</text>
               </view>
               <view class="card-quick" wx:if="{{!batchMode}}" catchtap="onQuickPick" data-id="{{pkg.id}}">
                 <text class="quick-icon">{{pkg.status === 'picked' ? '↩' : '✓'}}</text>

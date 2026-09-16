@@ -41,12 +41,17 @@ Page({
     familyName: '',
     isAdmin: false,
     familyId: '',
-    baseUrl: 'https://parcel.zsunny.top'
+    baseUrl: 'https://parcel.zsunny.top',
+    version: '1.0.0',
+    icpText: '浙ICP备2026069987号-2',
+    govText: '浙公网安备33019202003263号'
   },
 
   onLoad: function (opts) {
     api.setToken(app.globalData.token);
-    this.setData({ action: (opts && opts.action) || '' });
+    var version;
+    try { version = require('../../package.json').version; } catch (e) { version = '1.0.0'; }
+    this.setData({ action: (opts && opts.action) || '', version: version });
   },
 
   onShow: function () {
@@ -332,6 +337,12 @@ Page({
       wx.showToast({ title: data && data.ok ? '连通正常' : '连通失败', icon: 'none' });
     }, function () {
       wx.hideLoading();
+    });
+  },
+  onCopyICP: function () {
+    wx.setClipboardData({
+      data: '浙ICP备2026069987号-2  浙公网安备33019202003263号',
+      success: function () { wx.showToast({ title: '已复制', icon: 'success' }); }
     });
   }
 });

@@ -5,23 +5,47 @@
     <view class="greeting-date">{{todayStr}}</view>
   </view>
 
-  <!-- 统计卡片 -->
+  <!-- 统计卡片 3+2 布局 -->
   <view class="stats">
-    <view class="stat-card s-pickup" bindtap="onGoPickup" hover-class="hover-press">
-      <view class="stat-num">{{stats.pickup || 0}}</view>
-      <view class="stat-label">📦 待取快递</view>
+    <view class="stats-row">
+      <view class="stat-card s-pickup" bindtap="onGoPickup" hover-class="hover-press">
+        <view class="stat-icon">📦</view>
+        <view class="stat-num">{{stats.pickup || 0}}</view>
+        <view class="stat-label">待取快递</view>
+      </view>
+      <view class="stat-card s-todo" bindtap="onGoTodo" hover-class="hover-press">
+        <view class="stat-icon">📝</view>
+        <view class="stat-num">{{stats.todo || 0}}</view>
+        <view class="stat-label">待办备忘</view>
+      </view>
+      <view class="stat-card s-debt" bindtap="onGoDebt" hover-class="hover-press">
+        <view class="stat-icon">💳</view>
+        <view class="stat-num">{{stats.debt || 0}}</view>
+        <view class="stat-label">待还款项</view>
+        <view class="stat-sub" wx:if="{{stats.debtTotal > 0}}">¥{{stats.debtTotalLabel}}</view>
+      </view>
+      <view class="stat-card s-overdue" bindtap="onGoOverdue" hover-class="hover-press">
+        <view class="stat-icon">⚠️</view>
+        <view class="stat-num">{{stats.overdue || 0}}</view>
+        <view class="stat-label">逾期/到期</view>
+      </view>
     </view>
-    <view class="stat-card s-todo" bindtap="onGoTodo" hover-class="hover-press">
-      <view class="stat-num">{{stats.todo || 0}}</view>
-      <view class="stat-label">📝 待办备忘</view>
-    </view>
-    <view class="stat-card s-overdue" bindtap="onGoOverdue" hover-class="hover-press">
-      <view class="stat-num">{{stats.overdue || 0}}</view>
-      <view class="stat-label">⚠️ 逾期/到期</view>
-    </view>
-    <view class="stat-card s-done" bindtap="onGoDone" hover-class="hover-press">
-      <view class="stat-num">{{stats.picked || 0}}</view>
-      <view class="stat-label">✅ 已完成</view>
+    <view class="stats-row">
+      <view class="stat-card s-done" bindtap="onGoDone" hover-class="hover-press">
+        <view class="stat-icon">✅</view>
+        <view class="stat-num">{{stats.picked || 0}}</view>
+        <view class="stat-label">已完成</view>
+      </view>
+      <view class="stat-card s-ignored" bindtap="onGoIgnored" hover-class="hover-press">
+        <view class="stat-icon">🚫</view>
+        <view class="stat-num">{{stats.ignored || 0}}</view>
+        <view class="stat-label">已忽略</view>
+      </view>
+      <view class="stat-card s-private" bindtap="onGoPrivate" hover-class="hover-press">
+        <view class="stat-icon">🔒</view>
+        <view class="stat-num">{{stats.privateCount || 0}}</view>
+        <view class="stat-label">个人事项</view>
+      </view>
     </view>
   </view>
 
@@ -51,14 +75,22 @@
     </view>
   </view>
 
-  <!-- 今日摘要 -->
-  <view class="section" wx:if="{{todaySummary}}">
-    <view class="summary-card">
-      <view class="summary-icon">📋</view>
-      <view class="summary-body">
-        <view class="summary-title">{{todaySummary.title}}</view>
-        <view class="summary-desc">{{todaySummary.desc}}</view>
+  <!-- 最新待办 -->
+  <view class="section">
+    <view class="section-head">
+      <text class="section-title">📋 最新待办</text>
+      <text class="section-more" bindtap="onGoPending">全部 ›</text>
+    </view>
+    <view class="pending-list">
+      <view class="pending-item {{item._flagged ? 'flagged' : ''}}" wx:for="{{latestPending}}" wx:for-item="item" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}">
+        <text class="pending-icon">{{item._icon}}</text>
+        <view class="pending-body">
+          <text class="pending-text">{{item._text}}</text>
+          <text class="pending-time" wx:if="{{item._time}}">{{item._time}}</text>
+        </view>
+        <text class="pending-arrow">›</text>
       </view>
+      <view class="pending-empty" wx:if="{{latestPending.length === 0}}">全部处理完毕 🎉</view>
     </view>
   </view>
 </view>

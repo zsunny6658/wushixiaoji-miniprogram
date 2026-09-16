@@ -8,8 +8,8 @@
   <view class="bind-card">
     <view class="bind-input-wrap">
       <text class="bind-input-label">家庭入口口令</text>
-      <input class="bind-input" placeholder="请输入口令" placeholder-class="bind-placeholder"
-             value="{{passcode}}" bindinput="onPasscodeInput" focus="{{true}}" />
+      <textarea class="bind-input" placeholder="请输入口令" placeholder-class="bind-placeholder"
+                type="text" maxlength="-1" bindinput="onPasscodeInput" auto-height />
     </view>
     <button class="bind-btn {{loading ? 'btn-loading' : ''}}" bindtap="onBind" hover-class="none">
       {{loading ? '绑定中...' : '绑定并登录'}}
@@ -33,8 +33,8 @@
         <text class="modal-close" bindtap="onCancelCreate">×</text>
       </view>
       <view class="modal-desc">创建后将自动成为家庭管理员</view>
-      <input class="bind-input" placeholder="家庭名称（如：郑家）" placeholder-class="bind-placeholder"
-             value="{{familyName}}" bindinput="onFamilyNameInput" />
+      <textarea class="bind-input" placeholder="家庭名称（如：郑家）" placeholder-class="bind-placeholder"
+                type="text" maxlength="-1" bindinput="onFamilyNameInput" auto-height />
       <view class="modal-actions">
         <button class="bind-btn {{loading ? 'btn-loading' : ''}}" bindtap="onCreateFamily" hover-class="none">{{loading ? '创建中...' : '创建'}}</button>
       </view>

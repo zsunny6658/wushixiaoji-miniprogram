@@ -5,7 +5,7 @@
   <!-- 智能解析区 -->
   <view class="smart-section">
     <view class="smart-title">✨ 智能识别</view>
-    <textarea class="smart-textarea" placeholder="粘贴快递短信 / 备忘文本，自动识别" value="{{smartText}}" bindinput="onSmartText"></textarea>
+    <textarea class="smart-textarea" placeholder="粘贴快递短信或备忘文本" auto-height value="{{smartText}}" bindinput="onSmartText"></textarea>
     <button class="btn btn-primary btn-block" bindtap="onSmartParse">📝 文本识别</button>
 
     <!-- 图片识别区 -->
@@ -53,14 +53,39 @@
         </view>
         <view class="field">
           <text class="field-label">快递单号</text>
-          <input class="field-input" placeholder="如：78123456789" value="{{form.trackingNo}}" bindinput="onField" data-field="trackingNo" />
+          <input class="field-input" placeholder="如：781234567" value="{{form.trackingNo}}" bindinput="onField" data-field="trackingNo" />
         </view>
       </block>
 
       <block wx:if="{{type === 'todo'}}">
         <view class="field">
           <text class="field-label">备忘内容 <text class="req">*</text></text>
-          <input class="field-input" placeholder="如：买排骨、陪妈体检" value="{{form.code}}" bindinput="onField" data-field="code" />
+          <input class="field-input" placeholder="如：买排骨" value="{{form.code}}" bindinput="onField" data-field="code" />
+        </view>
+      </block>
+
+      <block wx:if="{{type === 'debt'}}">
+        <view class="field">
+          <text class="field-label">还款事项 <text class="req">*</text></text>
+          <input class="field-input" placeholder="如：招行信用卡还款" value="{{form.code}}" bindinput="onField" data-field="code" />
+        </view>
+        <view class="field">
+          <text class="field-label">金融机构</text>
+          <input class="field-input" placeholder="如：招商银行、花呗、建设银行" value="{{form.institution}}" bindinput="onField" data-field="institution" />
+        </view>
+        <view class="field">
+          <text class="field-label">金额（元）</text>
+          <input class="field-input" type="digit" placeholder="如：5230.5" value="{{form.amount}}" bindinput="onField" data-field="amount" />
+        </view>
+        <view class="field">
+          <text class="field-label">还款期限</text>
+          <picker mode="date" value="{{dueDateStr}}" bindchange="onDueDateChange" end="{{endDate}}">
+            <view class="field-picker">
+              <text class="field-picker-value">{{dueDateStr || '选择日期'}}</text>
+              <text class="field-picker-arrow">▼</text>
+            </view>
+          </picker>
+          <text class="field-hint">到期将收到逾期提醒</text>
         </view>
       </block>
 
@@ -133,6 +158,14 @@
       <view class="field">
         <text class="field-label">备注</text>
         <input class="field-input" placeholder="补充说明" value="{{form.note}}" bindinput="onField" data-field="note" />
+      </view>
+
+      <view class="field">
+        <text class="field-label">可见范围</text>
+        <view class="private-toggle">
+          <switch checked="{{isPrivate}}" bindchange="onPrivateChange" color="#4f6ef7" />
+          <text class="private-label">{{isPrivate ? '🔒 仅本人可见' : '👨‍👩‍👧 家庭成员可见'}}</text>
+        </view>
       </view>
     </view>
   </view>

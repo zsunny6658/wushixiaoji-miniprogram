@@ -22,8 +22,14 @@ Page({
     }
   },
 
-  onPasscodeInput: function (e) { this.setData({ passcode: e.detail.value }); },
-  onFamilyNameInput: function (e) { this.setData({ familyName: e.detail.value }); },
+  onPasscodeInput: function (e) {
+    this._passcode = e.detail.value;
+    this.setData({ passcode: e.detail.value });
+  },
+  onFamilyNameInput: function (e) {
+    this._familyName = e.detail.value;
+    this.setData({ familyName: e.detail.value });
+  },
 
   // 绑定并登录
   onBind: function () {

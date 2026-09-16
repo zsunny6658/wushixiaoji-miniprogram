@@ -46,6 +46,12 @@ function parseDate(s) {
   return null;
 }
 
+function formatAmount(n) {
+  if (!n) return '0';
+  var num = Math.round(parseFloat(n) * 100) / 100;
+  return num.toFixed(2).replace(/\.?0+$/, '');
+}
+
 function isOverdue(p) {
   if (p.status !== 'pending' || !p.arrivedAt) return false;
   var d = parseDate(p.arrivedAt);
@@ -55,6 +61,31 @@ function isOverdue(p) {
 
 function impLabel(imp) {
   return imp === 'high' ? '🔴重要' : imp === 'low' ? '⚪低' : '🟡中';
+}
+
+function dueLabel(dueDate) {
+  if (!dueDate) return '';
+  var due = new Date(dueDate + 'T23:59:59');
+  if (isNaN(due)) return dueDate;
+  var now = new Date();
+  var diff = Math.ceil((due - now) / 86400000);
+  if (diff < 0) return '已逾期 ' + Math.abs(diff) + ' 天';
+  if (diff === 0) return '今天到期';
+  if (diff === 1) return '明天到期';
+  if (diff <= 7) return '剩 ' + diff + ' 天';
+  return '';
+}
+
+function dueDays(dueDate) {
+  if (!dueDate) return '';
+  var due = new Date(dueDate + 'T23:59:59');
+  if (isNaN(due)) return '';
+  var now = new Date();
+  var diff = Math.ceil((due - now) / 86400000);
+  if (diff < 0) return '已逾期 ' + Math.abs(diff) + ' 天';
+  if (diff === 0) return '今天到期';
+  if (diff === 1) return '明天';
+  return '剩 ' + diff + ' 天';
 }
 
 function urgLabel(urg) {
@@ -89,12 +120,31 @@ function decorate(p, members) {
   d.tagLabel = tagLabel(p.tag);
   d.sourceLabel = p.source || '';
   d.summaryText = summaryText(p);
+  d.isPrivate = !!p.isPrivate;
+  d.amount = p.amount || 0;
+  d.amountLabel = p.amount ? formatAmount(p.amount) : '';
+  d.institution = p.institution || '';
+  d.dueDate = p.dueDate || '';
+  d.dueLabel = dueLabel(p.dueDate);
+  d.dueDays = dueDays(p.dueDate);
   return d;
 }
 
 function summaryText(p) {
   var code = p && p.code ? String(p.code) : '';
   var title = p && p.title ? String(p.title) : '';
+  if (p && p.type === 'debt') {
+    var inst = p.institution || '';
+    var amt = p.amount ? '¥' + formatAmount(p.amount) : '';
+    var parts = [];
+    if (inst) parts.push(inst);
+    if (amt) parts.push(amt);
+    if (title) parts.push(title);
+    if (code && title !== code) parts.push(code);
+    var t = parts.join(' · ') || code;
+    if (t.length <= 30) return t;
+    return t.slice(0, 30) + '…';
+  }
   if (title && title !== code) return title;
   if (!code) return '';
   if (code.length <= 24) return code;
@@ -111,8 +161,11 @@ module.exports = {
   fmtTime: fmtTime,
   isToday: isToday,
   ownerColor: ownerColor,
+  formatAmount: formatAmount,
   isOverdue: isOverdue,
   impLabel: impLabel,
+  dueLabel: dueLabel,
+  dueDays: dueDays,
   urgLabel: urgLabel,
   sortPackages: sortPackages,
   decorate: decorate,

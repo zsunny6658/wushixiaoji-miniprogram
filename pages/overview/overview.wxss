@@ -24,21 +24,32 @@
 /* 统计卡片 */
 .stats {
   display: flex;
+  flex-direction: column;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
+}
+.stats-row {
+  display: flex;
+  gap: var(--spacing-sm);
 }
 .stat-card {
   flex: 1;
   background: var(--bg-card);
   border-radius: var(--radius-md);
-  padding: var(--spacing-md) 16rpx;
+  padding: 20rpx 16rpx;
   text-align: center;
   box-shadow: var(--shadow-1);
   cursor: pointer;
   transition: transform 0.15s;
+  border-top: 6rpx solid transparent;
 }
 .stat-card:active {
   transform: scale(0.97);
+}
+.stat-icon {
+  font-size: 40rpx;
+  line-height: 1;
+  margin-bottom: 4rpx;
 }
 .stat-num {
   font-size: var(--font-heading);
@@ -47,18 +58,30 @@
   line-height: 1.2;
 }
 .stat-label {
-  font-size: var(--font-caption);
+  font-size: 22rpx;
   color: var(--text-secondary);
-  margin-top: var(--spacing-xs);
+  margin-top: 4rpx;
 }
-.s-pickup { border-top: 6rpx solid var(--color-primary); }
+.s-pickup { border-top-color: var(--color-primary); }
 .s-pickup .stat-num { color: var(--color-primary); }
-.s-todo { border-top: 6rpx solid var(--color-warning); }
+.s-todo { border-top-color: var(--color-warning); }
 .s-todo .stat-num { color: var(--color-warning); }
-.s-overdue { border-top: 6rpx solid var(--color-error); }
+.s-overdue { border-top-color: var(--color-error); }
 .s-overdue .stat-num { color: var(--color-error); }
-.s-done { border-top: 6rpx solid var(--color-success); }
+.s-done { border-top-color: var(--color-success); }
 .s-done .stat-num { color: var(--color-success); }
+.s-debt { border-top-color: #7c3aed; }
+.s-debt .stat-num { color: #7c3aed; }
+.s-private { border-top-color: #6b7280; }
+.s-private .stat-num { color: #6b7280; }
+.s-ignored { border-top-color: var(--text-tertiary); }
+.s-ignored .stat-num { color: var(--text-tertiary); }
+.stat-sub {
+  font-size: 20rpx;
+  color: var(--text-tertiary);
+  margin-top: 2rpx;
+  font-weight: 500;
+}
 
 /* 通用 section */
 .section {
@@ -72,14 +95,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: 12rpx;
 }
 .section-title {
   font-size: var(--font-subtitle);
   font-weight: 600;
   color: var(--text-primary);
 }
-.section-count {
+.section-more {
   font-size: var(--font-body-sm);
   color: var(--color-primary);
   cursor: pointer;
@@ -129,26 +152,55 @@
 .q4 .quad-num { color: var(--quad-q4-num); }
 .q4 .quad-label { color: var(--quad-q4-label); }
 
-/* 今日摘要 */
-.summary-card {
+/* 最新待办列表 */
+.pending-list {
+  display: flex;
+  flex-direction: column;
+}
+.pending-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: 12rpx;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid var(--bg-hover);
+  transition: background 0.15s;
 }
-.summary-icon {
-  font-size: 56rpx;
+.pending-item:last-child { border-bottom: none; }
+.pending-item:active { background: var(--bg-hover); }
+.pending-item.flagged { border-left: 4rpx solid #ef4444; padding-left: 8rpx; }
+.pending-icon {
+  font-size: 28rpx;
+  flex-shrink: 0;
+  width: 36rpx;
+  text-align: center;
 }
-.summary-body {
+.pending-body {
   flex: 1;
+  min-width: 0;
 }
-.summary-title {
-  font-size: var(--font-body);
-  font-weight: 600;
+.pending-text {
+  display: block;
+  font-size: 26rpx;
   color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.3;
 }
-.summary-desc {
+.pending-time {
+  display: block;
+  font-size: 20rpx;
+  color: var(--text-tertiary);
+  margin-top: 2rpx;
+}
+.pending-arrow {
+  font-size: 28rpx;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+.pending-empty {
+  text-align: center;
+  padding: 20rpx 0;
   font-size: var(--font-body-sm);
-  color: var(--text-secondary);
-  margin-top: var(--spacing-xs);
-  line-height: 1.5;
+  color: var(--text-tertiary);
 }

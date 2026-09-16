@@ -1,4 +1,5 @@
 <view class="page">
+  <view class="version-bar">V6 21:23</view>
   <view class="quad-summary">
     <text class="summary-label">待处理总数</text>
     <text class="summary-count">{{totalCount}}</text>
@@ -10,22 +11,16 @@
         <text class="quad-title">🔴 重要紧急</text>
         <text class="quad-count">{{quadrants.q1.length}}</text>
       </view>
-      <view class="quad-hint">立即处理</view>
       <scroll-view class="quad-list" scroll-y>
-        <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q1}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
-          <view class="qcard-main">
-            <text class="qcard-title">{{pkg.title || pkg.code}}</text>
-            <view class="qcard-meta">
-              <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
-              <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
-              <text class="qcard-code qcard-code-wrap" wx:if="{{pkg.type === 'todo'}}">{{pkg.code}}</text>
-              <text class="qcard-assignee" wx:if="{{pkg.type === 'todo' && pkg.assignee}}">@{{pkg.assignee}}</text>
-              <text class="qcard-src" wx:if="{{pkg.source}}">{{pkg.source}}</text>
-              <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
-              <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+        <view class="qcard {{pkg.overdue ? 'urgent' : ''}} {{pkg.importance === 'high' ? 'flagged' : ''}}" wx:for="{{quadrants.q1}}" wx:for-item="pkg" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
+          <view class="qcard-body">
+            <text class="qcard-title-text">{{pkg.summaryText || pkg.title || pkg.code}}</text>
+            <view class="qcard-meta-row">
+              <text class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+              <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
             </view>
           </view>
-          <text class="qcard-arrow">›</text>
         </view>
         <view class="quad-empty" wx:if="{{quadrants.q1.length === 0}}">暂无</view>
       </scroll-view>
@@ -36,22 +31,16 @@
         <text class="quad-title">🟡 重要不紧急</text>
         <text class="quad-count">{{quadrants.q2.length}}</text>
       </view>
-      <view class="quad-hint">规划安排</view>
       <scroll-view class="quad-list" scroll-y>
-        <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q2}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
-          <view class="qcard-main">
-            <text class="qcard-title">{{pkg.title || pkg.code}}</text>
-            <view class="qcard-meta">
-              <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
-              <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
-              <text class="qcard-code qcard-code-wrap" wx:if="{{pkg.type === 'todo'}}">{{pkg.code}}</text>
-              <text class="qcard-assignee" wx:if="{{pkg.type === 'todo' && pkg.assignee}}">@{{pkg.assignee}}</text>
-              <text class="qcard-src" wx:if="{{pkg.source}}">{{pkg.source}}</text>
-              <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
-              <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+        <view class="qcard {{pkg.overdue ? 'urgent' : ''}} {{pkg.importance === 'high' ? 'flagged' : ''}}" wx:for="{{quadrants.q2}}" wx:for-item="pkg" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
+          <view class="qcard-body">
+            <text class="qcard-title-text">{{pkg.summaryText || pkg.title || pkg.code}}</text>
+            <view class="qcard-meta-row">
+              <text class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+              <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
             </view>
           </view>
-          <text class="qcard-arrow">›</text>
         </view>
         <view class="quad-empty" wx:if="{{quadrants.q2.length === 0}}">暂无</view>
       </scroll-view>
@@ -62,22 +51,16 @@
         <text class="quad-title">🔵 不重要紧急</text>
         <text class="quad-count">{{quadrants.q3.length}}</text>
       </view>
-      <view class="quad-hint">快速处理</view>
       <scroll-view class="quad-list" scroll-y>
-        <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q3}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
-          <view class="qcard-main">
-            <text class="qcard-title">{{pkg.title || pkg.code}}</text>
-            <view class="qcard-meta">
-              <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
-              <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
-              <text class="qcard-code qcard-code-wrap" wx:if="{{pkg.type === 'todo'}}">{{pkg.code}}</text>
-              <text class="qcard-assignee" wx:if="{{pkg.type === 'todo' && pkg.assignee}}">@{{pkg.assignee}}</text>
-              <text class="qcard-src" wx:if="{{pkg.source}}">{{pkg.source}}</text>
-              <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
-              <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+        <view class="qcard {{pkg.overdue ? 'urgent' : ''}} {{pkg.importance === 'high' ? 'flagged' : ''}}" wx:for="{{quadrants.q3}}" wx:for-item="pkg" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
+          <view class="qcard-body">
+            <text class="qcard-title-text">{{pkg.summaryText || pkg.title || pkg.code}}</text>
+            <view class="qcard-meta-row">
+              <text class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+              <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
             </view>
           </view>
-          <text class="qcard-arrow">›</text>
         </view>
         <view class="quad-empty" wx:if="{{quadrants.q3.length === 0}}">暂无</view>
       </scroll-view>
@@ -88,22 +71,16 @@
         <text class="quad-title">⚪ 不重要不紧急</text>
         <text class="quad-count">{{quadrants.q4.length}}</text>
       </view>
-      <view class="quad-hint">可忽略</view>
       <scroll-view class="quad-list" scroll-y>
-        <view class="qcard {{pkg.overdue ? 'urgent' : ''}}" wx:for="{{quadrants.q4}}" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
-          <view class="qcard-main">
-            <text class="qcard-title">{{pkg.title || pkg.code}}</text>
-            <view class="qcard-meta">
-              <text class="qcard-type">{{pkg.type === 'pickup' ? '📦取件' : '📝备忘'}}</text>
-              <text class="qcard-code" wx:if="{{pkg.type === 'pickup'}}">{{pkg.code}}</text>
-              <text class="qcard-code qcard-code-wrap" wx:if="{{pkg.type === 'todo'}}">{{pkg.code}}</text>
-              <text class="qcard-assignee" wx:if="{{pkg.type === 'todo' && pkg.assignee}}">@{{pkg.assignee}}</text>
-              <text class="qcard-src" wx:if="{{pkg.source}}">{{pkg.source}}</text>
-              <text class="qcard-time" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
-              <text class="qcard-occ" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+        <view class="qcard {{pkg.overdue ? 'urgent' : ''}} {{pkg.importance === 'high' ? 'flagged' : ''}}" wx:for="{{quadrants.q4}}" wx:for-item="pkg" wx:key="id" catchtap="onEdit" data-id="{{pkg.id}}">
+          <view class="qcard-body">
+            <text class="qcard-title-text">{{pkg.summaryText || pkg.title || pkg.code}}</text>
+            <view class="qcard-meta-row">
+              <text class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
+              <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
             </view>
           </view>
-          <text class="qcard-arrow">›</text>
         </view>
         <view class="quad-empty" wx:if="{{quadrants.q4.length === 0}}">暂无</view>
       </scroll-view>

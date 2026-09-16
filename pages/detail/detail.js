@@ -30,27 +30,38 @@ Page({
     var gd = app.globalData;
     var pkgs = (gd.packages || []);
     var raw = pkgs.find(function (p) { return p.id === id; });
-    if (!raw) {
-      // 缓存里没有，刷新后重试一次
-      app.refreshState(function () {
-        raw = (app.globalData.packages || []).find(function (p) { return p.id === id; });
-        if (!raw) {
-          wx.showToast({ title: '记录不存在', icon: 'none' });
-          setTimeout(function () { wx.navigateBack(); }, 1000);
-          return;
-        }
-        that.applyDetail(raw);
-      });
+    if (raw) {
+      this.applyDetail(raw);
       return;
     }
-    this.applyDetail(raw);
+    // 缓存里没有，先刷新本地状态重试
+    app.refreshState(function () {
+      raw = (app.globalData.packages || []).find(function (p) { return p.id === id; });
+      if (raw) {
+        that.applyDetail(raw);
+        return;
+      }
+      // 本地还是没有，走 API 直接查
+      api.getPackage(id, function (data) {
+        if (data && data.package) {
+          that.applyDetail(data.package);
+        } else {
+          wx.showToast({ title: '记录不存在', icon: 'none' });
+          setTimeout(function () { wx.navigateBack(); }, 1000);
+        }
+      }, function () {
+        wx.showToast({ title: '记录不存在', icon: 'none' });
+        setTimeout(function () { wx.navigateBack(); }, 1000);
+      });
+    });
   },
 
   applyDetail: function (raw) {
     var gd = app.globalData;
     var decorated = helpers.decorate(raw, gd.members);
     this.setData({ pkg: decorated });
-    wx.setNavigationBarTitle({ title: decorated.type === 'pickup' ? '取件详情' : '备忘详情' });
+    var titleMap = { pickup: '取件详情', todo: '备忘详情', debt: '待还详情' };
+    wx.setNavigationBarTitle({ title: titleMap[decorated.type] || '详情' });
   },
 
   onCopy: function () {
@@ -87,6 +98,40 @@ Page({
         }
       }
     });
+  },
+
+  onToggleIgnore: function () {
+    var self = this;
+    var pkg = this.data.pkg;
+    var id = pkg.id;
+    if (pkg.status === 'ignored') {
+      api.updatePackage(id, { status: 'pending' }, function () {
+        app.refreshState(function () { self.loadDetail(id); });
+        wx.showToast({ title: '已取消忽略', icon: 'success' });
+      });
+    } else {
+      api.updatePackage(id, { status: 'ignored' }, function () {
+        app.refreshState(function () { self.loadDetail(id); });
+        wx.showToast({ title: '已忽略', icon: 'success' });
+      });
+    }
+  },
+
+  onToggleFlag: function () {
+    var self = this;
+    var pkg = this.data.pkg;
+    var id = pkg.id;
+    if (pkg.importance === 'high') {
+      api.updatePackage(id, { importance: 'medium' }, function () {
+        app.refreshState(function () { self.loadDetail(id); });
+        wx.showToast({ title: '已取消重点', icon: 'success' });
+      });
+    } else {
+      api.updatePackage(id, { importance: 'high' }, function () {
+        app.refreshState(function () { self.loadDetail(id); });
+        wx.showToast({ title: '已标记重点', icon: 'success' });
+      });
+    }
   },
 
   onTogglePick: function () {

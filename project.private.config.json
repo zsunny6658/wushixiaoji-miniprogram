@@ -2,7 +2,7 @@
   "libVersion": "3.17.3",
   "projectname": "family-parcel-hub-miniapp",
   "setting": {
-    "urlCheck": false,
+    "urlCheck": true,
     "coverView": false,
     "lazyloadPlaceholderEnable": false,
     "skylineRenderEnable": false,

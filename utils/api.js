@@ -74,6 +74,9 @@ var API = {
   addPackages: function (items, cb, errCb) {
     this.request('POST', '/api/packages', { items: items }, cb, errCb);
   },
+  getPackage: function (id, cb, errCb) {
+    this.request('GET', '/api/packages/' + id, null, cb, errCb);
+  },
   updatePackage: function (id, data, cb, errCb) {
     this.request('PATCH', '/api/packages/' + id, data, cb, errCb);
   },
@@ -164,6 +167,14 @@ var API = {
   // 成员口令重发
   resendMember: function (id, cb, errCb) {
     this.request('POST', '/api/members/' + id + '/resend', {}, cb, errCb);
+  },
+
+  // 通知设置
+  getNotifyConfig: function (cb, errCb) {
+    this.request('GET', '/api/notify/config', null, cb, errCb);
+  },
+  updateNotifyConfig: function (data, cb, errCb) {
+    this.request('PUT', '/api/notify/config', data, cb, errCb);
   }
 };
 

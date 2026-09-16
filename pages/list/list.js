@@ -7,6 +7,7 @@ Page({
   data: {
     recordType: 'all',
     filter: 'all',
+    scope: 'all',
     importanceFilter: 'all',
     urgencyFilter: 'all',
     group: 'none',
@@ -18,7 +19,11 @@ Page({
     urgOptions: ['紧迫性：全部', '⚡ 紧急', '🕐 普通'],
     urgIndex: 0,
     groupOptions: ['不分组', '按成员', '按待办类型'],
+    typeOptions: ['全部', '取件', '备忘', '待还'],
+    scopeOptions: ['全部', '👨‍👩‍👧 家庭', '🔒 个人'],
+    scopeIndex: 0,
     groupIndex: 0,
+    counts: { all: 0, pending: 0, picked: 0, overdue: 0, ignored: 0 },
     emptyEmoji: '📋',
     emptyTitle: '当前没有记录',
     emptyDesc: '点击右下角 + 添加',
@@ -32,11 +37,13 @@ Page({
     this.setData({
       recordType: 'all',
       filter: 'all',
+      scope: 'all',
       importanceFilter: 'all',
       urgencyFilter: 'all',
       group: app.globalData.group || 'none',
       impIndex: 0,
       urgIndex: 0,
+      scopeIndex: 0,
       groupIndex: ['none', 'owner', 'type'].indexOf(app.globalData.group || 'none')
     });
   },
@@ -49,6 +56,8 @@ Page({
       this.setData({
         recordType: gd._deepLinkFilter.recordType || 'all',
         filter: gd._deepLinkFilter.filter || 'all',
+        scope: gd._deepLinkFilter.scope || 'all',
+        scopeIndex: ['all', 'family', 'personal'].indexOf(gd._deepLinkFilter.scope || 'all'),
         impIndex: ['all', 'high', 'medium', 'low'].indexOf(gd._deepLinkFilter.importance || 'all'),
         urgIndex: ['all', 'urgent', 'normal'].indexOf(gd._deepLinkFilter.urgency || 'all'),
         importanceFilter: gd._deepLinkFilter.importance || 'all',
@@ -70,9 +79,18 @@ Page({
 
 
     if (this.data.recordType !== 'all') pkgs = pkgs.filter(function (p) { return p.type === this.data.recordType; }.bind(this));
+    // 个人可见性过滤（后端已过滤，这里兜底）
+    pkgs = pkgs.filter(function (p) {
+      if (p.isPrivate && p.ownerId && p.ownerId !== app.globalData.meId && !app.globalData.isAdmin) return false;
+      return true;
+    });
+    // 家庭/个人筛选
+    if (this.data.scope === 'family') pkgs = pkgs.filter(function (p) { return !p.isPrivate; });
+    else if (this.data.scope === 'personal') pkgs = pkgs.filter(function (p) { return p.isPrivate; });
     if (this.data.filter === 'pending') pkgs = pkgs.filter(function (p) { return p.status === 'pending'; });
     else if (this.data.filter === 'picked') pkgs = pkgs.filter(function (p) { return p.status === 'picked'; });
-    else if (this.data.filter === 'overdue') pkgs = pkgs.filter(function (p) { return p.overdue; });
+    else if (this.data.filter === 'overdue') pkgs = pkgs.filter(function (p) { return p.overdue && p.status === 'pending'; });
+    else if (this.data.filter === 'ignored') pkgs = pkgs.filter(function (p) { return p.status === 'ignored'; });
     if (this.data.importanceFilter !== 'all') pkgs = pkgs.filter(function (p) { return p.importance === this.data.importanceFilter; }.bind(this));
     if (this.data.urgencyFilter !== 'all') pkgs = pkgs.filter(function (p) { return p.urgency === this.data.urgencyFilter; }.bind(this));
     var kw = this.data.search.trim().toLowerCase();
@@ -81,13 +99,15 @@ Page({
              (p.station || '').toLowerCase().indexOf(kw) >= 0 ||
              (p.trackingNo || '').toLowerCase().indexOf(kw) >= 0 ||
              (p.owner || '').toLowerCase().indexOf(kw) >= 0 ||
-             (p.company || '').toLowerCase().indexOf(kw) >= 0;
+             (p.company || '').toLowerCase().indexOf(kw) >= 0 ||
+             (p.institution || '').toLowerCase().indexOf(kw) >= 0 ||
+             (p.title || '').toLowerCase().indexOf(kw) >= 0;
     });
     pkgs = helpers.sortPackages(pkgs);
 
     var groups = [];
     if (this.data.group !== 'none' && pkgs.length) {
-      var keyOf = this.data.group === 'owner' ? function (p) { return p.owner || '未指定'; } : function (p) { return p.type === 'pickup' ? '📦 取件' : '📝 备忘'; };
+      var keyOf = this.data.group === 'owner' ? function (p) { return p.owner || '未指定'; } : function (p) { return p.type === 'pickup' ? '📦 取件' : (p.type === 'debt' ? '💳 待还' : '📝 备忘'); };
       var map = {}, order = [];
       pkgs.forEach(function (p) {
         var k = keyOf(p);
@@ -97,12 +117,26 @@ Page({
       order.forEach(function (k) { groups.push({ key: k, items: map[k] }); });
     }
 
-    var emptyMap = { all: ['📋', '当前没有记录', '点击右下角 + 添加'], pending: ['⏳', '没有待办', '做得不错'], picked: ['✅', '没有已完成', '完成后点击 ✓ 归档'], overdue: ['⚠️', '没有逾期', '没有需要处理的'] };
+    var emptyMap = { all: ['📋', '当前没有记录', '点击右下角 + 添加'], pending: ['⏳', '没有待办', '做得不错'], picked: ['✅', '没有已完成', '完成后点击 ✓ 归档'], overdue: ['⚠️', '没有逾期', '没有需要处理的'], ignored: ['🚫', '没有已忽略的记录', '点击卡片进入详情可忽略'], debt: ['💳', '没有待还款项', '点击右下角 + 添加'] };
     var em = emptyMap[this.data.filter] || emptyMap.all;
 
-    this.setData({ list: pkgs, groups: groups, emptyEmoji: em[0], emptyTitle: em[1], emptyDesc: em[2] });
+    var allPkgs = (gd.packages || []).map(function (p) { return helpers.decorate(p, gd.members); });
+    var counts = {
+      all: allPkgs.length,
+      pending: allPkgs.filter(function (p) { return p.status === 'pending'; }).length,
+      picked: allPkgs.filter(function (p) { return p.status === 'picked'; }).length,
+      overdue: allPkgs.filter(function (p) { return p.overdue && p.status === 'pending'; }).length,
+      ignored: allPkgs.filter(function (p) { return p.status === 'ignored'; }).length
+    };
+
+    this.setData({ list: pkgs, groups: groups, counts: counts, emptyEmoji: em[0], emptyTitle: em[1], emptyDesc: em[2] });
   },
 
+  switchScope: function (e) {
+    var s = e.currentTarget.dataset.scope;
+    this.setData({ scope: s });
+    this.computeList();
+  },
   switchType: function (e) {
     var t = e.currentTarget.dataset.type;
     app.globalData.recordType = t;
@@ -112,6 +146,24 @@ Page({
   switchFilter: function (e) {
     this.setData({ filter: e.currentTarget.dataset.filter });
     this.computeList();
+  },
+
+  onToggleIgnore: function (e) {
+    var id = e.currentTarget.dataset.id;
+    var pkg = (app.globalData.packages || []).find(function (p) { return p.id === id; });
+    if (!pkg) return;
+    var that = this;
+    if (pkg.status === 'ignored') {
+      api.updatePackage(id, { status: 'pending' }, function () {
+        that.computeList();
+        wx.showToast({ title: '已取消忽略', icon: 'success' });
+      });
+    } else {
+      api.updatePackage(id, { status: 'ignored' }, function () {
+        that.computeList();
+        wx.showToast({ title: '已忽略', icon: 'success' });
+      });
+    }
   },
   onSearch: function (e) { this.setData({ search: e.detail.value }); this.computeList(); },
   onImpChange: function (e) {

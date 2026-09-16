@@ -11,8 +11,10 @@ Page({
     editTitle: '',
     type: 'pickup',
     typeIndex: 0,
-    typeOptions: ['📦 取件码', '📝 文本备忘'],
-    form: { station: '', code: '', company: '', trackingNo: '', note: '' },
+    typeOptions: ['📦 取件码', '📝 文本备忘', '💳 待还款'],
+    form: { station: '', code: '', company: '', trackingNo: '', note: '', institution: '', amount: '' },
+    dueDateStr: '',
+    isPrivate: false,
     smartText: '',
     imageTempPaths: [],
     imageBase64List: [],
@@ -43,8 +45,10 @@ Page({
       var r = app.globalData._pendingAddData;
       this.setData({
         type: r.type || 'pickup',
-        typeIndex: (r.type === 'todo') ? 1 : 0,
-        form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '' },
+        typeIndex: (r.type === 'todo') ? 1 : (r.type === 'debt' ? 2 : 0),
+        form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '', institution: r.institution || '', amount: r.amount ? String(r.amount) : '' },
+        dueDateStr: r.dueDate || '',
+        isPrivate: !!r.isPrivate,
         impIndex: ['high', 'medium', 'low'].indexOf(r.importance || 'medium'),
         urgIndex: ['urgent', 'normal'].indexOf(r.urgency || 'normal')
       });
@@ -58,8 +62,10 @@ Page({
           editId: pkg.id,
           editTitle: pkg.code || '',
           type: pkg.type || 'pickup',
-          typeIndex: pkg.type === 'todo' ? 1 : 0,
-          form: { station: pkg.station || '', code: pkg.code || '', company: pkg.company || '', trackingNo: pkg.trackingNo || '', note: pkg.note || '' },
+          typeIndex: pkg.type === 'todo' ? 1 : (pkg.type === 'debt' ? 2 : 0),
+          form: { station: pkg.station || '', code: pkg.code || '', company: pkg.company || '', trackingNo: pkg.trackingNo || '', note: pkg.note || '', institution: pkg.institution || '', amount: pkg.amount ? String(pkg.amount) : '' },
+          dueDateStr: pkg.dueDate || '',
+          isPrivate: !!pkg.isPrivate,
           dateStr: pkg.arrivedAt ? d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2) : today(),
           timeStr: pkg.arrivedAt ? ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2) : nowTime(),
           memberIndex: this.findMemberIndex(pkg.owner),
@@ -81,7 +87,11 @@ Page({
 
   onTypeChange: function (e) {
     var i = parseInt(e.detail.value, 10);
-    this.setData({ typeIndex: i, type: i === 1 ? 'todo' : 'pickup' });
+    var typeMap = { 0: 'pickup', 1: 'todo', 2: 'debt' };
+    this.setData({ typeIndex: i, type: typeMap[i] || 'pickup' });
+  },
+  onPrivateChange: function (e) {
+    this.setData({ isPrivate: e.detail.value });
   },
   onField: function (e) {
     var f = e.currentTarget.dataset.field;
@@ -96,6 +106,7 @@ Page({
   onAssignerChange: function (e) { this.setData({ assignerIndex: parseInt(e.detail.value, 10) }); },
   onImpChange: function (e) { this.setData({ impIndex: parseInt(e.detail.value, 10) }); },
   onUrgChange: function (e) { this.setData({ urgIndex: parseInt(e.detail.value, 10) }); },
+  onDueDateChange: function (e) { this.setData({ dueDateStr: e.detail.value }); },
 
   onSmartParse: function () {
     var text = this.data.smartText.trim();
@@ -118,8 +129,10 @@ Page({
         var d = new Date(r.arrivedAt || Date.now());
         that.setData({
           type: r.type || 'pickup',
-          typeIndex: (r.type === 'todo') ? 1 : 0,
-          form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '' },
+          typeIndex: (r.type === 'todo') ? 1 : (r.type === 'debt' ? 2 : 0),
+          form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '', institution: r.institution || '', amount: r.amount ? String(r.amount) : '' },
+          dueDateStr: r.dueDate || '',
+          isPrivate: r.type === 'debt' ? true : false,
           dateStr: r.arrivedAt ? d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2) : today(),
           timeStr: r.arrivedAt ? ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2) : nowTime(),
           impIndex: ['high', 'medium', 'low'].indexOf(r.importance || 'medium'),
@@ -217,8 +230,10 @@ Page({
       var d = new Date(r.arrivedAt || Date.now());
       that.setData({
         type: r.type || 'pickup',
-        typeIndex: (r.type === 'todo') ? 1 : 0,
-        form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '' },
+        typeIndex: (r.type === 'todo') ? 1 : (r.type === 'debt' ? 2 : 0),
+        form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '', institution: r.institution || '', amount: r.amount ? String(r.amount) : '' },
+      dueDateStr: r.dueDate || '',
+        isPrivate: r.type === 'debt' ? true : false,
         dateStr: r.arrivedAt ? d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2) : today(),
         timeStr: r.arrivedAt ? ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2) : nowTime(),
         impIndex: ['high', 'medium', 'low'].indexOf(r.importance || 'medium'),
@@ -254,7 +269,11 @@ Page({
       assigner: this.data.assignerIndex === 0 ? '' : this.data.memberOptions[this.data.assignerIndex],
       note: f.note || '',
       importance: ['high', 'medium', 'low'][this.data.impIndex] || 'medium',
-      urgency: ['urgent', 'normal'][this.data.urgIndex] || 'normal'
+      urgency: ['urgent', 'normal'][this.data.urgIndex] || 'normal',
+      institution: f.institution || '',
+      amount: f.amount ? parseFloat(f.amount) : 0,
+      dueDate: this.data.dueDateStr || '',
+      isPrivate: this.data.isPrivate
     };
     wx.showLoading({ title: '保存中...' });
     if (this.data.editId) {

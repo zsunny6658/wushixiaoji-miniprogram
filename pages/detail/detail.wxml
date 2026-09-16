@@ -1,8 +1,8 @@
 <view class="detail-page">
   <!-- 顶部状态栏 -->
-  <view class="status-bar {{pkg.status === 'picked' ? 'done' : ''}}">
-    <text class="status-icon">{{pkg.status === 'picked' ? '✅' : '⏳'}}</text>
-    <text class="status-text">{{pkg.status === 'picked' ? '已完成' : '待处理'}}</text>
+  <view class="status-bar {{pkg.status === 'picked' ? 'done' : ''}} {{pkg.status === 'ignored' ? 'ignored' : ''}}">
+    <text class="status-icon">{{pkg.status === 'picked' ? '✅' : (pkg.status === 'ignored' ? '🚫' : '⏳')}}</text>
+    <text class="status-text">{{pkg.status === 'picked' ? '已完成' : (pkg.status === 'ignored' ? '已忽略' : '待处理')}}</text>
     <view class="status-right" wx:if="{{pkg.overdue}}">
       <text class="overdue-badge">逾期</text>
     </view>
@@ -13,7 +13,8 @@
     <!-- 标题卡片 -->
     <view class="title-card">
       <view class="title-row">
-        <text class="type-badge {{pkg.type}}">{{pkg.type === 'pickup' ? '📦 取件' : '📝 备忘'}}</text>
+        <text class="type-badge {{pkg.type}}">{{pkg.type === 'pickup' ? '📦 取件' : (pkg.type === 'debt' ? '💳 待还' : '📝 备忘')}}</text>
+        <text class="private-badge" wx:if="{{pkg.isPrivate}}">🔒 个人</text>
         <text class="occ-badge" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
         <text class="tag-badge" wx:if="{{pkg.tagLabel}}">{{pkg.tagLabel}}</text>
       </view>
@@ -23,12 +24,20 @@
         <text class="station-icon">📍</text>
         <text>{{pkg.station}}</text>
       </view>
+      <view class="debt-amount" wx:if="{{pkg.type === 'debt' && pkg.amount}}">
+        <text class="debt-amount-label">还款金额</text>
+        <text class="debt-amount-value">¥{{pkg.amountLabel}}</text>
+      </view>
     </view>
 
-    <!-- 内容区 (todo 的完整内容) -->
-    <view class="content-section" wx:if="{{pkg.type === 'todo'}}">
-      <view class="content-title">📝 内容</view>
+    <!-- 内容区 (todo/debt 的完整内容) -->
+    <view class="content-section" wx:if="{{pkg.type === 'todo' || pkg.type === 'debt'}}">
+      <view class="content-title">{{pkg.type === 'debt' ? '💳 待还款项' : '📝 备忘内容'}}</view>
       <view class="content-text">{{pkg.code}}</view>
+      <view class="debt-institution" wx:if="{{pkg.type === 'debt' && pkg.institution}}">
+        <text class="debt-inst-label">金融机构</text>
+        <text class="debt-inst-value">{{pkg.institution}}</text>
+      </view>
     </view>
 
     <!-- 原始内容 -->
@@ -44,6 +53,10 @@
         <view class="info-row" wx:if="{{pkg.type === 'pickup' && pkg.company}}">
           <text class="info-label">🚚 公司</text>
           <text class="info-value">{{pkg.company}}</text>
+        </view>
+        <view class="info-row" wx:if="{{pkg.type === 'debt' && pkg.dueDate}}">
+          <text class="info-label">📅 还款期限</text>
+          <text class="info-value {{pkg.dueDays ? 'warn' : ''}}">{{pkg.dueDate}} {{pkg.dueDays ? '(' + pkg.dueDays + ')' : ''}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.trackingNo}}">
           <text class="info-label">🔢 单号</text>
@@ -95,6 +108,10 @@
 
   <!-- 底部操作栏 -->
   <view class="action-bar">
+    <button class="action-btn action-flag {{pkg.importance === 'high' ? 'action-flag-active' : ''}}" bindtap="onToggleFlag">
+      <text class="action-icon">🚩</text>
+      <text>{{pkg.importance === 'high' ? '取消重点' : '标重点'}}</text>
+    </button>
     <button class="action-btn action-copy" bindtap="onCopy">
       <text class="action-icon">📋</text>
       <text>复制</text>
@@ -103,13 +120,17 @@
       <text class="action-icon">✏️</text>
       <text>编辑</text>
     </button>
-    <button class="action-btn action-delete" bindtap="onDelete">
-      <text class="action-icon">🗑️</text>
-      <text>删除</text>
+    <button class="action-btn action-ignore {{pkg.status === 'ignored' ? 'action-ignored' : ''}}" bindtap="onToggleIgnore">
+      <text class="action-icon">🚫</text>
+      <text>{{pkg.status === 'ignored' ? '取消忽略' : '忽略'}}</text>
     </button>
     <button class="action-btn action-main {{pkg.status === 'picked' ? 'action-unpick' : ''}}" bindtap="onTogglePick">
       <text class="action-icon">{{pkg.status === 'picked' ? '↩️' : '✓'}}</text>
       <text>{{pkg.status === 'picked' ? '撤销' : '完成'}}</text>
+    </button>
+    <button class="action-btn action-delete" bindtap="onDelete">
+      <text class="action-icon">🗑️</text>
+      <text>删除</text>
     </button>
   </view>
 </view>

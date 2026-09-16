@@ -18,7 +18,8 @@ Page({
     groupOptions: ['不分组', '按成员', '按待办类型'],
     groupIndex: 0,
     showCreateFamily: false,
-    newFamilyName: ''
+    newFamilyName: '',
+    notifyEnabled: true
   },
 
   onLoad: function () {
@@ -96,6 +97,18 @@ Page({
     this.setData({ groupIndex: i });
   },
 
+  onToggleNotify: function (e) {
+    var enabled = e.detail.value;
+    var that = this;
+    that.setData({ notifyEnabled: enabled });
+    api.request('PUT', '/api/notify/config', { enabled: enabled }, function () {
+      wx.showToast({ title: enabled ? '已开启' : '已关闭', icon: 'success' });
+    }, function () {
+      that.setData({ notifyEnabled: !enabled });
+      wx.showToast({ title: '设置失败', icon: 'none' });
+    });
+  },
+
   switchFamily: function (e) {
     var fid = e.currentTarget.dataset.id;
     app.globalData.familyId = fid;
@@ -104,33 +117,8 @@ Page({
     wx.showToast({ title: '已切换', icon: 'success' });
   },
 
-  onRefresh: function () {
-    app.refreshState(function () { wx.showToast({ title: '已刷新', icon: 'success' }); });
-  },
-
-  onClearPicked: function () {
-    var that = this;
-    wx.showModal({
-      title: '清理已完成',
-      content: '删除所有已完成的记录？',
-      success: function (res) {
-        if (res.confirm) {
-          api.clearPicked(function () {
-            wx.showToast({ title: '已清理', icon: 'success' });
-            app.refreshState();
-          });
-        }
-      }
-    });
-  },
-
-  onExport: function () {
-    var pkgs = (app.globalData.packages || []).filter(function (p) { return p.status === 'pending'; });
-    var lines = pkgs.map(function (p) {
-      return (p.type === 'pickup' ? '【取件】' : '【备忘】') + p.code + (p.station ? ' @ ' + p.station : '') + (p.arrivedAt ? ' (' + new Date(p.arrivedAt).toLocaleString() + ')' : '');
-    });
-    if (!lines.length) { wx.showToast({ title: '没有待处理记录', icon: 'none' }); return; }
-    wx.setClipboardData({ data: lines.join('\n'), success: function () { wx.showToast({ title: '已复制 ' + lines.length + ' 条', icon: 'success' }); } });
+  onCopyBaseUrl: function () {
+    wx.setClipboardData({ data: this.data.baseUrl, success: function () { wx.showToast({ title: '已复制', icon: 'success' }); } });
   },
 
   onEditProfile: function () {

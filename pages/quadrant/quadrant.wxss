@@ -1,9 +1,22 @@
-/* pages/quadrant/quadrant.wxss - 四象限 2x2 矩阵 */
+/* pages/quadrant/quadrant.wxss - 四象限 2x2 网格 */
+
+.version-bar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  background: #333;
+  color: #fff;
+  font-size: 18rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 0 0 0 12rpx;
+  z-index: 999;
+}
 
 .page {
   min-height: 100vh;
   background: var(--bg-page);
   padding: var(--spacing-md);
+  padding-top: calc(var(--spacing-md) + 30rpx);
   box-sizing: border-box;
 }
 
@@ -13,7 +26,7 @@
   align-items: baseline;
   justify-content: center;
   gap: 12rpx;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 16rpx var(--spacing-md);
   background: var(--bg-card);
   border-radius: var(--radius-md);
   margin-bottom: var(--spacing-sm);
@@ -35,7 +48,7 @@
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: var(--spacing-sm);
-  height: calc(100vh - 220rpx - env(safe-area-inset-bottom));
+  height: calc(100vh - 180rpx - env(safe-area-inset-bottom));
 }
 
 /* 每个象限格子 */
@@ -59,10 +72,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 12rpx 16rpx;
+  flex-shrink: 0;
 }
 .quad-title {
-  font-size: var(--font-body-sm);
+  font-size: 24rpx;
   font-weight: 700;
 }
 .quad-cell.q1 .quad-title { color: var(--quad-q1-label); }
@@ -70,12 +84,12 @@
 .quad-cell.q3 .quad-title { color: var(--quad-q3-label); }
 .quad-cell.q4 .quad-title { color: var(--quad-q4-label); }
 .quad-count {
-  min-width: 40rpx;
-  height: 40rpx;
-  line-height: 40rpx;
+  min-width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
   text-align: center;
   border-radius: var(--radius-full);
-  font-size: var(--font-body-sm);
+  font-size: 22rpx;
   font-weight: 700;
   background: var(--bg-card);
   padding: 0 8rpx;
@@ -86,117 +100,59 @@
 .quad-cell.q3 .quad-count { color: var(--quad-q3-num); }
 .quad-cell.q4 .quad-count { color: var(--quad-q4-num); }
 
-/* 行动建议 */
-.quad-hint {
-  font-size: var(--font-caption);
-  padding: 0 var(--spacing-md) var(--spacing-xs);
-  opacity: 0.8;
-}
-.quad-cell.q1 .quad-hint { color: var(--quad-q1-label); }
-.quad-cell.q2 .quad-hint { color: var(--quad-q2-label); }
-.quad-cell.q3 .quad-hint { color: var(--quad-q3-label); }
-.quad-cell.q4 .quad-hint { color: var(--quad-q4-label); }
-
-/* 象限内列表 */
+/* 象限内列表（可滚动） */
 .quad-list {
   flex: 1;
   min-height: 0;
-  padding: 0 var(--spacing-xs) var(--spacing-xs);
+  padding: 0 12rpx 12rpx;
 }
 
 /* 卡片 */
 .qcard {
-  display: flex;
-  align-items: center;
   background: var(--bg-card);
   border-radius: var(--radius-sm);
-  padding: 12rpx 16rpx;
+  padding: 10rpx 14rpx;
   margin-bottom: 6rpx;
   box-shadow: 0 1rpx 4rpx rgba(0,0,0,0.06);
-  cursor: pointer;
   transition: transform 0.15s;
 }
 .qcard:active { transform: scale(0.98); }
-.qcard.urgent { border-left: 4rpx solid var(--color-error); }
-.qcard-main {
-  flex: 1;
+.qcard.urgent { border-left: 3rpx solid var(--color-error); }
+.qcard.flagged { border-left: 3rpx solid #ef4444; }
+
+.qcard-body {
   min-width: 0;
-  margin-right: 8rpx;
 }
-.qcard-title {
+.qcard-title-text {
   display: block;
-  font-size: var(--font-body);
+  font-size: 22rpx;
   font-weight: 700;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 1.3;
-  margin-bottom: 4rpx;
+  margin-bottom: 2rpx;
 }
-.qcard-code {
-  display: block;
-  font-size: 22rpx;
-  color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.3;
-}
-.qcard-meta {
+.qcard-meta-row {
   display: flex;
   align-items: center;
   gap: 8rpx;
-  margin-top: 2rpx;
   flex-wrap: wrap;
 }
-.qcard-type {
-  font-size: 20rpx;
-  color: var(--text-secondary);
+.qcard-meta-item {
+  font-size: 18rpx;
+  color: var(--text-tertiary);
 }
-.qcard-assignee {
-  font-size: 20rpx;
+.qcard-meta-item.assignee {
   color: var(--color-success);
   font-weight: 600;
 }
-.qcard-src {
-  font-size: 20rpx;
-  color: var(--text-tertiary);
-  max-width: 200rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.qcard-time {
-  font-size: 20rpx;
-  color: var(--text-tertiary);
-}
-.qcard-code-wrap {
-  white-space: normal;
-  word-break: break-all;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.qcard-occ {
-  font-size: 20rpx;
-  font-weight: 700;
-  color: var(--color-error);
-  background: var(--color-error-light);
-  padding: 1rpx 6rpx;
-  border-radius: 4rpx;
-}
-.qcard-arrow {
-  font-size: 28rpx;
-  color: var(--text-tertiary);
-  flex-shrink: 0;
-}
 
-/* 象限空状态 */
+/* 空状态 */
 .quad-empty {
   text-align: center;
-  padding: 40rpx 0;
-  font-size: var(--font-caption);
+  padding: 20rpx 0;
+  font-size: 20rpx;
   color: var(--text-tertiary);
 }

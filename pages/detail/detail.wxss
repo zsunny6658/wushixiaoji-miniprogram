@@ -19,6 +19,9 @@
 .status-bar.done {
   background: linear-gradient(135deg, var(--color-success) 0%, #4ADE80 100%);
 }
+.status-bar.ignored {
+  background: linear-gradient(135deg, var(--text-tertiary) 0%, var(--text-disabled) 100%);
+}
 .status-icon { font-size: 32rpx; margin-right: 12rpx; }
 .status-text { flex: 1; }
 .status-right { display: flex; align-items: center; }
@@ -72,6 +75,49 @@
   font-size: var(--font-body);
   color: var(--text-secondary);
   font-weight: 500;
+}
+.debt-amount {
+  margin-top: var(--spacing-sm);
+  display: flex;
+  align-items: baseline;
+  gap: 12rpx;
+}
+.debt-amount-label {
+  font-size: var(--font-body-sm);
+  color: var(--text-secondary);
+}
+.debt-amount-value {
+  font-size: var(--font-heading);
+  font-weight: 700;
+  color: #7c3aed;
+}
+.debt-institution {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 12rpx;
+  padding: 12rpx 16rpx;
+  background: #f5f3ff;
+  border-radius: var(--radius-sm);
+}
+.debt-inst-label {
+  font-size: var(--font-body-sm);
+  color: var(--text-secondary);
+}
+.debt-inst-value {
+  font-size: var(--font-body);
+  font-weight: 600;
+  color: #7c3aed;
+}
+.private-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 12rpx;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-caption);
+  background: #f0f0f0;
+  color: #666;
+  font-weight: 600;
 }
 
 /* 内容区 (todo 完整内容) */
@@ -191,6 +237,10 @@
 .action-copy { background: var(--color-info-light); color: var(--color-info); }
 .action-edit { background: var(--color-primary-light); color: var(--color-primary); }
 .action-delete { background: var(--color-error-light); color: var(--color-error); }
+.action-flag { background: #fce4e4; color: #ef4444; }
+.action-flag-active { background: #ef4444; color: #fff; }
+.action-ignore { background: var(--text-tertiary); color: var(--text-white); }
+.action-ignored { background: var(--color-warning); color: var(--text-white); }
 .action-main {
   flex: 1.5;
   background: linear-gradient(135deg, var(--color-primary) 0%, #6C8AFF 100%);

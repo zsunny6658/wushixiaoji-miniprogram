@@ -100,28 +100,16 @@
       </view>
     </picker>
 
-    <!-- 工具 -->
-    <text class="menu-group-title">工具</text>
-    <view class="cell" bindtap="onRefresh" hover-class="cell-hover">
+    <!-- 通知 -->
+    <text class="menu-group-title">通知</text>
+    <view class="cell" bindtap="onToggleNotify" hover-class="cell-hover">
       <view class="cell-left">
-        <text class="cell-icon">🔄</text>
-        <text class="cell-title">刷新数据</text>
+        <text class="cell-icon">🔔</text>
+        <text class="cell-title">逾期提醒</text>
       </view>
-      <text class="cell-arrow">›</text>
-    </view>
-    <view class="cell" bindtap="onClearPicked" hover-class="cell-hover">
-      <view class="cell-left">
-        <text class="cell-icon">🗑️</text>
-        <text class="cell-title">清理已完成</text>
+      <view class="cell-right">
+        <switch checked="{{notifyEnabled}}" bindchange="onToggleNotify" color="#4f6ef7" />
       </view>
-      <text class="cell-arrow">›</text>
-    </view>
-    <view class="cell" bindtap="onExport" hover-class="cell-hover">
-      <view class="cell-left">
-        <text class="cell-icon">📋</text>
-        <text class="cell-title">复制全部取件码</text>
-      </view>
-      <text class="cell-arrow">›</text>
     </view>
 
     <!-- 关于 -->
@@ -132,10 +120,10 @@
         <text class="cell-title">屋事小记 v1.0.0</text>
       </view>
     </view>
-    <view class="cell">
+    <view class="cell" bindtap="onCopyBaseUrl" hover-class="cell-hover">
       <view class="cell-left">
         <text class="cell-icon">🔗</text>
-        <text class="cell-title">服务地址</text>
+        <text class="cell-title">服务地址（点击复制）</text>
       </view>
       <text class="cell-url">{{baseUrl}}</text>
     </view>

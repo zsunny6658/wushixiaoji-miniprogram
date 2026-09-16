@@ -110,14 +110,24 @@
   width: 100%;
   border: 2rpx solid var(--border);
   border-radius: var(--radius-md);
-  padding: var(--spacing-sm);
+  padding: 20rpx 24rpx;
   font-size: var(--font-body);
   line-height: 1.5;
   box-sizing: border-box;
   background: var(--bg-card);
   transition: border-color 0.15s;
+  min-height: 80rpx;
 }
 .field-input:focus { border-color: var(--color-primary); }
+.private-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+.private-label {
+  font-size: var(--font-body-sm);
+  color: var(--text-secondary);
+}
 .field-picker {
   display: flex;
   align-items: center;

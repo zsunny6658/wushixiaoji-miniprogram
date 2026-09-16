@@ -316,6 +316,21 @@
   font-weight: 500;
 }
 
+.about-icp {
+  display: flex;
+  justify-content: space-between;
+  padding: 10rpx 0;
+}
+.about-icp-label {
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+}
+.about-icp-value {
+  font-size: var(--font-caption);
+  color: var(--text-secondary);
+  font-family: -apple-system, "Helvetica Neue", "PingFang SC", sans-serif;
+}
+
 .page-bottom {
   height: env(safe-area-inset-bottom);
 }

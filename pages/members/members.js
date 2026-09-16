@@ -85,7 +85,10 @@ Page({
         if (res.confirm) {
           api.deleteMember(id, function () {
             wx.showToast({ title: '已删除', icon: 'success' });
+            app.refreshState();
             that.refresh();
+          }, function (msg) {
+            wx.showToast({ title: msg || '删除失败', icon: 'none' });
           });
         }
       }
