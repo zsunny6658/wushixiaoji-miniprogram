@@ -24,13 +24,18 @@
         <view class="stat-label">待还款项</view>
         <view class="stat-sub" wx:if="{{stats.debtTotal > 0}}">¥{{stats.debtTotalLabel}}</view>
       </view>
+      <view class="stat-card s-private" bindtap="onGoPrivate" hover-class="hover-press">
+        <view class="stat-icon">🔒</view>
+        <view class="stat-num">{{stats.privateCount || 0}}</view>
+        <view class="stat-label">个人事项</view>
+      </view>
+    </view>
+    <view class="stats-row">
       <view class="stat-card s-overdue" bindtap="onGoOverdue" hover-class="hover-press">
         <view class="stat-icon">⚠️</view>
         <view class="stat-num">{{stats.overdue || 0}}</view>
         <view class="stat-label">逾期/到期</view>
       </view>
-    </view>
-    <view class="stats-row">
       <view class="stat-card s-done" bindtap="onGoDone" hover-class="hover-press">
         <view class="stat-icon">✅</view>
         <view class="stat-num">{{stats.picked || 0}}</view>
@@ -40,11 +45,6 @@
         <view class="stat-icon">🚫</view>
         <view class="stat-num">{{stats.ignored || 0}}</view>
         <view class="stat-label">已忽略</view>
-      </view>
-      <view class="stat-card s-private" bindtap="onGoPrivate" hover-class="hover-press">
-        <view class="stat-icon">🔒</view>
-        <view class="stat-num">{{stats.privateCount || 0}}</view>
-        <view class="stat-label">个人事项</view>
       </view>
     </view>
   </view>

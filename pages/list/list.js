@@ -87,10 +87,6 @@ Page({
     // 家庭/个人筛选
     if (this.data.scope === 'family') pkgs = pkgs.filter(function (p) { return !p.isPrivate; });
     else if (this.data.scope === 'personal') pkgs = pkgs.filter(function (p) { return p.isPrivate; });
-    if (this.data.filter === 'pending') pkgs = pkgs.filter(function (p) { return p.status === 'pending'; });
-    else if (this.data.filter === 'picked') pkgs = pkgs.filter(function (p) { return p.status === 'picked'; });
-    else if (this.data.filter === 'overdue') pkgs = pkgs.filter(function (p) { return p.overdue && p.status === 'pending'; });
-    else if (this.data.filter === 'ignored') pkgs = pkgs.filter(function (p) { return p.status === 'ignored'; });
     if (this.data.importanceFilter !== 'all') pkgs = pkgs.filter(function (p) { return p.importance === this.data.importanceFilter; }.bind(this));
     if (this.data.urgencyFilter !== 'all') pkgs = pkgs.filter(function (p) { return p.urgency === this.data.urgencyFilter; }.bind(this));
     var kw = this.data.search.trim().toLowerCase();
@@ -103,6 +99,20 @@ Page({
              (p.institution || '').toLowerCase().indexOf(kw) >= 0 ||
              (p.title || '').toLowerCase().indexOf(kw) >= 0;
     });
+    // 基于当前筛选条件（不含状态筛选）计算各状态计数，使数字随筛选变化
+    var basePkgs = pkgs.slice();
+    var counts = {
+      all: basePkgs.length,
+      pending: basePkgs.filter(function (p) { return p.status === 'pending'; }).length,
+      picked: basePkgs.filter(function (p) { return p.status === 'picked'; }).length,
+      overdue: basePkgs.filter(function (p) { return p.overdue && p.status === 'pending'; }).length,
+      ignored: basePkgs.filter(function (p) { return p.status === 'ignored'; }).length
+    };
+    // 应用状态筛选（影响列表显示，不影响上面的计数）
+    if (this.data.filter === 'pending') pkgs = pkgs.filter(function (p) { return p.status === 'pending'; });
+    else if (this.data.filter === 'picked') pkgs = pkgs.filter(function (p) { return p.status === 'picked'; });
+    else if (this.data.filter === 'overdue') pkgs = pkgs.filter(function (p) { return p.overdue && p.status === 'pending'; });
+    else if (this.data.filter === 'ignored') pkgs = pkgs.filter(function (p) { return p.status === 'ignored'; });
     pkgs = helpers.sortPackages(pkgs);
 
     var groups = [];
@@ -119,15 +129,6 @@ Page({
 
     var emptyMap = { all: ['📋', '当前没有记录', '点击右下角 + 添加'], pending: ['⏳', '没有待办', '做得不错'], picked: ['✅', '没有已完成', '完成后点击 ✓ 归档'], overdue: ['⚠️', '没有逾期', '没有需要处理的'], ignored: ['🚫', '没有已忽略的记录', '点击卡片进入详情可忽略'], debt: ['💳', '没有待还款项', '点击右下角 + 添加'] };
     var em = emptyMap[this.data.filter] || emptyMap.all;
-
-    var allPkgs = (gd.packages || []).map(function (p) { return helpers.decorate(p, gd.members); });
-    var counts = {
-      all: allPkgs.length,
-      pending: allPkgs.filter(function (p) { return p.status === 'pending'; }).length,
-      picked: allPkgs.filter(function (p) { return p.status === 'picked'; }).length,
-      overdue: allPkgs.filter(function (p) { return p.overdue && p.status === 'pending'; }).length,
-      ignored: allPkgs.filter(function (p) { return p.status === 'ignored'; }).length
-    };
 
     this.setData({ list: pkgs, groups: groups, counts: counts, emptyEmoji: em[0], emptyTitle: em[1], emptyDesc: em[2] });
   },

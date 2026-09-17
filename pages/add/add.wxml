@@ -2,8 +2,8 @@
   <!-- 编辑模式提示 -->
   <view class="edit-tip" wx:if="{{editId}}">编辑模式：修改 {{editTitle}}</view>
 
-  <!-- 智能解析区 -->
-  <view class="smart-section">
+  <!-- 智能解析区（仅新建模式显示，编辑模式隐藏） -->
+  <view class="smart-section" wx:if="{{!editId}}">
     <view class="smart-title">✨ 智能识别</view>
     <textarea class="smart-textarea" placeholder="粘贴快递短信或备忘文本" auto-height value="{{smartText}}" bindinput="onSmartText"></textarea>
     <button class="btn btn-primary btn-block" bindtap="onSmartParse">📝 文本识别</button>
