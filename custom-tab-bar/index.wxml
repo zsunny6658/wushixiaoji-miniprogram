@@ -9,8 +9,15 @@
   </view>
   <view class="tab-center">
     <view class="center-btn {{voiceRecording ? 'recording' : ''}}" catchtap="openAdd" catchlongpress="onVoiceTap" catchtouchend="onVoiceEnd">
-      <text class="center-plus {{voiceRecording ? 'center-rec-dot' : ''}}">{{voiceRecording ? '●' : '+'}}</text>
-      <text wx:if="{{voiceRecording}}" class="center-rec-label">松开结束</text>
+      <text class="center-plus">{{voiceRecording ? '🎤' : '+'}}</text>
+      <view wx:if="{{voiceRecording}}" class="rec-badges">
+        <view class="rec-wave">
+          <view class="rec-bar" style="height:12rpx"></view>
+          <view class="rec-bar" style="height:20rpx"></view>
+          <view class="rec-bar" style="height:16rpx"></view>
+        </view>
+        <text class="center-rec-label">松开结束</text>
+      </view>
     </view>
   </view>
   <view class="tab-item {{active === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">
