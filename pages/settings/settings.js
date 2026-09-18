@@ -35,6 +35,8 @@ Page({
     },
     mailConfigured: false,
     testEmailTo: '',
+    // 语音额度
+    asrStatus: null,
     // 通用
     meName: '',
     meFirstChar: '?',
@@ -58,6 +60,16 @@ Page({
   onShow: function () {
     this.refresh();
     this.loadByAction();
+    this.loadAsrStatus();
+  },
+
+  loadAsrStatus: function () {
+    var that = this;
+    api.voiceStatus(function (data) {
+      if (data && data.asr) {
+        that.setData({ asrStatus: data.asr });
+      }
+    });
   },
 
   refresh: function () {

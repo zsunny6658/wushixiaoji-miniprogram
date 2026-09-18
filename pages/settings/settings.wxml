@@ -232,6 +232,32 @@
       <text class="section-desc">当前家庭：{{familyName}}</text>
     </view>
 
+    <!-- 语音额度 -->
+    <view class="section" wx:if="{{asrStatus}}">
+      <text class="section-title">语音识别</text>
+      <view class="quota-card">
+        <view class="quota-row">
+          <text class="quota-label">一句话识别</text>
+          <text class="quota-value">{{asrStatus.textToSentence.used}} / {{asrStatus.textToSentence.quota}}</text> 
+        </view>
+        <view class="quota-bar">
+          <view class="quota-fill" style="width: {{asrStatus.textToSentence.percent}}%"></view>
+        </view>
+        <text class="quota-hint">每月免费 {{asrStatus.textToSentence.quota}} 次，已用 {{asrStatus.textToSentence.percent}}%</text>
+      </view>
+      <view class="quota-card" wx:if="{{asrStatus.realtime}}">
+        <view class="quota-row">
+          <text class="quota-label">实时语音</text>
+          <text class="quota-value">{{asrStatus.realtime.usedHours}}h / {{asrStatus.realtime.quotaHours}}h</text>
+        </view>
+        <view class="quota-bar">
+          <view class="quota-fill" style="width: {{asrStatus.realtime.percent}}%"></view>
+        </view>
+        <text class="quota-hint">剩余 {{asrStatus.realtime.remainingHours}} 小时</text>
+      </view>
+      <text class="section-desc" wx:if="{{asrStatus.engine === 'local-fallback'}}">⚠️ 额度已用尽，已降级到本地识别</text>
+    </view>
+
     <!-- 关于 -->
     <view class="section">
       <text class="section-title">关于</text>
