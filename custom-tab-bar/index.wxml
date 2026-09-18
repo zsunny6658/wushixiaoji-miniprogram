@@ -31,6 +31,7 @@
         <text class="rec-mic-icon">🎤</text>
       </view>
       <text class="rec-status-text">正在录音</text>
+      <text class="rec-time">{{recSeconds}}s</text>
       <text class="rec-hint-text">松开手指结束</text>
       <view class="rec-wave-large">
         <view class="rec-wave-bar" style="height:20rpx"></view>
@@ -49,6 +50,18 @@
     <view class="transcribing-content">
       <view class="transcribing-spinner"></view>
       <text class="transcribing-text">语音转写中...</text>
+    </view>
+  </view>
+  <!-- 转写结果预览遮罩 -->
+  <view class="preview-overlay" wx:if="{{showPreview}}" catchtap="onDismissPreview">
+    <view class="preview-content" catchtap="noop">
+      <text class="preview-title">🎤 语音识别结果</text>
+      <text class="preview-text">{{transcriptPreview}}</text>
+      <view class="preview-actions">
+        <button class="btn-sm btn-outline" bindtap="onCopyTranscript">📋 复制</button>
+        <button class="btn-sm btn-danger" bindtap="onDismissPreview">取消</button>
+        <button class="btn-sm btn-primary" bindtap="onConfirmPreview">确认使用</button>
+      </view>
     </view>
   </view>
 </view>

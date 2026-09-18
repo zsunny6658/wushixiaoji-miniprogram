@@ -2,7 +2,11 @@ Component({
   data: {
     active: 0,
     centerVisible: true,
-    voiceRecording: false
+    voiceRecording: false,
+    transcribing: false,
+    recSeconds: 0,
+    transcriptPreview: '',
+    showPreview: false
   },
 
   lifecycle: {
@@ -36,12 +40,17 @@ Component({
       this.stopRecording();
     },
 
+    noop: function () {},
+
     startRecording: function () {
       var that = this;
       var recorder = wx.getRecorderManager();
+      var startTime = 0;
+      var timer = null;
 
       recorder.onStop(function (res) {
         that.setData({ voiceRecording: false });
+        if (timer) { clearInterval(timer); timer = null; }
         if (!res.tempFilePath) return;
         var fs = wx.getFileSystemManager();
         var b64;
@@ -51,9 +60,8 @@ Component({
           wx.showToast({ title: '录音读取失败', icon: 'none' });
           return;
         }
-        that.setData({ transcribing: true });
+        that.setData({ transcribing: true, recSeconds: 0 });
         var api = require('../utils/api');
-        // 优先用腾讯云语音识别
         api.voiceTranscribe(b64, 'mp3', function (data) {
           that.setData({ transcribing: false });
           if (data.error === 'quota_exhausted') {
@@ -69,26 +77,7 @@ Component({
             wx.showToast({ title: '未识别到语音内容', icon: 'none' });
             return;
           }
-          // 识别成功后，尝试智能解析，看能否直接填充表单
-          api.parse(transcript, 'auto', function (parseData) {
-            var records = parseData.records || [];
-            if (records.length > 1) {
-              api.addPackages(records, function () {
-                wx.showToast({ title: '已导入 ' + records.length + ' 条', icon: 'success' });
-              });
-              return;
-            }
-            if (records.length === 1) {
-              getApp().globalData._pendingAddData = records[0];
-              wx.navigateTo({ url: '/pages/add/add' });
-              return;
-            }
-            getApp().globalData._pendingSmartText = transcript;
-            wx.navigateTo({ url: '/pages/add/add' });
-          }, function () {
-            getApp().globalData._pendingSmartText = transcript;
-            wx.navigateTo({ url: '/pages/add/add' });
-          });
+          that.setData({ transcriptPreview: transcript, showPreview: true });
         }, function () {
           that.setData({ transcribing: false });
           wx.showToast({ title: '语音识别失败', icon: 'none' });
@@ -97,10 +86,22 @@ Component({
 
       recorder.onError(function (err) {
         that.setData({ voiceRecording: false });
+        if (timer) { clearInterval(timer); timer = null; }
         wx.showToast({ title: '录音失败', icon: 'none' });
       });
 
-      that.setData({ voiceRecording: true });
+      that.setData({ voiceRecording: true, recSeconds: 0 });
+      startTime = Date.now();
+
+      timer = setInterval(function () {
+        var elapsed = Math.floor((Date.now() - startTime) / 1000);
+        if (elapsed >= 60) {
+          if (timer) { clearInterval(timer); timer = null; }
+          if (that.data.voiceRecording) that.stopRecording();
+          return;
+        }
+        that.setData({ recSeconds: elapsed });
+      }, 1000);
 
       recorder.start({
         duration: 60000,
@@ -110,11 +111,8 @@ Component({
         format: 'mp3'
       });
 
-      // 长按持续录音，超时自动停止
       setTimeout(function () {
-        if (that.data.voiceRecording) {
-          that.stopRecording();
-        }
+        if (that.data.voiceRecording) that.stopRecording();
       }, 60000);
     },
 
@@ -123,6 +121,44 @@ Component({
       try {
         wx.getRecorderManager().stop();
       } catch (e) {}
+    },
+
+    onConfirmPreview: function () {
+      var transcript = this.data.transcriptPreview;
+      this.setData({ showPreview: false, transcriptPreview: '' });
+      var api = require('../utils/api');
+      api.parse(transcript, 'auto', function (parseData) {
+        var records = parseData.records || [];
+        if (records.length > 1) {
+          api.addPackages(records, function () {
+            wx.showToast({ title: '已导入 ' + records.length + ' 条', icon: 'success' });
+          });
+          return;
+        }
+        if (records.length === 1) {
+          getApp().globalData._pendingAddData = records[0];
+          wx.navigateTo({ url: '/pages/add/add' });
+          return;
+        }
+        getApp().globalData._pendingSmartText = transcript;
+        wx.navigateTo({ url: '/pages/add/add' });
+      }, function () {
+        getApp().globalData._pendingSmartText = transcript;
+        wx.navigateTo({ url: '/pages/add/add' });
+      });
+    },
+
+    onDismissPreview: function () {
+      this.setData({ showPreview: false, transcriptPreview: '' });
+    },
+
+    onCopyTranscript: function () {
+      wx.setClipboardData({
+        data: this.data.transcriptPreview,
+        success: function () {
+          wx.showToast({ title: '已复制', icon: 'success' });
+        }
+      });
     }
   }
 });
