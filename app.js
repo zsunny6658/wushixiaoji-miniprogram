@@ -21,7 +21,8 @@ App({
     importanceFilter: 'all',
     urgencyFilter: 'all',
     group: 'station',
-    search: ''
+    search: '',
+    ignoreCleanupDays: 7
   },
 
   onLaunch: function () {
@@ -31,6 +32,7 @@ App({
     this.globalData.viewMode = wx.getStorageSync('parcel.viewMode') || 'list';
     this.globalData.recordType = wx.getStorageSync('parcel.recordType') || 'all';
     this.globalData.group = wx.getStorageSync('parcel.group') || 'station';
+    this.globalData.ignoreCleanupDays = parseInt(wx.getStorageSync('parcel.ignoreCleanupDays'), 10) || 7;
     api.setBaseUrl(this.globalData.baseUrl);
     if (this.globalData.token) {
       this.refreshState();

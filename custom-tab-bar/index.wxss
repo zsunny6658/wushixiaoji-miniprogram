@@ -109,3 +109,140 @@
   0%, 100% { transform: scaleY(0.4); }
   50% { transform: scaleY(1); }
 }
+
+/* 全屏录音遮罩 */
+.rec-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rec-overlay-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+.rec-overlay-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+}
+.rec-anim {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rec-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 3rpx solid rgba(255, 77, 79, 0.6);
+}
+.rec-ring-1 {
+  width: 160rpx;
+  height: 160rpx;
+  animation: recRingPulse 1.5s infinite ease-out;
+}
+.rec-ring-2 {
+  width: 160rpx;
+  height: 160rpx;
+  animation: recRingPulse 1.5s infinite ease-out 0.5s;
+}
+.rec-ring-3 {
+  width: 160rpx;
+  height: 160rpx;
+  animation: recRingPulse 1.5s infinite ease-out 1s;
+}
+@keyframes recRingPulse {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+.rec-mic-icon {
+  font-size: 72rpx;
+  z-index: 2;
+}
+.rec-status-text {
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: 600;
+}
+.rec-hint-text {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.7);
+}
+.rec-wave-large {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  height: 48rpx;
+  margin-top: 8rpx;
+}
+.rec-wave-bar {
+  width: 5rpx;
+  background: #ff4d4f;
+  border-radius: 3rpx;
+  animation: recWave 0.6s infinite ease-in-out;
+}
+.rec-wave-bar:nth-child(1) { animation-delay: 0s; }
+.rec-wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.rec-wave-bar:nth-child(3) { animation-delay: 0.2s; }
+.rec-wave-bar:nth-child(4) { animation-delay: 0.3s; }
+.rec-wave-bar:nth-child(5) { animation-delay: 0.4s; }
+.rec-wave-bar:nth-child(6) { animation-delay: 0.5s; }
+.rec-wave-bar:nth-child(7) { animation-delay: 0.6s; }
+
+/* 转写中全屏遮罩 */
+.transcribing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.transcribing-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+.transcribing-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+}
+.transcribing-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid rgba(255, 255, 255, 0.2);
+  border-top-color: #4A90D9;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.transcribing-text {
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: 600;
+}

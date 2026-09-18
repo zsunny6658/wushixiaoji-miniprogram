@@ -10,14 +10,6 @@
   <view class="tab-center">
     <view class="center-btn {{voiceRecording ? 'recording' : ''}}" catchtap="openAdd" catchlongpress="onVoiceTap" catchtouchend="onVoiceEnd">
       <text class="center-plus">{{voiceRecording ? '🎤' : '+'}}</text>
-      <view wx:if="{{voiceRecording}}" class="rec-badges">
-        <view class="rec-wave">
-          <view class="rec-bar" style="height:12rpx"></view>
-          <view class="rec-bar" style="height:20rpx"></view>
-          <view class="rec-bar" style="height:16rpx"></view>
-        </view>
-        <text class="center-rec-label">松开结束</text>
-      </view>
     </view>
   </view>
   <view class="tab-item {{active === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">
@@ -27,5 +19,36 @@
   <view class="tab-item {{active === 3 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="3">
     <text class="tab-icon">👤</text>
     <text class="tab-text">我的</text>
+  </view>
+  <!-- 全屏录音遮罩 -->
+  <view class="rec-overlay" wx:if="{{voiceRecording}}" catchtouchend="onVoiceEnd">
+    <view class="rec-overlay-bg"></view>
+    <view class="rec-overlay-content">
+      <view class="rec-anim">
+        <view class="rec-ring rec-ring-1"></view>
+        <view class="rec-ring rec-ring-2"></view>
+        <view class="rec-ring rec-ring-3"></view>
+        <text class="rec-mic-icon">🎤</text>
+      </view>
+      <text class="rec-status-text">正在录音</text>
+      <text class="rec-hint-text">松开手指结束</text>
+      <view class="rec-wave-large">
+        <view class="rec-wave-bar" style="height:20rpx"></view>
+        <view class="rec-wave-bar" style="height:36rpx"></view>
+        <view class="rec-wave-bar" style="height:28rpx"></view>
+        <view class="rec-wave-bar" style="height:44rpx"></view>
+        <view class="rec-wave-bar" style="height:32rpx"></view>
+        <view class="rec-wave-bar" style="height:40rpx"></view>
+        <view class="rec-wave-bar" style="height:24rpx"></view>
+      </view>
+    </view>
+  </view>
+  <!-- 转写中遮罩 -->
+  <view class="transcribing-overlay" wx:if="{{transcribing}}">
+    <view class="transcribing-bg"></view>
+    <view class="transcribing-content">
+      <view class="transcribing-spinner"></view>
+      <text class="transcribing-text">语音转写中...</text>
+    </view>
   </view>
 </view>

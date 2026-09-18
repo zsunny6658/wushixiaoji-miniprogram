@@ -199,6 +199,18 @@
         <button class="btn-secondary" bindtap="onSaveConfig">保存配置</button>
       </view>
     </view>
+
+    <view class="section">
+      <text class="section-title">数据清理</text>
+      <text class="section-desc">已忽略的记录会在指定天数后自动删除</text>
+      <view class="form-item">
+        <text class="form-label">自动删除天数</text>
+        <input class="form-input" type="number" value="{{config.ignoreCleanupDays}}" data-field="ignoreCleanupDays" bindinput="onConfigInput" />
+      </view>
+      <view class="btn-row">
+        <button class="btn-secondary" bindtap="onSaveConfig">保存配置</button>
+      </view>
+    </view>
   </block>
 
   <!-- ============ 默认：完整设置页 ============ -->

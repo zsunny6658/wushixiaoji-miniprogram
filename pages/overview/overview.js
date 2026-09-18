@@ -135,5 +135,11 @@ Page({
     var quad = e.currentTarget.dataset.quad;
     app.globalData._focusQuad = quad;
     wx.switchTab({ url: '/pages/quadrant/quadrant' });
+  },
+  onShareAppMessage: function () {
+    return { title: '屋事小记 - 家庭快递取件码共享', path: '/pages/overview/overview' };
+  },
+  onShareTimeline: function () {
+    return { title: '屋事小记 - 家庭快递取件码共享' };
   }
 });

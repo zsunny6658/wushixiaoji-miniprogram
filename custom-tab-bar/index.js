@@ -51,10 +51,10 @@ Component({
           wx.showToast({ title: '录音读取失败', icon: 'none' });
           return;
         }
-        wx.showLoading({ title: '转写中...' });
+        that.setData({ transcribing: true });
         var api = require('../utils/api');
         api.parseAudio('data:audio/mpeg;base64,' + b64, function (data) {
-          wx.hideLoading();
+          that.setData({ transcribing: false });
           var transcript = data.transcript || '';
           if (!transcript) {
             wx.showToast({ title: '未识别到语音内容', icon: 'none' });
@@ -74,7 +74,7 @@ Component({
           getApp().globalData._pendingSmartText = transcript;
           wx.navigateTo({ url: '/pages/add/add' });
         }, function () {
-          wx.hideLoading();
+          that.setData({ transcribing: false });
           wx.showToast({ title: '语音识别失败', icon: 'none' });
         });
       });

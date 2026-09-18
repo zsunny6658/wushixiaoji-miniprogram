@@ -30,7 +30,8 @@ Page({
     config: {
       smtpHost: '', smtpPort: '465', smtpSecure: true,
       smtpUser: '', smtpPass: '', smtpFrom: '', smtpFromName: '',
-      aiProvider: '', aiModel: '', aiBaseUrl: '', aiApiKey: ''
+      aiProvider: '', aiModel: '', aiBaseUrl: '', aiApiKey: '',
+      ignoreCleanupDays: 7
     },
     mailConfigured: false,
     testEmailTo: '',
@@ -125,7 +126,8 @@ Page({
             aiProvider: a.provider || '',
             aiModel: a.textModel || '',
             aiBaseUrl: a.baseURL || '',
-            aiApiKey: ''
+            aiApiKey: '',
+            ignoreCleanupDays: c.ignoreCleanupDays || 7
           },
           mailConfigured: data && data.mailConfigured
         });
@@ -313,9 +315,12 @@ Page({
         baseURL: c.aiBaseUrl,
         apiKey: c.aiApiKey || undefined,
         textModel: c.aiModel
-      }
+      },
+      ignoreCleanupDays: Math.max(1, parseInt(c.ignoreCleanupDays, 10) || 7)
     };
     api.updateConfig(patch, this.data.familyId, function () {
+      app.globalData.ignoreCleanupDays = patch.ignoreCleanupDays;
+      wx.setStorageSync('parcel.ignoreCleanupDays', String(patch.ignoreCleanupDays));
       wx.showToast({ title: '已保存', icon: 'success' });
     });
   },

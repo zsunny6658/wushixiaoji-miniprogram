@@ -151,5 +151,11 @@ Page({
         }
       }
     });
+  },
+  onShareAppMessage: function () {
+    return { title: '屋事小记 - 家庭快递取件码共享', path: '/pages/overview/overview' };
+  },
+  onShareTimeline: function () {
+    return { title: '屋事小记 - 家庭快递取件码共享' };
   }
 });

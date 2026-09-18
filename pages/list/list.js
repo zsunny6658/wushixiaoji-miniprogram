@@ -160,14 +160,15 @@ Page({
         wx.showToast({ title: '已取消忽略', icon: 'success' });
       });
     } else {
+      var days = app.globalData.ignoreCleanupDays || 7;
       wx.showModal({
         title: '确认忽略',
-        content: '忽略后将在7天后自动删除，确认忽略？',
+        content: '忽略后将在' + days + '天后自动删除，确认忽略？',
         success: function (res) {
           if (res.confirm) {
             api.updatePackage(id, { status: 'ignored' }, function () {
               that.computeList();
-              wx.showToast({ title: '已忽略，7天后自动删除', icon: 'none' });
+              wx.showToast({ title: '已忽略，' + (app.globalData.ignoreCleanupDays || 7) + '天后自动删除', icon: 'none' });
             });
           }
         }
@@ -337,5 +338,14 @@ Page({
   onCopy: function (e) {
     wx.setClipboardData({ data: e.currentTarget.dataset.code, success: function () { wx.showToast({ title: '已复制', icon: 'success' }); } });
   },
-  onAdd: function () { wx.navigateTo({ url: '/pages/add/add' }); }
+  onAdd: function () { wx.navigateTo({ url: '/pages/add/add' }); },
+  onShareAppMessage: function () {
+    return {
+      title: '屋事小记 - 家庭快递取件码共享',
+      path: '/pages/list/list'
+    };
+  },
+  onShareTimeline: function () {
+    return { title: '屋事小记 - 家庭快递取件码共享' };
+  }
 });
