@@ -127,6 +127,22 @@ function decorate(p, members) {
   d.dueDate = p.dueDate || '';
   d.dueLabel = dueLabel(p.dueDate);
   d.dueDays = dueDays(p.dueDate);
+  // 忽略自动删除倒计时：忽略后7天自动删除
+  d.ignoreDeleteLabel = '';
+  if (p.status === 'ignored' && p.ignoreAt) {
+    var ignoreTs = Date.parse(p.ignoreAt);
+    if (!isNaN(ignoreTs)) {
+      var remainMs = (ignoreTs + 7 * 86400000) - Date.now();
+      if (remainMs <= 0) {
+        d.ignoreDeleteLabel = '将自动删除';
+      } else {
+        var remainDays = Math.ceil(remainMs / 86400000);
+        var remainDate = new Date(ignoreTs + 7 * 86400000);
+        var dateStr = (remainDate.getMonth() + 1) + '月' + remainDate.getDate() + '日';
+        d.ignoreDeleteLabel = '将在' + dateStr + '自动删除';
+      }
+    }
+  }
   return d;
 }
 

@@ -110,9 +110,17 @@ Page({
         wx.showToast({ title: '已取消忽略', icon: 'success' });
       });
     } else {
-      api.updatePackage(id, { status: 'ignored' }, function () {
-        app.refreshState(function () { self.loadDetail(id); });
-        wx.showToast({ title: '已忽略', icon: 'success' });
+      wx.showModal({
+        title: '确认忽略',
+        content: '忽略后将在7天后自动删除，确认忽略？',
+        success: function (res) {
+          if (res.confirm) {
+            api.updatePackage(id, { status: 'ignored' }, function () {
+              app.refreshState(function () { self.loadDetail(id); });
+              wx.showToast({ title: '已忽略，7天后自动删除', icon: 'none' });
+            });
+          }
+        }
       });
     }
   },

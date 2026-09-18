@@ -3,9 +3,14 @@
   <view class="status-bar {{pkg.status === 'picked' ? 'done' : ''}} {{pkg.status === 'ignored' ? 'ignored' : ''}}">
     <text class="status-icon">{{pkg.status === 'picked' ? '✅' : (pkg.status === 'ignored' ? '🚫' : '⏳')}}</text>
     <text class="status-text">{{pkg.status === 'picked' ? '已完成' : (pkg.status === 'ignored' ? '已忽略' : '待处理')}}</text>
-    <view class="status-right" wx:if="{{pkg.overdue}}">
+    <view class="status-right" wx:if="{{pkg.overdue && pkg.status !== 'ignored' && pkg.status !== 'picked'}}">
       <text class="overdue-badge">逾期</text>
     </view>
+  </view>
+  <!-- 忽略自动删除提示 -->
+  <view class="ignore-notice" wx:if="{{pkg.status === 'ignored'}}">
+    <text class="ignore-notice-icon">🗑️</text>
+    <text class="ignore-notice-text">已忽略，{{pkg.ignoreDeleteLabel}}</text>
   </view>
 
   <!-- 主要内容 -->
