@@ -53,26 +53,42 @@ Component({
         }
         that.setData({ transcribing: true });
         var api = require('../utils/api');
-        api.parseAudio('data:audio/mpeg;base64,' + b64, function (data) {
+        // 优先用腾讯云语音识别
+        api.voiceTranscribe(b64, 'mp3', function (data) {
           that.setData({ transcribing: false });
-          var transcript = data.transcript || '';
+          if (data.error === 'quota_exhausted') {
+            wx.showToast({ title: '语音额度已用尽，请下次再试', icon: 'none' });
+            return;
+          }
+          if (!data.ok) {
+            wx.showToast({ title: (data.error || '语音识别失败'), icon: 'none' });
+            return;
+          }
+          var transcript = data.text || '';
           if (!transcript) {
             wx.showToast({ title: '未识别到语音内容', icon: 'none' });
             return;
           }
-          if (data.records && data.records.length > 1) {
-            api.addPackages(data.records, function () {
-              wx.showToast({ title: '已导入 ' + data.records.length + ' 条', icon: 'success' });
-            });
-            return;
-          }
-          if (data.records && data.records.length === 1) {
-            getApp().globalData._pendingAddData = data.records[0];
+          // 识别成功后，尝试智能解析，看能否直接填充表单
+          api.parse(transcript, 'auto', function (parseData) {
+            var records = parseData.records || [];
+            if (records.length > 1) {
+              api.addPackages(records, function () {
+                wx.showToast({ title: '已导入 ' + records.length + ' 条', icon: 'success' });
+              });
+              return;
+            }
+            if (records.length === 1) {
+              getApp().globalData._pendingAddData = records[0];
+              wx.navigateTo({ url: '/pages/add/add' });
+              return;
+            }
+            getApp().globalData._pendingSmartText = transcript;
             wx.navigateTo({ url: '/pages/add/add' });
-            return;
-          }
-          getApp().globalData._pendingSmartText = transcript;
-          wx.navigateTo({ url: '/pages/add/add' });
+          }, function () {
+            getApp().globalData._pendingSmartText = transcript;
+            wx.navigateTo({ url: '/pages/add/add' });
+          });
         }, function () {
           that.setData({ transcribing: false });
           wx.showToast({ title: '语音识别失败', icon: 'none' });

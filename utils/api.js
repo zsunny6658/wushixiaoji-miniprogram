@@ -97,6 +97,12 @@ var API = {
   parseAudio: function (audio, cb, errCb) {
     this.request('POST', '/api/parse/audio', { audio: audio }, cb, errCb);
   },
+  voiceTranscribe: function (audioBase64, format, cb, errCb) {
+    this.request('POST', '/api/voice/transcribe', { audio: audioBase64, format: format || 'mp3' }, cb, errCb);
+  },
+  voiceStatus: function (cb, errCb) {
+    this.request('GET', '/api/voice/status', null, cb, errCb);
+  },
 
   // 成员
   getMembers: function (cb, errCb) {
