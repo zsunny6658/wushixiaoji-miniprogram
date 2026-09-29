@@ -196,6 +196,73 @@ Page({
   onUrgChange: function (e) { this.setData({ urgIndex: parseInt(e.detail.value, 10) }); },
   onDueDateChange: function (e) { this.setData({ dueDateStr: e.detail.value }); },
 
+  // 应用用药解析结果（文本/药板照片共用）：类型、药名、服药人、计划时间、药板
+  applyMedicationRecord: function (r) {
+    var patch = {
+      type: 'medication',
+      typeIndex: 3,
+      isPrivate: true,
+      form: Object.assign({}, this.data.form, { code: r.code || '', note: r.note || '' })
+    };
+    if (r.owner) patch.memberIndex = this.findMemberIndex(r.owner);
+    if (r.pillInfo) patch.pillInfo = this.normalizePillForm(r.pillInfo);
+    this.setData(patch);
+    var times = r.schedule && Array.isArray(r.schedule.times) && r.schedule.times.length ? r.schedule.times : null;
+    if (times) {
+      this.setData({ medTimes: times, doseIndex: Math.min(3, times.length - 1) });
+    }
+  },
+
+  // 拍药板照片识别版式（M3：拍照 → 视觉模型 → pillInfo 预填）
+  onPillPhoto: function () {
+    var that = this;
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      sizeType: ['compressed'],
+      success: function (res) {
+        var path = res.tempFiles && res.tempFiles[0] && res.tempFiles[0].tempFilePath;
+        if (!path) return;
+        wx.showLoading({ title: '识别中...' });
+        wx.compressImage({
+          src: path,
+          quality: 70,
+          success: function (c) { that.readAndParsePillPhoto(c.tempFilePath); },
+          fail: function () { that.readAndParsePillPhoto(path); }
+        });
+      }
+    });
+  },
+
+  readAndParsePillPhoto: function (path) {
+    var that = this;
+    var fs = wx.getFileSystemManager();
+    fs.readFile({
+      filePath: path,
+      encoding: 'base64',
+      success: function (res) {
+        var dataUrl = 'data:image/jpeg;base64,' + res.data;
+        api.parseImage([dataUrl], 'medication', function (data) {
+          wx.hideLoading();
+          if (data.fallback || !data.records || !data.records.length) {
+            wx.showToast({ title: '未能识别药板，请手动设置', icon: 'none' });
+            return;
+          }
+          that.applyMedicationRecord(data.records[0]);
+          wx.showToast({ title: '已识别药板', icon: 'success' });
+        }, function () {
+          wx.hideLoading();
+          wx.showToast({ title: '识别失败，请手动设置', icon: 'none' });
+        });
+      },
+      fail: function () {
+        wx.hideLoading();
+        wx.showToast({ title: '读取图片失败', icon: 'none' });
+      }
+    });
+  },
+
   onSmartParse: function () {
     var text = this.data.smartText.trim();
     if (!text) { wx.showToast({ title: '请输入文本', icon: 'none' }); return; }
@@ -217,15 +284,16 @@ Page({
         var d = new Date(r.arrivedAt || Date.now());
         that.setData({
           type: r.type || 'pickup',
-          typeIndex: (r.type === 'todo') ? 1 : (r.type === 'debt' ? 2 : 0),
+          typeIndex: that.typeIndexOf(r.type || 'pickup'),
           form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '', institution: r.institution || '', amount: r.amount ? String(r.amount) : '' },
           dueDateStr: r.dueDate || '',
-          isPrivate: r.type === 'debt' ? true : false,
+          isPrivate: r.type === 'debt' || r.type === 'medication' ? true : false,
           dateStr: r.arrivedAt ? d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2) : today(),
           timeStr: r.arrivedAt ? ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2) : nowTime(),
           impIndex: ['high', 'medium', 'low'].indexOf(r.importance || 'medium'),
           urgIndex: ['urgent', 'normal'].indexOf(r.urgency || 'normal')
         });
+        if (r.type === 'medication') that.applyMedicationRecord(r);
         wx.showToast({ title: '已识别', icon: 'success' });
       } else {
         wx.showToast({ title: '未识别到内容', icon: 'none' });
@@ -337,15 +405,16 @@ Page({
       var d = new Date(r.arrivedAt || Date.now());
       that.setData({
         type: r.type || 'pickup',
-        typeIndex: this.typeIndexOf(r.type),
+        typeIndex: this.typeIndexOf(r.type || 'pickup'),
         form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '', institution: r.institution || '', amount: r.amount ? String(r.amount) : '' },
       dueDateStr: r.dueDate || '',
-        isPrivate: r.type === 'debt' ? true : false,
+        isPrivate: r.type === 'debt' || r.type === 'medication' ? true : false,
         dateStr: r.arrivedAt ? d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2) : today(),
         timeStr: r.arrivedAt ? ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2) : nowTime(),
         impIndex: ['high', 'medium', 'low'].indexOf(r.importance || 'medium'),
         urgIndex: ['urgent', 'normal'].indexOf(r.urgency || 'normal')
       });
+      if (r.type === 'medication') that.applyMedicationRecord(r);
       wx.showToast({ title: '已识别', icon: 'success' });
     }, function () {
       wx.hideLoading();

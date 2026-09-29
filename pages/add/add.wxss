@@ -310,3 +310,18 @@
   font-weight: 600;
   color: var(--text-primary);
 }
+
+/* 拍药板识别按钮 */
+.pill-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pill-photo-btn {
+  font-size: 24rpx;
+  color: var(--color-primary, #4A90D9);
+  background: rgba(74, 144, 217, 0.1);
+  border: 2rpx solid rgba(74, 144, 217, 0.3);
+  border-radius: 999rpx;
+  padding: 6rpx 20rpx;
+}

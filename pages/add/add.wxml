@@ -99,7 +99,10 @@
           <text class="field-hint">到点将通过邮件/订阅消息提醒</text>
         </view>
         <view class="field">
-          <text class="field-label">药板设置</text>
+          <view class="pill-head-row">
+            <text class="field-label">药板设置</text>
+            <view class="pill-photo-btn" bindtap="onPillPhoto">📷 拍药板识别</view>
+          </view>
           <view class="pill-colors">
             <view class="pill-color-dot {{pillInfo.color === item ? 'pc-active' : ''}}" wx:for="{{pillColorOptions}}" wx:key="*this" style="background:{{pillColorHex[item]}}" bindtap="onPillColorTap" data-color="{{item}}"></view>
           </view>
