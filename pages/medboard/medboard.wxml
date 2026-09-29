@@ -36,6 +36,7 @@
       </view>
       <view class="compare-switch">
         <view class="cs-item {{compare === 'current' ? 'cs-active' : ''}}" bindtap="onCompareToggle" data-mode="current">当前</view>
+        <view class="cs-item {{compare === 'today' ? 'cs-active' : ''}}" bindtap="onCompareToggle" data-mode="today">今日对比</view>
         <view class="cs-item {{compare === 'full' ? 'cs-active' : ''}}" bindtap="onCompareToggle" data-mode="full">满版</view>
       </view>
     </view>
@@ -48,8 +49,55 @@
       </view>
     </view>
 
-    <!-- 铝箔药板 -->
-    <view class="blister">
+    <!-- 今日前后对比（双板） -->
+    <block wx:if="{{compare === 'today'}}">
+      <view class="compare-label cl-before">今天之前</view>
+      <view class="blister blister-mini">
+        <view class="blister-row" wx:for="{{compareRows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
+          <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
+            <view wx:if="{{cell.showPill}}" class="pill shape-{{pillShape}}" style="background:{{colorHex}}">
+              <view wx:if="{{pillShape === 'capsule'}}" class="capsule-line"></view>
+            </view>
+            <view wx:else class="pill-hole">
+              <text class="hole-text">{{cell.holeText}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="compare-label cl-after">现在（今日已服高亮）</view>
+      <view class="blister blister-mini blister-after">
+        <view class="blister-row" wx:for="{{rows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
+          <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
+            <view
+              wx:if="{{cell.showPill}}"
+              class="pill shape-{{pillShape}}"
+              style="background:{{colorHex}}"
+              bindtap="onPillTap"
+              data-board="{{cell.boardNo}}"
+              data-pill="{{cell.index}}"
+              data-taken="{{cell.taken}}"
+            >
+              <view wx:if="{{pillShape === 'capsule'}}" class="capsule-line"></view>
+            </view>
+            <view
+              wx:else
+              class="pill-hole {{cell.isToday ? 'hole-today' : ''}}"
+              bindtap="onTodayHoleTap"
+              data-board="{{cell.boardNo}}"
+              data-pill="{{cell.index}}"
+              data-today="{{cell.isToday}}"
+              data-logid="{{cell.todayLogId}}"
+            >
+              <text class="hole-text">{{cell.holeText}}</text>
+              <text class="hole-today-tag" wx:if="{{cell.isToday}}">今</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 单板（当前 / 满版） -->
+    <view class="blister" wx:else>
       <view class="blister-row" wx:for="{{rows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
         <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
           <view
@@ -65,18 +113,36 @@
           </view>
           <view
             wx:else
-            class="pill-hole"
-            bindtap="onCellLongPress"
+            class="pill-hole {{cell.isToday ? 'hole-today' : ''}}"
+            bindtap="onTodayHoleTap"
             bindlongpress="onCellLongPress"
             data-board="{{cell.boardNo}}"
             data-pill="{{cell.index}}"
             data-taken="{{cell.taken}}"
+            data-today="{{cell.isToday}}"
+            data-logid="{{cell.todayLogId}}"
           >
             <text class="hole-text">{{cell.holeText}}</text>
+            <text class="hole-today-tag" wx:if="{{cell.isToday}}">今</text>
           </view>
         </view>
       </view>
     </view>
-    <view class="board-hint">点击药丸记录服药 · 长按缺口撤销今日打卡</view>
+    <view class="board-hint" wx:if="{{compare !== 'today'}}">点击任意药丸记录服药（无需按顺序）· 长按缺口撤销今日打卡</view>
+    <view class="board-hint" wx:else>上：今天开始前的药板 · 下：现在的药板，绿色「今」为今日服用</view>
+
+    <!-- 近 7 天依从性 -->
+    <view class="week-card" wx:if="{{weekDays.length}}">
+      <view class="week-title">近 7 天服药情况</view>
+      <view class="week-list">
+        <view class="week-item" wx:for="{{weekDays}}" wx:key="date">
+          <text class="week-day">{{item.label}}</text>
+          <view class="week-bar">
+            <view class="week-bar-fill {{item.full ? 'wbf-full' : (item.none ? 'wbf-none' : '')}}" style="width:{{item.percent}}%"></view>
+          </view>
+          <text class="week-count">{{item.taken}}/{{item.total}}</text>
+        </view>
+      </view>
+    </view>
   </block>
 </view>

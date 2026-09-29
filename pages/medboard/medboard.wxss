@@ -227,3 +227,125 @@
   color: var(--text-tertiary, #94A3B8);
   margin-top: 20rpx;
 }
+
+/* 今日前后对比（双板） */
+.compare-label {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+  margin: 4rpx 0 10rpx;
+}
+.cl-after {
+  margin-top: 20rpx;
+  color: #10B981;
+}
+.blister-mini {
+  padding: 18rpx 14rpx;
+}
+.blister-mini .cell {
+  height: 88rpx;
+}
+.blister-mini .shape-round,
+.blister-mini .shape-square,
+.blister-mini .pill-hole {
+  width: 58rpx;
+  height: 58rpx;
+}
+.blister-mini .shape-oval {
+  width: 72rpx;
+  height: 46rpx;
+  border-radius: 23rpx;
+}
+.blister-mini .shape-capsule {
+  width: 80rpx;
+  height: 36rpx;
+  border-radius: 18rpx;
+}
+.blister-mini .hole-text {
+  font-size: 24rpx;
+}
+.blister-after {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+/* 今日服用的缺口高亮 */
+.hole-today {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.65);
+  position: relative;
+}
+.hole-today .hole-text {
+  color: #10B981;
+}
+.hole-today-tag {
+  position: absolute;
+  top: -10rpx;
+  right: -12rpx;
+  min-width: 28rpx;
+  height: 28rpx;
+  line-height: 28rpx;
+  border-radius: 999rpx;
+  background: #10B981;
+  color: #fff;
+  font-size: 18rpx;
+  text-align: center;
+  padding: 0 4rpx;
+  box-sizing: border-box;
+}
+
+/* 近 7 天依从性 */
+.week-card {
+  background: var(--bg-card, #fff);
+  border: 2rpx solid var(--border, #E2E8F0);
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  margin-top: 24rpx;
+}
+.week-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary, #0F172A);
+  margin-bottom: 18rpx;
+}
+.week-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+.week-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.week-day {
+  width: 80rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary, #475569);
+  flex-shrink: 0;
+}
+.week-bar {
+  flex: 1;
+  height: 16rpx;
+  border-radius: 999rpx;
+  background: var(--bg-page, #F1F5F9);
+  overflow: hidden;
+}
+.week-bar-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: var(--color-primary, #4A90D9);
+  transition: width 0.3s ease;
+}
+.week-bar-fill.wbf-full {
+  background: #10B981;
+}
+.week-bar-fill.wbf-none {
+  background: rgba(100, 116, 139, 0.3);
+}
+.week-count {
+  width: 64rpx;
+  text-align: right;
+  font-size: 22rpx;
+  color: var(--text-tertiary, #94A3B8);
+  flex-shrink: 0;
+}

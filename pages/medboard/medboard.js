@@ -32,6 +32,8 @@ Page({
     todayPercent: 0,
     boxRemaining: 0,
     compare: 'current',
+    compareRows: [],
+    weekDays: [],
     loading: true,
     error: ''
   },
@@ -98,6 +100,24 @@ Page({
     });
 
     var todayTaken = slots.filter(function (s) { return s.taken; }).length;
+
+    // 近 7 天依从性（服务端 days：{date, taken, total}，下标 0 = 今天）
+    var weekDays = (res.days || []).map(function (d, i) {
+      var label;
+      if (i === 0) label = '今天';
+      else if (i === 1) label = '昨天';
+      else label = d.date.slice(5).replace('-', '/');
+      return {
+        date: d.date,
+        label: label,
+        taken: d.taken,
+        total: d.total,
+        percent: d.total ? Math.round(d.taken * 100 / d.total) : 0,
+        full: d.total > 0 && d.taken >= d.total,
+        none: d.taken === 0
+      };
+    });
+
     this.setData({
       pkg: pkg,
       colorHex: COLOR_HEX[pi.color],
@@ -105,6 +125,7 @@ Page({
       pillShape: pi.shape,
       boards: boards,
       slots: slots,
+      weekDays: weekDays,
       todayTaken: todayTaken,
       todayTotal: times.length,
       todayPercent: times.length ? Math.round(todayTaken * 100 / times.length) : 0,
@@ -116,26 +137,47 @@ Page({
   buildBoard: function () {
     var pi = this.pi;
     var boardNo = this.data.boardNo;
+    var today = todayStr();
     var cap = pi.rows * pi.cols;
     var cells = [];
+    var beforeCells = [];
     for (var i = 0; i < cap; i++) {
-      var log = this.allLogs.find(function (l) { return l.boardNo === boardNo && l.pillIndex === i; });
-      var todayLog = this.todayLogs.find(function (l) { return l.boardNo === boardNo && l.pillIndex === i; });
-      cells.push({
-        index: i,
-        boardNo: boardNo,
-        taken: !!log,
-        takenAt: log ? (log.takenAt || '').slice(0, 10) : '',
-        todayLogId: todayLog ? todayLog.id : '',
-        showPill: this.data.compare === 'full' || !log,
-        holeText: log ? '✓' : ''
-      });
+      (function (idx) {
+        var that2 = this;
+        var logs = that2.allLogs.filter(function (l) { return l.boardNo === boardNo && l.pillIndex === idx; });
+        var log = logs[logs.length - 1];
+        var todayLog = logs.find(function (l) { return l.date === today; });
+        var beforeLog = logs.find(function (l) { return l.date < today; }); // 今天之前已吃
+        // 主板（现在）：已吃 → 缺口；今日刚吃的缺口高亮
+        cells.push({
+          index: idx,
+          boardNo: boardNo,
+          taken: !!log,
+          takenAt: log ? (log.takenAt || '').slice(0, 10) : '',
+          isToday: !!todayLog,
+          todayLogId: todayLog ? todayLog.id : '',
+          showPill: that2.data.compare === 'full' || !log,
+          holeText: log ? '✓' : ''
+        });
+        // 对比板（今天之前）：仅历史缺口，今日吃的位置药丸仍在
+        beforeCells.push({
+          index: idx,
+          boardNo: boardNo,
+          taken: !!beforeLog,
+          showPill: !beforeLog,
+          holeText: beforeLog ? '✓' : ''
+        });
+      }).call(this, i);
     }
     var rows = [];
     for (var r = 0; r < pi.rows; r++) {
       rows.push(cells.slice(r * pi.cols, (r + 1) * pi.cols));
     }
-    this.setData({ rows: rows });
+    var compareRows = [];
+    for (var r2 = 0; r2 < pi.rows; r2++) {
+      compareRows.push(beforeCells.slice(r2 * pi.cols, (r2 + 1) * pi.cols));
+    }
+    this.setData({ rows: rows, compareRows: compareRows });
   },
 
   onCompareToggle: function (e) {
@@ -152,7 +194,7 @@ Page({
     this.buildBoard();
   },
 
-  // 点击药丸：记录为今日某次服药
+  // 点击药丸：记录为今日某次服药（任意位置乱序点击均可，无需按顺序）
   onPillTap: function (e) {
     var ds = e.currentTarget.dataset;
     var pillIndex = parseInt(ds.pill, 10);
