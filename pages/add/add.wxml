@@ -19,7 +19,7 @@
       <view class="image-actions">
         <button class="btn btn-outline btn-sm" bindtap="onChooseImage">📷 选择图片</button>
         <button class="btn btn-primary btn-sm" bindtap="onParseImage" disabled="{{imageParsing || !imageTempPaths.length}}">
-          {{imageParsing ? '识别中...' : ''}}<ficon wx:if="{{!imageParsing}}" name="search" size="28" color="#4A90D9" /> 图片识别
+          {{imageParsing ? '识别中...' : '图片识别'}}<ficon wx:if="{{!imageParsing}}" name="search" size="28" color="#4A90D9" />
         </button>
       </view>
     </view>
