@@ -16,6 +16,7 @@
         <text class="med-note" wx:if="{{pkg.note}}">{{pkg.note}}</text>
       </view>
       <view class="med-progress">
+        <view class="rest-banner" wx:if="{{!dueToday}}">🌙 今日非服药日 · 好好休息</view>
         <view class="progress-head">
           <text class="progress-label">今日已服 {{todayTaken}}/{{todayTotal}}</text>
           <text class="box-remaining">盒内剩余 {{boxRemaining}} 颗</text>

@@ -15,6 +15,10 @@ Page({
     moreFilled: false,
     typeOptions: ['📦 取件码', '📝 文本备忘', '💳 待还款', '💊 用药提醒'],
     doseOptions: ['每日1次', '每日2次', '每日3次', '每日4次'],
+    freqOptions: ['每天', '隔1天', '每3天', '每周固定几日'],
+    freqIndex: 0,
+    weekChips: [{ v: 1, l: '一' }, { v: 2, l: '二' }, { v: 3, l: '三' }, { v: 4, l: '四' }, { v: 5, l: '五' }, { v: 6, l: '六' }, { v: 0, l: '日' }],
+    selWeekdays: [1, 3, 5],
     doseIndex: 1,
     medTimes: ['08:00', '20:00'],
     pillColorOptions: ['white', 'yellow', 'pink', 'red', 'blue', 'green', 'purple', 'orange', 'brown'],
@@ -90,9 +94,15 @@ Page({
           urgIndex: ['urgent', 'normal'].indexOf(pkg.urgency || 'normal'),
           pillInfo: this.normalizePillForm(pkg.pillInfo)
         });
-        // 编辑模式：用药类型回填服药次数/时间
+        // 编辑模式：用药类型回填服药次数/时间 + 服药频率
         if (pkg.type === 'medication' && pkg.schedule && Array.isArray(pkg.schedule.times) && pkg.schedule.times.length) {
           this.setData({ medTimes: pkg.schedule.times, doseIndex: Math.min(3, pkg.schedule.times.length - 1) });
+          var sf = pkg.schedule.freq || 'daily';
+          var fi = 0;
+          if (sf === 'interval') fi = (parseInt(pkg.schedule.intervalDays, 10) || 2) === 3 ? 2 : 1;
+          else if (sf === 'weekly') fi = 3;
+          this.setData({ freqIndex: fi, selWeekdays: sf === 'weekly' && Array.isArray(pkg.schedule.weekdays) && pkg.schedule.weekdays.length ? pkg.schedule.weekdays.slice() : [1, 3, 5] });
+          this.syncWeekChips();
         }
         // 编辑模式：折叠区有非默认值时自动展开并标记已填写
         var hasMore = this.data.memberIndex > 0 || this.data.assigneeIndex > 0 ||
@@ -142,6 +152,30 @@ Page({
     var idx = parseInt(e.detail.value, 10);
     var defaults = [['08:00'], ['08:00', '20:00'], ['08:00', '13:00', '20:00'], ['08:00', '12:00', '18:00', '22:00']];
     this.setData({ doseIndex: idx, medTimes: defaults[idx] || ['08:00', '20:00'] });
+  },
+  onFreqChange: function (e) {
+    this.setData({ freqIndex: parseInt(e.detail.value, 10) });
+  },
+  onWeekChipTap: function (e) {
+    var v = parseInt(e.currentTarget.dataset.v, 10);
+    var sel = this.data.selWeekdays.slice();
+    var i = sel.indexOf(v);
+    if (i >= 0) {
+      if (sel.length <= 1) { wx.showToast({ title: '至少保留一天', icon: 'none' }); return; }
+      sel.splice(i, 1);
+    } else {
+      sel.push(v);
+    }
+    this.setData({ selWeekdays: sel.sort() });
+    this.syncWeekChips();
+  },
+
+  syncWeekChips: function () {
+    var sel = this.data.selWeekdays;
+    var chips = this.data.weekChips.map(function (c) {
+      return { v: c.v, l: c.l, sel: sel.indexOf(c.v) >= 0 };
+    });
+    this.setData({ weekChips: chips });
   },
   onMedTimeChange: function (e) {
     var idx = parseInt(e.currentTarget.dataset.idx, 10);
@@ -526,7 +560,14 @@ Page({
       isPrivate: this.data.isPrivate
     };
     if (this.data.type === 'medication') {
-      data.schedule = { times: this.data.medTimes, active: true };
+      var fiSub = this.data.freqIndex;
+      var sched = { times: this.data.medTimes, active: true };
+      if (fiSub === 1) { sched.freq = 'interval'; sched.intervalDays = 2; }
+      else if (fiSub === 2) { sched.freq = 'interval'; sched.intervalDays = 3; }
+      else if (fiSub === 3) {
+        if (this.data.selWeekdays.length) { sched.freq = 'weekly'; sched.weekdays = this.data.selWeekdays; }
+      }
+      data.schedule = sched;
       data.pillInfo = this.data.pillInfo;
     }
     wx.showLoading({ title: '保存中...' });

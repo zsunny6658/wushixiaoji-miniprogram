@@ -409,3 +409,15 @@
   from { transform: scale(1.35); opacity: 0.3; }
   to { transform: scale(1); opacity: 1; }
 }
+
+/* 非服药日横幅 */
+.rest-banner {
+  margin-top: 12rpx;
+  background: rgba(74, 144, 217, 0.16);
+  border: 2rpx dashed rgba(74, 144, 217, 0.45);
+  border-radius: 16rpx;
+  padding: 12rpx 20rpx;
+  font-size: 24rpx;
+  color: #3D7EC2;
+  text-align: center;
+}

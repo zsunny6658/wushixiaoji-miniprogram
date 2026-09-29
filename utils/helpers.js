@@ -141,7 +141,18 @@ function decorate(p, members) {
   d.amount = p.amount || 0;
   d.amountLabel = p.amount ? formatAmount(p.amount) : '';
   d.institution = p.institution || '';
-  d.scheduleLabel = (p.schedule && Array.isArray(p.schedule.times) && p.schedule.times.length) ? p.schedule.times.join(' / ') : '';
+  d.scheduleLabel = '';
+  if (p.schedule && Array.isArray(p.schedule.times) && p.schedule.times.length) {
+    var st = p.schedule.times.join(' / ');
+    if (p.schedule.freq === 'weekly' && Array.isArray(p.schedule.weekdays) && p.schedule.weekdays.length) {
+      var WD_CN = ['日', '一', '二', '三', '四', '五', '六'];
+      d.scheduleLabel = '每' + p.schedule.weekdays.map(function (w) { return WD_CN[w]; }).join('/') + ' ' + st;
+    } else if (p.schedule.freq === 'interval') {
+      d.scheduleLabel = '每' + (parseInt(p.schedule.intervalDays, 10) || 2) + '天 ' + st;
+    } else {
+      d.scheduleLabel = st;
+    }
+  }
   d.dueDate = p.dueDate || '';
   d.dueLabel = dueLabel(p.dueDate);
   d.dueDays = dueDays(p.dueDate);

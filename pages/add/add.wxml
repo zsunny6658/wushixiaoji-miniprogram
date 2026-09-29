@@ -99,6 +99,18 @@
           </picker>
         </view>
         <view class="field">
+          <text class="field-label">服药频率</text>
+          <picker range="{{freqOptions}}" value="{{freqIndex}}" bindchange="onFreqChange">
+            <view class="field-picker">
+              <text class="field-picker-value">{{freqOptions[freqIndex]}}</text>
+              <text class="field-picker-arrow">▼</text>
+            </view>
+          </picker>
+          <view class="week-chips" wx:if="{{freqIndex === 3}}">
+            <view class="week-chip {{item.sel ? 'wc-active' : ''}}" wx:for="{{weekChips}}" wx:key="v" bindtap="onWeekChipTap" data-v="{{item.v}}">{{item.l}}</view>
+          </view>
+        </view>
+        <view class="field">
           <text class="field-label">服药时间</text>
           <view class="med-times">
             <picker wx:for="{{medTimes}}" wx:key="index" mode="time" value="{{item}}" data-idx="{{index}}" bindchange="onMedTimeChange">

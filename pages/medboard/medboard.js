@@ -30,6 +30,7 @@ Page({
     slots: [],
     todayTaken: 0,
     todayTotal: 0,
+    dueToday: true,
     todayPercent: 0,
     boxRemaining: 0,
     compare: 'current',
@@ -124,6 +125,8 @@ Page({
     });
 
     var todayTaken = slots.filter(function (s) { return s.taken; }).length;
+    var dueToday = res.dueToday !== undefined ? !!res.dueToday : true;
+    var todayTotal = res.todayTotal != null ? res.todayTotal : times.length;
 
     // 近 7 天依从性（服务端 days：{date, taken, total}，下标 0 = 今天）
     var weekDays = (res.days || []).map(function (d, i) {
@@ -175,8 +178,9 @@ Page({
       streak: streak,
       timeline: timeline,
       todayTaken: todayTaken,
-      todayTotal: times.length,
-      todayPercent: times.length ? Math.round(todayTaken * 100 / times.length) : 0,
+      todayTotal: todayTotal,
+      dueToday: dueToday,
+      todayPercent: todayTotal ? Math.round(todayTaken * 100 / todayTotal) : 0,
       boxRemaining: pi.boards * pi.rows * pi.cols - this.allLogs.length
     });
     this.buildBoard();
@@ -247,6 +251,10 @@ Page({
     var ds = e.currentTarget.dataset;
     var pillIndex = parseInt(ds.pill, 10);
     var boardNo = parseInt(ds.board, 10);
+    if (!this.data.dueToday) {
+      wx.showToast({ title: '今日非服药日，好好休息', icon: 'none' });
+      return;
+    }
     if (ds.taken === 'true' || ds.taken === true) return;
     var untaken = this.data.slots.filter(function (s) { return !s.taken; });
     if (!untaken.length) {
