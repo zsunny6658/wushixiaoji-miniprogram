@@ -228,7 +228,7 @@ Page({
       var items = (res && res.items) || [];
       var source = (res && res.source) || 'none';
       if (!items.length) {
-        wx.showToast({ title: '未收录，请手动设置药板', icon: 'none' });
+        wx.showToast({ title: (res && res.hint) || '未收录，请手动设置药板', icon: 'none' });
         return;
       }
       if (items.length === 1) {
