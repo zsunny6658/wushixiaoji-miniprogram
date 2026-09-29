@@ -207,6 +207,11 @@
 .pending-item:last-child { border-bottom: none; }
 .pending-item:active { background: var(--bg-hover); }
 .pending-item.flagged { border-left: 4rpx solid #ef4444; padding-left: 8rpx; }
+
+/* 今日动态 */
+.act-item .pending-time { flex-shrink: 0; }
+.act-item.act-done { border-left: 4rpx solid var(--color-success); padding-left: 8rpx; }
+.act-item.act-new { border-left: 4rpx solid var(--color-info); padding-left: 8rpx; }
 .pending-icon {
   font-size: 28rpx;
   flex-shrink: 0;

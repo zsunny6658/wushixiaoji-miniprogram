@@ -102,4 +102,20 @@
       <view class="pending-empty" wx:if="{{latestPending.length === 0}}">全部处理完毕 🎉</view>
     </view>
   </view>
+
+  <!-- 今日动态 -->
+  <view class="section" wx:if="{{todayActs.length}}">
+    <view class="section-head">
+      <text class="section-title">🔔 今日动态</text>
+    </view>
+    <view class="pending-list">
+      <view class="pending-item act-item {{item.cls}}" wx:for="{{todayActs}}" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}">
+        <text class="pending-icon">{{item.icon}}</text>
+        <view class="pending-body">
+          <text class="pending-text">{{item.text}}</text>
+        </view>
+        <text class="pending-time act-time">{{item._time}}</text>
+      </view>
+    </view>
+  </view>
 </view>

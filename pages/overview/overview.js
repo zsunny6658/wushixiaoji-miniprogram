@@ -10,6 +10,7 @@ Page({
     todayStr: '',
     quadrantCounts: { q1: 0, q2: 0, q3: 0, q4: 0 },
     latestPending: [],
+    todayActs: [],
     searchKeyword: ''
   },
 
@@ -63,6 +64,27 @@ Page({
       p._flagged = p.importance === 'high';
     });
 
+    // 今日动态（今日新增 / 今日完成，按时间倒序取前 5）
+    var nd = new Date();
+    var todayPrefix = nd.getFullYear() + '-' + ('0' + (nd.getMonth() + 1)).slice(-2) + '-' + ('0' + nd.getDate()).slice(-2);
+    var acts = [];
+    pkgs.forEach(function (p) {
+      if (p.createdAt && p.createdAt.indexOf(todayPrefix) === 0) {
+        acts.push({ id: p.id + ':new', time: p.createdAt, icon: p.type === 'pickup' ? '📦' : (p.type === 'debt' ? '💳' : '📝'),
+          text: '新增「' + (p.summaryText || p.title || p.code || '') + '」', cls: 'act-new' });
+      }
+      if (p.status === 'picked' && p.pickedAt && p.pickedAt.indexOf(todayPrefix) === 0) {
+        acts.push({ id: p.id + ':done', time: p.pickedAt, icon: '✅',
+          text: '完成「' + (p.summaryText || p.title || p.code || '') + '」', cls: 'act-done' });
+      }
+    });
+    acts.sort(function (a, b) { return b.time.localeCompare(a.time); });
+    var todayActs = acts.slice(0, 5).map(function (a) {
+      var t = new Date(a.time);
+      a._time = ('0' + t.getHours()).slice(-2) + ':' + ('0' + t.getMinutes()).slice(-2);
+      return a;
+    });
+
     // 问候语
     var now = new Date();
     var hour = now.getHours();
@@ -91,6 +113,7 @@ Page({
       stats: { todo: todoC, pickup: pickupC, debt: debtC, debtTotal: debtTotal, debtTotalLabel: helpers.formatAmount(debtTotal), overdue: overdueC, picked: pickedC, ignored: ignoredC, privateCount: privateC },
       quadrantCounts: counts,
       latestPending: latestPending,
+      todayActs: todayActs,
       greetingText: greeting,
       todayStr: todayStr
     });

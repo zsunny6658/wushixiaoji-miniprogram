@@ -119,32 +119,24 @@
   <!-- 底部操作栏 -->
   <view class="action-bar">
     <button class="action-btn action-flag {{pkg.importance === 'high' ? 'action-flag-active' : ''}}" bindtap="onToggleFlag">
-      <text class="action-icon">🚩</text>
+      <ficon class="action-icon-vec" name="flag" size="34" color="{{pkg.importance === 'high' ? '#EF5350' : '#718096'}}" />
       <text>{{pkg.importance === 'high' ? '取消重点' : '标重点'}}</text>
     </button>
-    <button class="action-btn action-copy" bindtap="onCopy">
-      <text class="action-icon">📋</text>
-      <text>复制</text>
-    </button>
     <button class="action-btn action-edit" bindtap="onEdit">
-      <text class="action-icon">✏️</text>
+      <ficon class="action-icon-vec" name="edit" size="34" color="#718096" />
       <text>编辑</text>
     </button>
     <button class="action-btn action-ignore {{pkg.status === 'ignored' ? 'action-ignored' : ''}}" bindtap="onToggleIgnore" wx:if="{{pkg.status !== 'archived'}}">
-      <text class="action-icon">🚫</text>
+      <ficon class="action-icon-vec" name="belloff" size="34" color="#718096" />
       <text>{{pkg.status === 'ignored' ? '恢复' : '忽略'}}</text>
     </button>
     <button class="action-btn action-main {{pkg.status === 'picked' ? 'action-unpick' : ''}}" bindtap="onTogglePick" wx:if="{{pkg.status !== 'archived'}}">
-      <text class="action-icon">{{pkg.status === 'picked' ? '↩️' : '✓'}}</text>
+      <ficon class="action-icon-vec" name="check-circle" size="34" color="#FFFFFF" />
       <text>{{pkg.status === 'picked' ? '撤销' : '完成'}}</text>
     </button>
-    <button class="action-btn action-archive" bindtap="onArchive" wx:if="{{pkg.status !== 'archived'}}">
-      <text class="action-icon">📦</text>
-      <text>归档</text>
-    </button>
-    <button class="action-btn action-delete" bindtap="onDelete" wx:if="{{pkg.status !== 'archived'}}">
-      <text class="action-icon">🗑️</text>
-      <text>删除</text>
+    <button class="action-btn action-more" bindtap="onMoreActions">
+      <ficon class="action-icon-vec" name="copy" size="34" color="#718096" />
+      <text>更多</text>
     </button>
   </view>
 </view>

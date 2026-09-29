@@ -41,28 +41,28 @@
     <text class="menu-group-title">账户</text>
     <view class="cell" bindtap="onChangePassword" hover-class="cell-hover">
       <view class="cell-left">
-        <text class="cell-icon">🔒</text>
+        <ficon class="cell-icon-vec" name="lock" size="36" />
         <text class="cell-title">修改密码</text>
       </view>
       <text class="cell-arrow">›</text>
     </view>
     <view class="cell" bindtap="onManageTokens" hover-class="cell-hover">
       <view class="cell-left">
-        <text class="cell-icon">🔑</text>
+        <ficon class="cell-icon-vec" name="key" size="36" />
         <text class="cell-title">CLI Token</text>
       </view>
       <text class="cell-arrow">›</text>
     </view>
     <view class="cell" bindtap="onOpenArchive" hover-class="cell-hover">
       <view class="cell-left">
-        <text class="cell-icon">🗄️</text>
+        <ficon class="cell-icon-vec" name="archive" size="36" />
         <text class="cell-title">归档记录</text>
       </view>
       <text class="cell-arrow">›</text>
     </view>
     <view class="cell" bindtap="onManageWebhooks" hover-class="cell-hover">
       <view class="cell-left">
-        <text class="cell-icon">🔗</text>
+        <ficon class="cell-icon-vec" name="link" size="36" />
         <text class="cell-title">Webhook</text>
       </view>
       <text class="cell-arrow">›</text>
@@ -73,14 +73,14 @@
       <text class="menu-group-title">家庭管理</text>
       <view class="cell" bindtap="onManageMembers" hover-class="cell-hover">
         <view class="cell-left">
-          <text class="cell-icon">👥</text>
+          <ficon class="cell-icon-vec" name="users" size="36" />
           <text class="cell-title">家庭成员</text>
         </view>
         <text class="cell-arrow">›</text>
       </view>
       <view class="cell" bindtap="onFamilySettings" hover-class="cell-hover">
         <view class="cell-left">
-          <text class="cell-icon">⚙️</text>
+          <ficon class="cell-icon-vec" name="settings" size="36" />
           <text class="cell-title">家庭配置</text>
         </view>
         <text class="cell-arrow">›</text>
@@ -92,7 +92,7 @@
     <picker range="{{groupOptions}}" value="{{groupIndex}}" bindchange="onGroupChange">
       <view class="cell" hover-class="cell-hover">
         <view class="cell-left">
-          <text class="cell-icon">📂</text>
+          <ficon class="cell-icon-vec" name="folder" size="36" />
           <text class="cell-title">分组方式</text>
         </view>
         <view class="cell-right">
@@ -106,7 +106,7 @@
     <text class="menu-group-title">通知</text>
     <view class="cell" bindtap="onOpenNotifyModal" hover-class="cell-hover">
       <view class="cell-left">
-        <text class="cell-icon">🔔</text>
+        <ficon class="cell-icon-vec" name="bell" size="36" />
         <text class="cell-title">通知设置</text>
       </view>
       <view class="cell-right">

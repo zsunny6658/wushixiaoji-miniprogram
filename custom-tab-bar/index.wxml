@@ -1,10 +1,10 @@
 <view class="tab-bar">
   <view class="tab-item {{active === 0 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="0">
-    <text class="tab-icon">🏠</text>
+    <ficon name="home" size="40" color="{{active === 0 ? '#4A90D9' : '#9CA3AF'}}" />
     <text class="tab-text">概览</text>
   </view>
   <view class="tab-item {{active === 1 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="1">
-    <text class="tab-icon">📋</text>
+    <ficon name="clipboard" size="40" color="{{active === 1 ? '#4A90D9' : '#9CA3AF'}}" />
     <text class="tab-text">小记</text>
   </view>
   <view class="tab-center">
@@ -12,8 +12,8 @@
       <text class="center-plus">{{voiceRecording ? '🎤' : '+'}}</text>
     </view>
   </view>
-  <view class="tab-item {{active === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">
-    <text class="tab-icon">👤</text>
+  <view class="tab-item tab-item-wide {{active === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">
+    <ficon name="user" size="40" color="{{active === 2 ? '#4A90D9' : '#9CA3AF'}}" />
     <text class="tab-text">我的</text>
   </view>
   <!-- 全屏录音遮罩 -->

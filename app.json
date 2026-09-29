@@ -13,11 +13,11 @@
     "pages/archive/archive"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#4A90D9",
+    "navigationBarBackgroundColor": "@navBgColor",
     "navigationBarTitleText": "屋事小记",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#F5F7FA",
-    "backgroundTextStyle": "light"
+    "navigationBarTextStyle": "@navTxtStyle",
+    "backgroundColor": "@bgColor",
+    "backgroundTextStyle": "@bgTxtStyle"
   },
   "tabBar": {
     "color": "#9CA3AF",
@@ -47,5 +47,7 @@
       }
     ]
   },
+  "darkmode": true,
+  "themeLocation": "theme.json",
   "sitemapLocation": "sitemap.json"
 }

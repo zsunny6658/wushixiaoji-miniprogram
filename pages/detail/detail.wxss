@@ -234,6 +234,11 @@
 .action-btn:active { transform: scale(0.97); }
 .action-btn::after { border: none; }
 .action-icon { font-size: 36rpx; line-height: 1; }
+.action-icon-vec {
+  display: flex;
+  justify-content: center;
+  line-height: 1;
+}
 .action-copy { background: var(--color-info-light); color: var(--color-info); }
 .action-edit { background: var(--color-primary-light); color: var(--color-primary); }
 .action-delete { background: var(--color-error-light); color: var(--color-error); }

@@ -73,6 +73,23 @@ Page({
     });
   },
 
+  // 「更多」收纳低频操作：复制 / 归档 / 删除
+  onMoreActions: function () {
+    var that = this;
+    var isArchived = this.data.pkg.status === 'archived';
+    var items = ['复制'];
+    if (!isArchived) items = items.concat(['归档', '删除']);
+    wx.showActionSheet({
+      itemList: items,
+      success: function (res) {
+        var label = items[res.tapIndex];
+        if (label === '复制') that.onCopy();
+        else if (label === '归档') that.onArchive();
+        else if (label === '删除') that.onDelete();
+      }
+    });
+  },
+
   onEdit: function () {
     var id = this.data.pkg.id;
     wx.navigateTo({ url: '/pages/add/add?id=' + id });

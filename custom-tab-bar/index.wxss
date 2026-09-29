@@ -3,8 +3,8 @@
   align-items: center;
   justify-content: space-around;
   height: 100rpx;
-  background: #fff;
-  border-top: 1rpx solid #e5e5e5;
+  background: var(--bg-card, #fff);
+  border-top: 1rpx solid var(--border, #e5e5e5);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -33,11 +33,15 @@
 }
 
 .tab-center {
-  flex: 1;
+  flex: 1.5;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100rpx;
+}
+
+.tab-item-wide {
+  flex: 2;
 }
 
 .center-btn {
