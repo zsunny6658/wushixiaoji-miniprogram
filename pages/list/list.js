@@ -28,6 +28,8 @@ Page({
     emptyTitle: '当前没有记录',
     emptyDesc: '点击右下角 + 添加',
     batchMode: false,
+    showFilter: false,
+    activeFilterCount: 0,
     batchCount: 0,
     swipeTouchX: 0,
     swipeTouchY: 0,
@@ -70,6 +72,9 @@ Page({
         search: gd._deepLinkFilter.searchQuery || ''
       });
       gd._deepLinkFilter = null;
+      this.updateFilterBadge();
+      // 深链带非默认筛选时自动展开抽屉
+      if (this.data.activeFilterCount) this.setData({ showFilter: true });
     }
     var that = this;
     app.refreshState(function () { that.computeList(); });
@@ -142,6 +147,7 @@ Page({
   switchScope: function (e) {
     var s = e.currentTarget.dataset.scope;
     this.setData({ scope: s });
+    this.updateFilterBadge();
     this.computeList();
   },
   switchType: function (e) {
@@ -214,11 +220,32 @@ Page({
   },
 
   onSearch: function (e) { this.setData({ search: e.detail.value }); this.computeList(); },
+  onToggleFilter: function () { this.setData({ showFilter: !this.data.showFilter }); },
+  // 徽标 = 非默认筛选条件数（范围/重要性/紧迫性/分组）
+  updateFilterBadge: function () {
+    var d = this.data;
+    var n = (d.scope !== 'all' ? 1 : 0) + (d.impIndex > 0 ? 1 : 0) +
+      (d.urgIndex > 0 ? 1 : 0) + (d.groupIndex > 0 ? 1 : 0);
+    this.setData({ activeFilterCount: n });
+  },
+  onResetFilter: function () {
+    app.globalData.importanceFilter = 'all';
+    app.globalData.urgencyFilter = 'all';
+    this.setData({
+      scope: 'all', scopeIndex: 0,
+      impIndex: 0, importanceFilter: 'all',
+      urgIndex: 0, urgencyFilter: 'all',
+      groupIndex: 0, group: 'none'
+    });
+    this.updateFilterBadge();
+    this.computeList();
+  },
   onImpChange: function (e) {
     var idx = parseInt(e.detail.value, 10);
     var vals = ['all', 'high', 'medium', 'low'];
     app.globalData.importanceFilter = vals[idx];
     this.setData({ impIndex: idx, importanceFilter: vals[idx] });
+    this.updateFilterBadge();
     this.computeList();
   },
   onUrgChange: function (e) {
@@ -226,6 +253,7 @@ Page({
     var vals = ['all', 'urgent', 'normal'];
     app.globalData.urgencyFilter = vals[idx];
     this.setData({ urgIndex: idx, urgencyFilter: vals[idx] });
+    this.updateFilterBadge();
     this.computeList();
   },
   onGroupChange: function (e) {
@@ -233,6 +261,7 @@ Page({
     var vals = ['none', 'owner', 'type'];
     app.globalData.group = vals[idx];
     this.setData({ groupIndex: idx, group: vals[idx] });
+    this.updateFilterBadge();
     this.computeList();
   },
   onTogglePick: function (e) {

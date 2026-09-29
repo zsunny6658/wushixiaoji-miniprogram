@@ -1,5 +1,5 @@
 <view class="page">
-  <!-- 类型 + 范围 + 状态 tab -->
+  <!-- 类型 tab -->
   <view class="toolbar">
     <view class="segmented segmented-fill">
       <view class="seg-item {{recordType === 'all' ? 'seg-active' : ''}}" bindtap="switchType" data-type="all">全部</view>
@@ -8,13 +8,7 @@
       <view class="seg-item {{recordType === 'debt' ? 'seg-active' : ''}}" bindtap="switchType" data-type="debt">待还</view>
     </view>
   </view>
-  <view class="toolbar">
-    <view class="segmented segmented-fill">
-      <view class="seg-item {{scope === 'all' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="all">全部</view>
-      <view class="seg-item {{scope === 'family' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="family">👨‍👩‍👧 家庭</view>
-      <view class="seg-item {{scope === 'personal' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="personal">🔒 个人</view>
-    </view>
-  </view>
+  <!-- 状态 tab -->
   <view class="toolbar">
     <view class="segmented">
       <view class="seg-item {{filter === 'all' ? 'seg-active' : ''}}" bindtap="switchFilter" data-filter="all">全部<text class="seg-count">{{counts.all}}</text></view>
@@ -25,20 +19,34 @@
     </view>
   </view>
 
-  <!-- 搜索 + 筛选 -->
-  <view class="toolbar">
+  <!-- 搜索 + 筛选入口 -->
+  <view class="toolbar search-row">
     <input class="search-input" placeholder="{{recordType === 'todo' ? '搜索备忘内容' : '搜索取件码/驿站'}}" placeholder-style="color:var(--text-tertiary);line-height:1.5;font-size:28rpx;" value="{{search}}" bindinput="onSearch" />
+    <view class="filter-entry {{activeFilterCount ? 'filter-on' : ''}}" bindtap="onToggleFilter">
+      <text>筛选</text>
+      <text class="filter-badge" wx:if="{{activeFilterCount}}">{{activeFilterCount}}</text>
+    </view>
   </view>
-  <view class="toolbar filters">
-    <picker class="mini-select" range="{{impOptions}}" value="{{impIndex}}" bindchange="onImpChange">
-      <view class="mini-select-inner">{{impOptions[impIndex]}}</view>
-    </picker>
-    <picker class="mini-select" range="{{urgOptions}}" value="{{urgIndex}}" bindchange="onUrgChange">
-      <view class="mini-select-inner">{{urgOptions[urgIndex]}}</view>
-    </picker>
-    <picker class="mini-select" range="{{groupOptions}}" value="{{groupIndex}}" bindchange="onGroupChange">
-      <view class="mini-select-inner">{{groupOptions[groupIndex]}}</view>
-    </picker>
+
+  <!-- 筛选抽屉 -->
+  <view class="filter-drawer" wx:if="{{showFilter}}">
+    <view class="segmented segmented-fill">
+      <view class="seg-item {{scope === 'all' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="all">全部</view>
+      <view class="seg-item {{scope === 'family' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="family">👨‍👩‍👧 家庭</view>
+      <view class="seg-item {{scope === 'personal' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="personal">🔒 个人</view>
+    </view>
+    <view class="toolbar filters">
+      <picker class="mini-select" range="{{impOptions}}" value="{{impIndex}}" bindchange="onImpChange">
+        <view class="mini-select-inner">{{impOptions[impIndex]}}</view>
+      </picker>
+      <picker class="mini-select" range="{{urgOptions}}" value="{{urgIndex}}" bindchange="onUrgChange">
+        <view class="mini-select-inner">{{urgOptions[urgIndex]}}</view>
+      </picker>
+      <picker class="mini-select" range="{{groupOptions}}" value="{{groupIndex}}" bindchange="onGroupChange">
+        <view class="mini-select-inner">{{groupOptions[groupIndex]}}</view>
+      </picker>
+      <view class="filter-reset" wx:if="{{activeFilterCount}}" bindtap="onResetFilter">重置</view>
+    </view>
   </view>
 
   <!-- 批量操作栏 -->

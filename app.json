@@ -40,12 +40,6 @@
         "selectedIconPath": "images/list-active.png"
       },
       {
-        "pagePath": "pages/quadrant/quadrant",
-        "text": "四象限",
-        "iconPath": "images/quadrant.png",
-        "selectedIconPath": "images/quadrant-active.png"
-      },
-      {
         "pagePath": "pages/me/me",
         "text": "我的",
         "iconPath": "images/settings.png",

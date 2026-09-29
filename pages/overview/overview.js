@@ -124,7 +124,7 @@ Page({
     app.globalData._deepLinkFilter = { recordType: 'all', filter: 'ignored' };
     wx.switchTab({ url: '/pages/list/list' });
   },
-  onGoQuadrant: function () { wx.switchTab({ url: '/pages/quadrant/quadrant' }); },
+  onGoQuadrant: function () { wx.navigateTo({ url: '/pages/quadrant/quadrant' }); },
   onGoPending: function () {
     app.globalData._deepLinkFilter = { recordType: 'all', filter: 'pending' };
     wx.switchTab({ url: '/pages/list/list' });
@@ -143,7 +143,7 @@ Page({
   onGoQuadrantDetail: function (e) {
     var quad = e.currentTarget.dataset.quad;
     app.globalData._focusQuad = quad;
-    wx.switchTab({ url: '/pages/quadrant/quadrant' });
+    wx.navigateTo({ url: '/pages/quadrant/quadrant' });
   },
   onShareAppMessage: function () {
     return { title: '屋事小记 - 家庭快递取件码共享', path: '/pages/overview/overview' };
