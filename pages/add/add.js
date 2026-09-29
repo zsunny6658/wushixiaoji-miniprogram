@@ -186,6 +186,76 @@ Page({
     var v = e.detail.value;
     this.setData({ ['form.' + f]: v });
   },
+
+  // —— 药名输入联想（medication）——
+  onMedNameInput: function (e) {
+    var v = e.detail.value;
+    this.setData({ 'form.code': v });
+    var that = this;
+    if (this._suggestTimer) clearTimeout(this._suggestTimer);
+    if (!v || !v.trim()) {
+      this.setData({ showDrugSuggest: false, drugSuggests: [] });
+      return;
+    }
+    this._suggestTimer = setTimeout(function () {
+      api.suggestDrugs(v.trim(), function (res) {
+        var items = (res && res.items) || [];
+        that.setData({ showDrugSuggest: items.length > 0, drugSuggests: items });
+      });
+    }, 300);
+  },
+
+  // 点击联想项：填入药名并搜索形态
+  onDrugSuggestTap: function (e) {
+    var name = e.currentTarget.dataset.name;
+    this.setData({ 'form.code': name, showDrugSuggest: false, drugSuggests: [] });
+    this.lookupDrugAppearance(name);
+  },
+
+  // 手动触发形态搜索（输入完整药名后点「搜形态」）
+  onDrugSearchTap: function () {
+    var name = (this.data.form.code || '').trim();
+    if (!name) { wx.showToast({ title: '请先输入药名', icon: 'none' }); return; }
+    this.lookupDrugAppearance(name);
+  },
+
+  // 搜索药品形态：本地知识库优先（AI 兜底），单候选直填，多候选让用户选
+  lookupDrugAppearance: function (name) {
+    var that = this;
+    wx.showLoading({ title: '搜索形态...', mask: true });
+    api.searchDrugs(name, function (res) {
+      wx.hideLoading();
+      var items = (res && res.items) || [];
+      var source = (res && res.source) || 'none';
+      if (!items.length) {
+        wx.showToast({ title: '未收录，请手动设置药板', icon: 'none' });
+        return;
+      }
+      if (items.length === 1) {
+        that.applyDrugAppearance(items[0], source);
+        return;
+      }
+      var SHAPE_CN = { round: '圆形', oval: '椭圆', capsule: '胶囊', square: '方形' };
+      var labels = items.slice(0, 6).map(function (d) {
+        return (d.name || '') + '：' + SHAPE_CN[d.shape] + ' ' + d.rows + '×' + d.cols + ' 一盒' + d.boards + '板';
+      });
+      wx.showActionSheet({
+        itemList: labels,
+        success: function (r) {
+          if (r.tapIndex >= 0 && r.tapIndex < Math.min(items.length, 6)) {
+            that.applyDrugAppearance(items[r.tapIndex], source);
+          }
+        }
+      });
+    }, function () { wx.hideLoading(); });
+  },
+
+  // 应用药品形态：回填仿真药板（颜色/形状/行列/板数）
+  applyDrugAppearance: function (d, source) {
+    this.setData({ pillInfo: this.normalizePillForm(d) });
+    wx.showToast({ title: source === 'ai' ? 'AI 已生成药板·请核对' : '已生成仿真药板', icon: 'none' });
+  },
+
   onSmartText: function (e) { this.setData({ smartText: e.detail.value }); },
   onDateChange: function (e) { this.setData({ dateStr: e.detail.value }); },
   onTimeChange: function (e) { this.setData({ timeStr: e.detail.value }); },

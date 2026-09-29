@@ -222,6 +222,14 @@ var API = {
   },
   untakeMed: function (id, logId, cb, errCb) {
     this.request('DELETE', '/api/packages/' + id + '/medlogs/' + logId, null, cb, errCb);
+  },
+  // 药名输入联想
+  suggestDrugs: function (q, cb, errCb) {
+    this.request('GET', '/api/drugs/suggest', { q: q, limit: 6 }, cb, errCb);
+  },
+  // 药品形态搜索（本地库 + AI 兜底）
+  searchDrugs: function (name, cb, errCb) {
+    this.request('GET', '/api/drugs/search', { name: name }, cb, errCb);
   }
 };
 

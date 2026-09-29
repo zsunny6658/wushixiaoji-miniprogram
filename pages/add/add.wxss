@@ -325,3 +325,43 @@
   border-radius: 999rpx;
   padding: 6rpx 20rpx;
 }
+
+/* 药名联想下拉 */
+.field-drug {
+  position: relative;
+}
+.drug-suggest {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 30;
+  background: var(--bg-card, #fff);
+  border: 2rpx solid var(--border, #E2E8F0);
+  border-radius: 16rpx;
+  box-shadow: 0 12rpx 32rpx rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+  margin-top: 4rpx;
+}
+.drug-suggest-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2rpx;
+  padding: 16rpx 24rpx;
+  border-bottom: 2rpx solid var(--bg-page, #F1F5F9);
+}
+.drug-suggest-item:last-child {
+  border-bottom: none;
+}
+.drug-suggest-item:active {
+  background: rgba(74, 144, 217, 0.08);
+}
+.ds-name {
+  font-size: 27rpx;
+  font-weight: 600;
+  color: var(--text-primary, #0F172A);
+}
+.ds-note {
+  font-size: 22rpx;
+  color: var(--text-tertiary, #94A3B8);
+}

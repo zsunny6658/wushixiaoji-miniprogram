@@ -76,9 +76,18 @@
       </block>
 
       <block wx:if="{{type === 'medication'}}">
-        <view class="field">
-          <text class="field-label">药品名称 <text class="req">*</text></text>
-          <input class="field-input" placeholder="如：阿莫西林" value="{{form.code}}" bindinput="onField" data-field="code" />
+        <view class="field field-drug">
+          <view class="pill-head-row">
+            <text class="field-label">药品名称 <text class="req">*</text></text>
+            <view class="pill-photo-btn" bindtap="onDrugSearchTap">🔍 搜形态</view>
+          </view>
+          <input class="field-input" placeholder="如：阿莫西林（输入可联想）" value="{{form.code}}" bindinput="onMedNameInput" />
+          <view class="drug-suggest" wx:if="{{showDrugSuggest}}">
+            <view class="drug-suggest-item" wx:for="{{drugSuggests}}" wx:key="name" bindtap="onDrugSuggestTap" data-name="{{item.name}}">
+              <text class="ds-name">{{item.name}}</text>
+              <text class="ds-note">{{item.note}}</text>
+            </view>
+          </view>
         </view>
         <view class="field">
           <text class="field-label">每日次数</text>
