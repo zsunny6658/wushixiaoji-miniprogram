@@ -21,7 +21,8 @@ Component({
       var urls = {
         0: '/pages/overview/overview',
         1: '/pages/list/list',
-        2: '/pages/me/me'
+        2: '/pages/quadrant/quadrant',
+        3: '/pages/me/me'
       };
       var url = urls[idx];
       if (url) wx.switchTab({ url: url });

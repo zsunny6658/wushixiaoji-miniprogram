@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "概览",
-  "enablePullDownRefresh": true
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "ficon": "/components/ficon/index"
+  }
 }

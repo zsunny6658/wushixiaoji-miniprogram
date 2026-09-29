@@ -20,7 +20,7 @@
   </view>
 
   <view class="arch-empty" wx:elif="{{!loading}}">
-    <text class="arch-empty-icon">🗄️</text>
+    <view class="arch-empty-icon"><ficon name="archive" size="96" color="#CBD5E1" /></view>
     <text class="arch-empty-text">暂无归档记录</text>
     <text class="arch-empty-hint">在详情页选择「归档」后，记录会收纳到这里</text>
   </view>

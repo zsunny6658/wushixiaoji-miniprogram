@@ -8,7 +8,7 @@
   <!-- 搜索栏 -->
   <view class="search-bar">
     <view class="search-input-wrap">
-      <text class="search-icon">🔍</text>
+      <ficon class="search-icon" name="search" size="30" color="#9CA3AF" />
       <input class="search-input" placeholder="搜索取件码、驿站、备忘..." placeholder-class="search-placeholder" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearchGo" confirm-type="search" />
     </view>
     <text class="search-go" bindtap="onSearchGo">搜索</text>
@@ -18,40 +18,40 @@
   <view class="stats">
     <view class="stats-row">
       <view class="stat-card s-pickup" bindtap="onGoPickup" hover-class="hover-press">
-        <view class="stat-icon">📦</view>
+        <view class="stat-icon"><ficon name="box" size="44" color="#4A90D9" /></view>
         <view class="stat-num">{{stats.pickup || 0}}</view>
         <view class="stat-label">待取快递</view>
       </view>
       <view class="stat-card s-todo" bindtap="onGoTodo" hover-class="hover-press">
-        <view class="stat-icon">📝</view>
+        <view class="stat-icon"><ficon name="clipboard" size="44" color="#F59E0B" /></view>
         <view class="stat-num">{{stats.todo || 0}}</view>
         <view class="stat-label">待办备忘</view>
       </view>
       <view class="stat-card s-debt" bindtap="onGoDebt" hover-class="hover-press">
-        <view class="stat-icon">💳</view>
+        <view class="stat-icon"><ficon name="creditcard" size="44" color="#EF4444" /></view>
         <view class="stat-num">{{stats.debt || 0}}</view>
         <view class="stat-label">待还款项</view>
         <view class="stat-sub" wx:if="{{stats.debtTotal > 0}}">¥{{stats.debtTotalLabel}}</view>
       </view>
       <view class="stat-card s-private" bindtap="onGoPrivate" hover-class="hover-press">
-        <view class="stat-icon">🔒</view>
+        <view class="stat-icon"><ficon name="lock" size="44" color="#64748B" /></view>
         <view class="stat-num">{{stats.privateCount || 0}}</view>
         <view class="stat-label">个人事项</view>
       </view>
     </view>
     <view class="stats-row">
       <view class="stat-card s-overdue" bindtap="onGoOverdue" hover-class="hover-press">
-        <view class="stat-icon">⚠️</view>
+        <view class="stat-icon"><ficon name="alert-circle" size="44" color="#EF4444" /></view>
         <view class="stat-num">{{stats.overdue || 0}}</view>
         <view class="stat-label">逾期/到期</view>
       </view>
       <view class="stat-card s-done" bindtap="onGoDone" hover-class="hover-press">
-        <view class="stat-icon">✅</view>
+        <view class="stat-icon"><ficon name="check-circle" size="44" color="#10B981" /></view>
         <view class="stat-num">{{stats.picked || 0}}</view>
         <view class="stat-label">已完成</view>
       </view>
       <view class="stat-card s-ignored" bindtap="onGoIgnored" hover-class="hover-press">
-        <view class="stat-icon">🚫</view>
+        <view class="stat-icon"><ficon name="slash" size="44" color="#9CA3AF" /></view>
         <view class="stat-num">{{stats.ignored || 0}}</view>
         <view class="stat-label">已忽略</view>
       </view>
@@ -61,7 +61,7 @@
   <!-- 四象限看板 -->
   <view class="section">
     <view class="section-head">
-      <text class="section-title">🎯 优先级看板</text>
+      <view class="section-title"><ficon style="vertical-align:-6rpx;margin-right:8rpx" name="target" size="30" color="#718096" /> 优先级看板</view>
       <text class="section-more" bindtap="onGoQuadrant">查看全部 ›</text>
     </view>
     <view class="quad-grid">
@@ -87,30 +87,33 @@
   <!-- 最新待办 -->
   <view class="section">
     <view class="section-head">
-      <text class="section-title">📋 最新待办</text>
+      <view class="section-title"><ficon style="vertical-align:-6rpx;margin-right:8rpx" name="clipboard" size="30" color="#718096" /> 最新待办</view>
       <text class="section-more" bindtap="onGoPending">全部 ›</text>
     </view>
     <view class="pending-list">
       <view class="pending-item {{item._flagged ? 'flagged' : ''}}" wx:for="{{latestPending}}" wx:for-item="item" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}">
-        <text class="pending-icon">{{item._icon}}</text>
+        <ficon class="pending-icon" name="{{item._iconName}}" size="30" color="{{item._iconColor}}" />
         <view class="pending-body">
           <text class="pending-text">{{item._text}}</text>
           <text class="pending-time" wx:if="{{item._time}}">{{item._time}}</text>
         </view>
         <text class="pending-arrow">›</text>
       </view>
-      <view class="pending-empty" wx:if="{{latestPending.length === 0}}">全部处理完毕 🎉</view>
+      <view class="pending-empty" wx:if="{{latestPending.length === 0}}">
+        <text>全部处理完毕</text>
+        <ficon name="check-circle" size="30" color="#10B981" />
+      </view>
     </view>
   </view>
 
   <!-- 今日动态 -->
   <view class="section" wx:if="{{todayActs.length}}">
     <view class="section-head">
-      <text class="section-title">🔔 今日动态</text>
+      <view class="section-title"><ficon style="vertical-align:-6rpx;margin-right:8rpx" name="bell" size="30" color="#718096" /> 今日动态</view>
     </view>
     <view class="pending-list">
       <view class="pending-item act-item {{item.cls}}" wx:for="{{todayActs}}" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}">
-        <text class="pending-icon">{{item.icon}}</text>
+        <ficon class="pending-icon" name="{{item.iconName}}" size="30" color="{{item.iconColor || '#718096'}}" />
         <view class="pending-body">
           <text class="pending-text">{{item.text}}</text>
         </view>

@@ -1,5 +1,8 @@
 {
   "navigationBarTitleText": "归档记录",
   "enablePullDownRefresh": true,
-  "backgroundTextStyle": "dark"
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "ficon": "/components/ficon/index"
+  }
 }

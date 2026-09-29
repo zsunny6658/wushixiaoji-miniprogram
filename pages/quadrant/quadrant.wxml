@@ -16,7 +16,7 @@
           <view class="qcard-body">
             <text class="qcard-title-text">{{pkg.summaryText || pkg.title || pkg.code}}</text>
             <view class="qcard-meta-row">
-              <text class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <view class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}"><ficon style="vertical-align:-3rpx;margin-right:4rpx" name="clock" size="22" color="#9CA3AF" />{{pkg.arrivedLabel}}</view>
               <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
               <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
             </view>
@@ -36,7 +36,7 @@
           <view class="qcard-body">
             <text class="qcard-title-text">{{pkg.summaryText || pkg.title || pkg.code}}</text>
             <view class="qcard-meta-row">
-              <text class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <view class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}"><ficon style="vertical-align:-3rpx;margin-right:4rpx" name="clock" size="22" color="#9CA3AF" />{{pkg.arrivedLabel}}</view>
               <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
               <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
             </view>
@@ -56,7 +56,7 @@
           <view class="qcard-body">
             <text class="qcard-title-text">{{pkg.summaryText || pkg.title || pkg.code}}</text>
             <view class="qcard-meta-row">
-              <text class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <view class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}"><ficon style="vertical-align:-3rpx;margin-right:4rpx" name="clock" size="22" color="#9CA3AF" />{{pkg.arrivedLabel}}</view>
               <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
               <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
             </view>
@@ -76,7 +76,7 @@
           <view class="qcard-body">
             <text class="qcard-title-text">{{pkg.summaryText || pkg.title || pkg.code}}</text>
             <view class="qcard-meta-row">
-              <text class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}">⏰{{pkg.arrivedLabel}}</text>
+              <view class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}"><ficon style="vertical-align:-3rpx;margin-right:4rpx" name="clock" size="22" color="#9CA3AF" />{{pkg.arrivedLabel}}</view>
               <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
               <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
             </view>

@@ -265,14 +265,14 @@
         </view>
         <text class="quota-hint">剩余 {{asrStatus.realtime.remainingHours}} 小时</text>
       </view>
-      <text class="section-desc" wx:if="{{asrStatus.engine === 'local-fallback'}}">⚠️ 额度已用尽，已降级到本地识别</text>
+      <view class="section-desc" wx:if="{{asrStatus.engine === 'local-fallback'}}"><ficon style="vertical-align:-4rpx;margin-right:6rpx" name="alert-circle" size="24" color="#EF4444" /> 额度已用尽，已降级到本地识别</view>
     </view>
 
     <!-- 关于 -->
     <view class="section">
       <text class="section-title">关于</text>
       <view class="about-card">
-        <view class="about-logo">📦</view>
+        <view class="about-logo"><ficon name="box" size="72" color="#4A90D9" /></view>
         <text class="about-name">屋事小记</text>
         <text class="about-desc">家庭快递取件码共享平台</text>
         <view class="about-divider"></view>

@@ -1,7 +1,7 @@
 <view class="detail-page">
   <!-- 顶部状态栏 -->
   <view class="status-bar {{pkg.status === 'picked' ? 'done' : ''}} {{pkg.status === 'ignored' ? 'ignored' : ''}} {{pkg.status === 'archived' ? 'archived' : ''}}">
-    <text class="status-icon">{{pkg.status === 'picked' ? '✅' : (pkg.status === 'ignored' ? '🚫' : (pkg.status === 'archived' ? '📦' : '⏳'))}}</text>
+    <ficon class="status-icon" name="{{pkg.status === 'picked' ? 'check-circle' : (pkg.status === 'ignored' ? 'slash' : (pkg.status === 'archived' ? 'archive' : 'clock'))}}" size="48" color="#fff" />
     <text class="status-text">{{pkg.status === 'picked' ? '已完成' : (pkg.status === 'ignored' ? '已忽略' : (pkg.status === 'archived' ? '已归档' : '待处理'))}}</text>
     <view class="status-right" wx:if="{{pkg.overdue && pkg.status !== 'ignored' && pkg.status !== 'picked' && pkg.status !== 'archived'}}">
       <text class="overdue-badge">逾期</text>
@@ -9,12 +9,12 @@
   </view>
   <!-- 忽略自动删除提示 -->
   <view class="ignore-notice" wx:if="{{pkg.status === 'ignored'}}">
-    <text class="ignore-notice-icon">🗑️</text>
+    <ficon class="ignore-notice-icon" name="trash" size="32" color="#9CA3AF" />
     <text class="ignore-notice-text">已忽略，{{pkg.ignoreDeleteLabel}}</text>
   </view>
   <!-- 归档提示 -->
   <view class="archive-notice" wx:if="{{pkg.status === 'archived'}}">
-    <text class="archive-notice-icon">📦</text>
+    <ficon class="archive-notice-icon" name="archive" size="32" color="#F59E0B" />
     <text class="archive-notice-text">已归档，可恢复</text>
   </view>
 
@@ -23,8 +23,8 @@
     <!-- 标题卡片 -->
     <view class="title-card">
       <view class="title-row">
-        <text class="type-badge {{pkg.type}}">{{pkg.type === 'pickup' ? '📦 取件' : (pkg.type === 'debt' ? '💳 待还' : '📝 备忘')}}</text>
-        <text class="private-badge" wx:if="{{pkg.isPrivate}}">🔒 个人</text>
+        <view class="type-badge {{pkg.type}}"><ficon wx:if="{{pkg.type === 'pickup'}}" style="vertical-align:-5rpx;margin-right:6rpx" name="box" size="24" color="#4A90D9" /><ficon wx:elif="{{pkg.type === 'debt'}}" style="vertical-align:-5rpx;margin-right:6rpx" name="creditcard" size="24" color="#EF4444" /><ficon wx:else style="vertical-align:-5rpx;margin-right:6rpx" name="clipboard" size="24" color="#F59E0B" /> {{pkg.type === 'pickup' ? '取件' : (pkg.type === 'debt' ? '待还' : '备忘')}}</view>
+        <view class="private-badge" wx:if="{{pkg.isPrivate}}"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="lock" size="24" color="#64748B" /> 个人</view>
         <text class="occ-badge" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
         <text class="tag-badge" wx:if="{{pkg.tagLabel}}">{{pkg.tagLabel}}</text>
       </view>
@@ -42,7 +42,7 @@
 
     <!-- 内容区 (todo/debt 的完整内容) -->
     <view class="content-section" wx:if="{{pkg.type === 'todo' || pkg.type === 'debt'}}">
-      <view class="content-title">{{pkg.type === 'debt' ? '💳 待还款项' : '📝 备忘内容'}}</view>
+      <view class="content-title"><ficon wx:if="{{pkg.type === 'debt'}}" name="creditcard" size="28" color="#EF4444" /><ficon wx:else name="clipboard" size="28" color="#F59E0B" /> {{pkg.type === 'debt' ? '待还款项' : '备忘内容'}}</view>
       <view class="content-text">{{pkg.code}}</view>
       <view class="debt-institution" wx:if="{{pkg.type === 'debt' && pkg.institution}}">
         <text class="debt-inst-label">金融机构</text>
@@ -52,7 +52,7 @@
 
     <!-- 原始内容 -->
     <view class="raw-section" wx:if="{{pkg.raw}}">
-      <view class="raw-title">📋 原始内容</view>
+      <view class="raw-title"><ficon name="clipboard" size="28" color="#718096" /> 原始内容</view>
       <view class="raw-content">{{pkg.raw}}</view>
     </view>
 
@@ -61,55 +61,55 @@
       <view class="section-title">详情</view>
       <view class="info-list">
         <view class="info-row" wx:if="{{pkg.type === 'pickup' && pkg.company}}">
-          <text class="info-label">🚚 公司</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="truck" size="26" color="#718096" /> 公司</view>
           <text class="info-value">{{pkg.company}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.type === 'debt' && pkg.dueDate}}">
-          <text class="info-label">📅 还款期限</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="calendar" size="26" color="#EF4444" /> 还款期限</view>
           <text class="info-value {{pkg.dueDays ? 'warn' : ''}}">{{pkg.dueDate}} {{pkg.dueDays ? '(' + pkg.dueDays + ')' : ''}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.trackingNo}}">
-          <text class="info-label">🔢 单号</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="hash" size="26" color="#718096" /> 单号</view>
           <text class="info-value mono">{{pkg.trackingNo}}</text>
         </view>
         <view class="info-row">
-          <text class="info-label">🕐 时间</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="clock" size="26" color="#718096" /> 时间</view>
           <text class="info-value {{pkg.overdue ? 'warn' : ''}}">{{pkg.arrivedLabel}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.type === 'pickup'}}">
-          <text class="info-label">📦 驿站</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="box" size="26" color="#4A90D9" /> 驿站</view>
           <text class="info-value">{{pkg.station || '—'}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.initiator}}">
-          <text class="info-label">👤 发起人</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="user" size="26" color="#718096" /> 发起人</view>
           <text class="info-value">{{pkg.initiator}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.assignee}}">
-          <text class="info-label">📋 待办人</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="clipboard" size="26" color="#718096" /> 待办人</view>
           <text class="info-value">{{pkg.assignee}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.createdBy}}">
-          <text class="info-label">🏷️ 创建</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="folder" size="26" color="#718096" /> 创建</view>
           <text class="info-value">{{pkg.createdBy === 'cli' ? 'CLI' : pkg.createdBy === 'webhook' ? 'Webhook' : '手动'}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.source}}">
-          <text class="info-label">📡 来源</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="link" size="26" color="#718096" /> 来源</view>
           <text class="info-value mono">{{pkg.source}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.importance}}">
-          <text class="info-label">⚖️ 重要</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="flag" size="26" color="#718096" /> 重要</view>
           <text class="info-value">{{pkg.impLabel}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.urgency}}">
-          <text class="info-label">⚡ 紧迫</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="zap" size="26" color="#718096" /> 紧迫</view>
           <text class="info-value">{{pkg.urgLabel}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.note}}">
-          <text class="info-label">📝 备注</text>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="edit" size="26" color="#718096" /> 备注</view>
           <text class="info-value">{{pkg.note}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.status === 'picked' && pkg.pickedBy}}">
-          <text class="info-label">✅ 完成</text>
+          <view class="info-label"><ficon name="check-circle" size="26" color="#10B981" /> 完成</view>
           <text class="info-value">{{pkg.pickedBy}} {{pkg.pickedAtLabel}}</text>
         </view>
       </view>

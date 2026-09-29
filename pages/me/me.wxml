@@ -167,7 +167,7 @@
     </view>
     <view class="notify-item">
       <view class="notify-item-left">
-        <text class="notify-item-icon">🔔</text>
+        <ficon class="notify-item-icon" name="bell" size="36" color="#F59E0B" />
         <view class="notify-item-text">
           <text class="notify-item-title">逾期提醒</text>
           <text class="notify-item-desc">快递逾期前提醒</text>
@@ -177,7 +177,7 @@
     </view>
     <view class="notify-item" wx:if="{{notifyEnabled}}">
       <view class="notify-item-left">
-        <text class="notify-item-icon">⏰</text>
+        <ficon class="notify-item-icon" name="clock" size="36" color="#718096" />
         <view class="notify-item-text">
           <text class="notify-item-title">提前天数</text>
           <text class="notify-item-desc">逾期前多少天提醒</text>
@@ -187,7 +187,7 @@
     </view>
     <view class="notify-item">
       <view class="notify-item-left">
-        <text class="notify-item-icon">🗑️</text>
+        <ficon class="notify-item-icon" name="trash" size="36" color="#718096" />
         <view class="notify-item-text">
           <text class="notify-item-title">忽略删除</text>
           <text class="notify-item-desc">忽略记录自动清理天数</text>
@@ -200,7 +200,7 @@
     <text class="notify-section-title">提醒时间</text>
     <view class="notify-item">
       <view class="notify-item-left">
-        <text class="notify-item-icon">📦</text>
+        <ficon class="notify-item-icon" name="box" size="36" color="#4A90D9" />
         <view class="notify-item-text">
           <text class="notify-item-title">待取件提醒</text>
           <text class="notify-item-desc">超过24小时未取时提醒</text>
@@ -213,7 +213,7 @@
     </view>
     <view class="notify-item">
       <view class="notify-item-left">
-        <text class="notify-item-icon">💳</text>
+        <ficon class="notify-item-icon" name="creditcard" size="36" color="#EF4444" />
         <view class="notify-item-text">
           <text class="notify-item-title">还款提醒</text>
           <text class="notify-item-desc">即将逾期/已逾期时提醒</text>
@@ -226,7 +226,7 @@
     </view>
     <view class="notify-item">
       <view class="notify-item-left">
-        <text class="notify-item-icon">📋</text>
+        <ficon class="notify-item-icon" name="clipboard" size="36" color="#718096" />
         <view class="notify-item-text">
           <text class="notify-item-title">每日汇总</text>
           <text class="notify-item-desc">每天发送待办概览邮件</text>
@@ -243,7 +243,7 @@
     <text class="notify-section-title">通知方式</text>
     <view class="notify-item">
       <view class="notify-item-left">
-        <text class="notify-item-icon">📱</text>
+        <ficon class="notify-item-icon" name="smartphone" size="36" color="#718096" />
         <view class="notify-item-text">
           <text class="notify-item-title">小程序通知</text>
           <text class="notify-item-desc">授权后可接收逾期/取件提醒</text>
@@ -251,7 +251,7 @@
       </view>
     </view>
     <view class="notify-item notify-subscribe-row">
-      <button class="modal-btn modal-btn-sm modal-btn-outline" bindtap="onSubscribeNotify">🔔 授权订阅消息</button>
+      <button class="modal-btn modal-btn-sm modal-btn-outline" bindtap="onSubscribeNotify"><ficon name="bell" size="26" color="#4A90D9" /> 授权订阅消息</button>
       <text class="notify-status {{subscribeAuthorized ? 'notify-status-enabled' : 'notify-status-disabled'}}">{{subscribeAuthorized ? '已授权' : '未授权'}}</text>
     </view>
     <view class="notify-item">

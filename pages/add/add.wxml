@@ -6,7 +6,7 @@
   <view class="smart-section" wx:if="{{!editId}}">
     <view class="smart-title">✨ 智能识别</view>
     <textarea class="smart-textarea" placeholder="粘贴快递短信或备忘文本" auto-height value="{{smartText}}" bindinput="onSmartText"></textarea>
-    <button class="btn btn-primary btn-block" bindtap="onSmartParse">📝 文本识别</button>
+    <button class="btn btn-primary btn-block" bindtap="onSmartParse"><ficon name="clipboard" size="28" color="#fff" /> 文本识别</button>
 
     <!-- 图片识别区 -->
     <view class="image-section">
@@ -19,7 +19,7 @@
       <view class="image-actions">
         <button class="btn btn-outline btn-sm" bindtap="onChooseImage">📷 选择图片</button>
         <button class="btn btn-primary btn-sm" bindtap="onParseImage" disabled="{{imageParsing || !imageTempPaths.length}}">
-          {{imageParsing ? '识别中...' : '🔍 图片识别'}}
+          {{imageParsing ? '识别中...' : ''}}<ficon wx:if="{{!imageParsing}}" name="search" size="28" color="#4A90D9" /> 图片识别
         </button>
       </view>
     </view>
@@ -29,9 +29,9 @@
   <view class="form-section">
     <!-- 类型分段切换 -->
     <view class="type-segmented">
-      <view class="seg-item {{type === 'pickup' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="pickup">📦 取件</view>
-      <view class="seg-item {{type === 'todo' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="todo">📝 备忘</view>
-      <view class="seg-item {{type === 'debt' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="debt">💳 还款</view>
+      <view class="seg-item {{type === 'pickup' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="pickup"><ficon name="box" size="30" color="{{type === 'pickup' ? '#4A90D9' : '#718096'}}" /> 取件</view>
+      <view class="seg-item {{type === 'todo' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="todo"><ficon name="clipboard" size="30" color="{{type === 'todo' ? '#4A90D9' : '#718096'}}" /> 备忘</view>
+      <view class="seg-item {{type === 'debt' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="debt"><ficon name="creditcard" size="30" color="{{type === 'debt' ? '#4A90D9' : '#718096'}}" /> 还款</view>
     </view>
 
     <view class="form-grid">
@@ -176,7 +176,7 @@
         <text class="field-label">可见范围</text>
         <view class="private-toggle">
           <switch checked="{{isPrivate}}" bindchange="onPrivateChange" color="#4f6ef7" />
-          <text class="private-label">{{isPrivate ? '🔒 仅本人可见' : '👨‍👩‍👧 家庭成员可见'}}</text>
+          <view class="private-label"><ficon style="vertical-align:-4rpx;margin-right:6rpx" name="{{isPrivate ? 'lock' : 'users'}}" size="26" color="{{isPrivate ? '#64748B' : '#4A90D9'}}" /> {{isPrivate ? '仅本人可见' : '家庭成员可见'}}</view>
         </view>
       </view>
     </view>

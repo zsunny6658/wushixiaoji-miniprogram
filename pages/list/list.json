@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "小记",
-  "enablePullDownRefresh": true
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "ficon": "/components/ficon/index"
+  }
 }

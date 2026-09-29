@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "四象限"
+  "navigationBarTitleText": "四象限",
+  "usingComponents": {
+    "ficon": "/components/ficon/index"
+  }
 }

@@ -41,7 +41,7 @@
 
   <!-- 生成的口令 -->
   <view class="passcode-card" wx:if="{{passcode}}">
-    <view class="passcode-title">🎉 已生成入口口令</view>
+    <view class="passcode-title"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="check-circle" size="30" color="#10B981" /> 已生成入口口令</view>
     <view class="passcode-value">{{passcode}}</view>
     <view class="passcode-actions">
       <button class="btn btn-sm passcode-action" bindtap="onCopyPasscode">复制口令</button>

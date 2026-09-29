@@ -40,10 +40,6 @@
   height: 100rpx;
 }
 
-.tab-item-wide {
-  flex: 2;
-}
-
 .center-btn {
   width: 100rpx;
   height: 100rpx;

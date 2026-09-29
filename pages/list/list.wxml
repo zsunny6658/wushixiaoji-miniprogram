@@ -32,8 +32,8 @@
   <view class="filter-drawer" wx:if="{{showFilter}}">
     <view class="segmented segmented-fill">
       <view class="seg-item {{scope === 'all' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="all">全部</view>
-      <view class="seg-item {{scope === 'family' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="family">👨‍👩‍👧 家庭</view>
-      <view class="seg-item {{scope === 'personal' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="personal">🔒 个人</view>
+      <view class="seg-item {{scope === 'family' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="family"><ficon name="users" size="26" color="{{scope === 'family' ? '#4A90D9' : '#718096'}}" /> 家庭</view>
+      <view class="seg-item {{scope === 'personal' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="personal"><ficon name="lock" size="26" color="{{scope === 'personal' ? '#4A90D9' : '#718096'}}" /> 个人</view>
     </view>
     <view class="toolbar filters">
       <picker class="mini-select" range="{{impOptions}}" value="{{impIndex}}" bindchange="onImpChange">
@@ -75,7 +75,7 @@
       <view class="cards">
         <view class="card-swipe-wrap" wx:for="{{list}}" wx:key="id">
           <view class="swipe-left">
-            <view class="swipe-act {{item.importance === 'high' ? 'swipe-flag-off' : 'swipe-flag'}}" catchtap="onSwipeFlag" data-id="{{item.id}}">{{item.importance === 'high' ? '⛏ 取消红旗' : '🚩 红旗'}}</view>
+            <view class="swipe-act {{item.importance === 'high' ? 'swipe-flag-off' : 'swipe-flag'}}" catchtap="onSwipeFlag" data-id="{{item.id}}"><ficon name="flag" size="26" color="#fff" /> {{item.importance === 'high' ? '取消红旗' : '红旗'}}</view>
           </view>
           <view class="swipe-actions">
             <view class="swipe-act {{item.status === 'picked' ? 'swipe-undo' : 'swipe-done'}}" catchtap="onSwipePick" data-id="{{item.id}}">{{item.status === 'picked' ? '↩ 撤销' : '✓ 完成'}}</view>
@@ -91,10 +91,10 @@
                     <text class="tag tag-primary" wx:if="{{item.type === 'pickup'}}">取件</text>
                     <text class="tag tag-warning" wx:if="{{item.type === 'todo'}}">备忘</text>
                     <text class="tag tag-debt" wx:if="{{item.type === 'debt'}}">待还</text>
-                    <text class="tag tag-private" wx:if="{{item.isPrivate}}">🔒</text>
+                    <view class="tag tag-private" wx:if="{{item.isPrivate}}"><ficon style="vertical-align:-4rpx" name="lock" size="22" color="#64748B" /></view>
                   </view>
                   <view class="card-info-group">
-                    <text class="meta-item {{item.overdue ? 'time-warn' : ''}}" wx:if="{{item.arrivedAt}}">{{item.type === 'pickup' ? '🕐' : (item.type === 'debt' ? '💳' : '⏰')}} {{item.arrivedLabel}}</text>
+                    <view class="meta-item {{item.overdue ? 'time-warn' : ''}}" wx:if="{{item.arrivedAt}}"><ficon wx:if="{{item.type === 'debt'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="creditcard" size="24" color="#9CA3AF" /><ficon wx:else name="clock" size="24" color="#9CA3AF" /> {{item.arrivedLabel}}</view>
                     <text class="meta-item imp-{{item.importance}}">{{item.impLabel}}</text>
                     <text class="meta-item urg-{{item.urgency}}">{{item.urgLabel}}</text>
                     <text class="tag tag-success" wx:if="{{item.assignee}}">@{{item.assignee}}</text>
@@ -118,7 +118,7 @@
         <view class="cards">
           <view class="card-swipe-wrap" wx:for="{{item.items}}" wx:for-item="pkg" wx:key="id">
           <view class="swipe-left">
-            <view class="swipe-act {{pkg.importance === 'high' ? 'swipe-flag-off' : 'swipe-flag'}}" catchtap="onSwipeFlag" data-id="{{pkg.id}}">{{pkg.importance === 'high' ? '⛏ 取消红旗' : '🚩 红旗'}}</view>
+            <view class="swipe-act {{pkg.importance === 'high' ? 'swipe-flag-off' : 'swipe-flag'}}" catchtap="onSwipeFlag" data-id="{{pkg.id}}"><ficon name="flag" size="26" color="#fff" /> {{pkg.importance === 'high' ? '取消红旗' : '红旗'}}</view>
           </view>
           <view class="swipe-actions">
             <view class="swipe-act {{pkg.status === 'picked' ? 'swipe-undo' : 'swipe-done'}}" catchtap="onSwipePick" data-id="{{pkg.id}}">{{pkg.status === 'picked' ? '↩ 撤销' : '✓ 完成'}}</view>
@@ -134,10 +134,10 @@
                     <text class="tag tag-primary" wx:if="{{pkg.type === 'pickup'}}">取件</text>
                     <text class="tag tag-warning" wx:if="{{pkg.type === 'todo'}}">备忘</text>
                     <text class="tag tag-debt" wx:if="{{pkg.type === 'debt'}}">待还</text>
-                    <text class="tag tag-private" wx:if="{{pkg.isPrivate}}">🔒</text>
+                    <view class="tag tag-private" wx:if="{{pkg.isPrivate}}"><ficon style="vertical-align:-4rpx" name="lock" size="22" color="#64748B" /></view>
                   </view>
                   <view class="card-info-group">
-                    <text class="meta-item {{pkg.overdue ? 'time-warn' : ''}}" wx:if="{{pkg.arrivedAt}}">{{pkg.type === 'pickup' ? '🕐' : (pkg.type === 'debt' ? '💳' : '⏰')}} {{pkg.arrivedLabel}}</text>
+                    <view class="meta-item {{pkg.overdue ? 'time-warn' : ''}}" wx:if="{{pkg.arrivedAt}}"><ficon wx:if="{{pkg.type === 'debt'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="creditcard" size="24" color="#9CA3AF" /><ficon wx:else name="clock" size="24" color="#9CA3AF" /> {{pkg.arrivedLabel}}</view>
                     <text class="meta-item imp-{{pkg.importance}}">{{pkg.impLabel}}</text>
                     <text class="meta-item urg-{{pkg.urgency}}">{{pkg.urgLabel}}</text>
                     <text class="tag tag-success" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>

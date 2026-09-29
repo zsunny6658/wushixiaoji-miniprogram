@@ -43,7 +43,7 @@ Page({
   },
   onShow: function () {
     if (!app.globalData.token) { wx.reLaunch({ url: '/pages/login/login' }); return; }
-    if (this.getTabBar) this.getTabBar().setData({ active: 2 });
+    if (this.getTabBar) this.getTabBar().setData({ active: 3 });
     this.refresh();
   },
 

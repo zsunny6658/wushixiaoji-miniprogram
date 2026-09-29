@@ -58,7 +58,8 @@ Page({
     helpers.sortPackages(pendingPkgs);
     var latestPending = pendingPkgs.slice(0, 5);
     latestPending.forEach(function (p) {
-      p._icon = p.importance === 'high' ? '🚩' : (p.type === 'pickup' ? '📦' : (p.type === 'debt' ? '💳' : '📝'));
+      p._iconName = p.importance === 'high' ? 'flag' : (p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : 'clipboard'));
+      p._iconColor = p.importance === 'high' ? '#EF4444' : '#718096';
       p._text = p.summaryText || p.title || p.code;
       p._time = p.arrivedLabel;
       p._flagged = p.importance === 'high';
@@ -70,11 +71,11 @@ Page({
     var acts = [];
     pkgs.forEach(function (p) {
       if (p.createdAt && p.createdAt.indexOf(todayPrefix) === 0) {
-        acts.push({ id: p.id + ':new', time: p.createdAt, icon: p.type === 'pickup' ? '📦' : (p.type === 'debt' ? '💳' : '📝'),
+        acts.push({ id: p.id + ':new', time: p.createdAt, iconName: p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : 'clipboard'),
           text: '新增「' + (p.summaryText || p.title || p.code || '') + '」', cls: 'act-new' });
       }
       if (p.status === 'picked' && p.pickedAt && p.pickedAt.indexOf(todayPrefix) === 0) {
-        acts.push({ id: p.id + ':done', time: p.pickedAt, icon: '✅',
+        acts.push({ id: p.id + ':done', time: p.pickedAt, iconName: 'check-circle', iconColor: '#10B981',
           text: '完成「' + (p.summaryText || p.title || p.code || '') + '」', cls: 'act-done' });
       }
     });
@@ -147,7 +148,7 @@ Page({
     app.globalData._deepLinkFilter = { recordType: 'all', filter: 'ignored' };
     wx.switchTab({ url: '/pages/list/list' });
   },
-  onGoQuadrant: function () { wx.navigateTo({ url: '/pages/quadrant/quadrant' }); },
+  onGoQuadrant: function () { wx.switchTab({ url: '/pages/quadrant/quadrant' }); },
   onGoPending: function () {
     app.globalData._deepLinkFilter = { recordType: 'all', filter: 'pending' };
     wx.switchTab({ url: '/pages/list/list' });
@@ -166,7 +167,7 @@ Page({
   onGoQuadrantDetail: function (e) {
     var quad = e.currentTarget.dataset.quad;
     app.globalData._focusQuad = quad;
-    wx.navigateTo({ url: '/pages/quadrant/quadrant' });
+    wx.switchTab({ url: '/pages/quadrant/quadrant' });
   },
   onShareAppMessage: function () {
     return { title: '屋事小记 - 家庭快递取件码共享', path: '/pages/overview/overview' };
