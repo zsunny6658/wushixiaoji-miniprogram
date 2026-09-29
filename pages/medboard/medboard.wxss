@@ -243,16 +243,27 @@
   color: #7C93B4;
 }
 
-/* 今日前后对比（双板） */
-.compare-label {
-  font-size: 24rpx;
-  font-weight: 600;
-  color: var(--text-secondary, #475569);
-  margin: 4rpx 0 10rpx;
+/* 今日前后对比（双板，紧凑头） */
+.compare-card {
+  /* 容器：紧凑头部 + 上下两块小板 */
 }
-.cl-after {
-  margin-top: 20rpx;
+.compare-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 22rpx;
+  margin-bottom: 12rpx;
+}
+.ch-before {
+  color: var(--text-secondary, #475569);
+  font-weight: 600;
+}
+.ch-after {
   color: #10B981;
+  font-weight: 600;
+}
+.cmp-gap {
+  margin-top: 16rpx;
 }
 .blister-mini {
   padding: 18rpx 14rpx;
@@ -414,6 +425,12 @@
   font-size: 22rpx;
   color: var(--text-tertiary, #94A3B8);
   margin-left: auto;
+}
+.tl-empty {
+  font-size: 24rpx;
+  color: var(--text-tertiary, #94A3B8);
+  text-align: center;
+  padding: 10rpx 0 6rpx;
 }
 
 /* 今日缺口出现动画 */

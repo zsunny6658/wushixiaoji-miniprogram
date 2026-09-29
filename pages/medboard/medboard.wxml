@@ -54,9 +54,12 @@
       </view>
     </view>
 
-    <!-- 今日前后对比（双板） -->
-    <block wx:if="{{compare === 'today'}}">
-      <view class="compare-label cl-before">今天之前</view>
+    <!-- 今日前后对比（双板，紧凑头） -->
+    <view class="compare-card" wx:if="{{compare === 'today'}}">
+      <view class="compare-head">
+        <text class="ch-before">上 · 今天之前</text>
+        <text class="ch-after">下 · 现在，绿「今」= 今日已服</text>
+      </view>
       <view class="blister blister-mini">
         <view class="blister-row" wx:for="{{compareRows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
           <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
@@ -69,8 +72,7 @@
           </view>
         </view>
       </view>
-      <view class="compare-label cl-after">现在（今日已服高亮）</view>
-      <view class="blister blister-mini blister-after {{!dueToday ? 'blister-rest' : ''}}">
+      <view class="blister blister-mini blister-after {{!dueToday ? 'blister-rest' : ''}} cmp-gap">
         <view class="blister-row" wx:for="{{rows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
           <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
             <view
@@ -99,7 +101,7 @@
           </view>
         </view>
       </view>
-    </block>
+    </view>
 
     <!-- 单板（当前 / 满版） -->
     <view class="blister {{!dueToday ? 'blister-rest' : ''}}" wx:else>
@@ -135,17 +137,19 @@
     </view>
     <view class="board-hint board-hint-rest" wx:if="{{!dueToday}}">今日非服药日 · 药板仅供参考，明晚见 🌙</view>
     <view class="board-hint" wx:elif="{{compare !== 'today'}}">点击任意药丸记录服药（无需按顺序）· 长按缺口撤销今日打卡</view>
-    <view class="board-hint" wx:else>上：今天开始前的药板 · 下：现在的药板，绿色「今」为今日服用</view>
 
     <!-- 今日打卡时间线 -->
-    <view class="timeline-card" wx:if="{{timeline.length}}">
+    <view class="timeline-card">
       <view class="week-title">今日打卡记录</view>
-      <view class="tl-item" wx:for="{{timeline}}" wx:key="id">
-        <view class="tl-dot"></view>
-        <text class="tl-time">{{item.time}}</text>
-        <text class="tl-by">{{item.by}}</text>
-        <text class="tl-pos">{{item.pos}}</text>
-      </view>
+      <block wx:if="{{timeline.length}}">
+        <view class="tl-item" wx:for="{{timeline}}" wx:key="id">
+          <view class="tl-dot"></view>
+          <text class="tl-time">{{item.time}}</text>
+          <text class="tl-by">{{item.by}}</text>
+          <text class="tl-pos">{{item.pos}}</text>
+        </view>
+      </block>
+      <view class="tl-empty" wx:else>今日还未打卡 · 点击上方药丸记录第一次服药</view>
     </view>
 
     <!-- 近 7 天依从性 -->

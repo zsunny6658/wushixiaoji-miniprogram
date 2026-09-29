@@ -2,6 +2,14 @@
 var api = require('../../utils/api');
 var app = getApp();
 
+// freqOptions 下标 → schedule.freq 映射（统一维护，模板/保存共用，勿再硬编码下标）
+var FREQ_MAP = [
+  { freq: 'daily' },
+  { freq: 'interval', intervalDays: 2 },
+  { freq: 'interval', intervalDays: 3 },
+  { freq: 'weekly' }
+];
+
 function today() { var d = new Date(); return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2); }
 function nowTime() { var d = new Date(); return ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2); }
 
@@ -17,6 +25,8 @@ Page({
     doseOptions: ['每日1次', '每日2次', '每日3次', '每日4次'],
     freqOptions: ['每天', '隔1天', '每3天', '每周固定几日'],
     freqIndex: 0,
+    showWeekChips: false,
+    pillBoardOpen: false,
     weekChips: [{ v: 1, l: '一' }, { v: 2, l: '二' }, { v: 3, l: '三' }, { v: 4, l: '四' }, { v: 5, l: '五' }, { v: 6, l: '六' }, { v: 0, l: '日' }],
     selWeekdays: [1, 3, 5],
     doseIndex: 1,
@@ -101,7 +111,7 @@ Page({
           var fi = 0;
           if (sf === 'interval') fi = (parseInt(pkg.schedule.intervalDays, 10) || 2) === 3 ? 2 : 1;
           else if (sf === 'weekly') fi = 3;
-          this.setData({ freqIndex: fi, selWeekdays: sf === 'weekly' && Array.isArray(pkg.schedule.weekdays) && pkg.schedule.weekdays.length ? pkg.schedule.weekdays.slice() : [1, 3, 5] });
+          this.setData({ freqIndex: fi, showWeekChips: !!FREQ_MAP[fi] && FREQ_MAP[fi].freq === 'weekly', pillBoardOpen: true, selWeekdays: sf === 'weekly' && Array.isArray(pkg.schedule.weekdays) && pkg.schedule.weekdays.length ? pkg.schedule.weekdays.slice() : [1, 3, 5] });
           this.syncWeekChips();
         }
         // 编辑模式：折叠区有非默认值时自动展开并标记已填写
@@ -154,7 +164,7 @@ Page({
     this.setData({ doseIndex: idx, medTimes: defaults[idx] || ['08:00', '20:00'] });
   },
   onFreqChange: function (e) {
-    this.setData({ freqIndex: parseInt(e.detail.value, 10) });
+    this.setData({ freqIndex: parseInt(e.detail.value, 10), showWeekChips: !!FREQ_MAP[parseInt(e.detail.value, 10)] && FREQ_MAP[parseInt(e.detail.value, 10)].freq === 'weekly' });
   },
   onWeekChipTap: function (e) {
     var v = parseInt(e.currentTarget.dataset.v, 10);
@@ -284,10 +294,15 @@ Page({
     }, function () { wx.hideLoading(); });
   },
 
-  // 应用药品形态：回填仿真药板（颜色/形状/行列/板数）
+  // 应用药品形态：回填仿真药板（颜色/形状/行列/板数），并展开药板设置方便核对
   applyDrugAppearance: function (d, source) {
-    this.setData({ pillInfo: this.normalizePillForm(d) });
+    this.setData({ pillInfo: this.normalizePillForm(d), pillBoardOpen: true });
     wx.showToast({ title: source === 'ai' ? 'AI 已生成药板·请核对' : '已生成仿真药板', icon: 'none' });
+  },
+
+  // 药板设置折叠/展开
+  onTogglePillBoard: function () {
+    this.setData({ pillBoardOpen: !this.data.pillBoardOpen });
   },
 
   onSmartText: function (e) { this.setData({ smartText: e.detail.value }); },
@@ -309,7 +324,7 @@ Page({
       form: Object.assign({}, this.data.form, { code: r.code || '', note: r.note || '' })
     };
     if (r.owner) patch.memberIndex = this.findMemberIndex(r.owner);
-    if (r.pillInfo) patch.pillInfo = this.normalizePillForm(r.pillInfo);
+    if (r.pillInfo) { patch.pillInfo = this.normalizePillForm(r.pillInfo); patch.pillBoardOpen = true; }
     this.setData(patch);
     var times = r.schedule && Array.isArray(r.schedule.times) && r.schedule.times.length ? r.schedule.times : null;
     if (times) {
@@ -560,11 +575,10 @@ Page({
       isPrivate: this.data.isPrivate
     };
     if (this.data.type === 'medication') {
-      var fiSub = this.data.freqIndex;
+      var fm = FREQ_MAP[this.data.freqIndex] || FREQ_MAP[0];
       var sched = { times: this.data.medTimes, active: true };
-      if (fiSub === 1) { sched.freq = 'interval'; sched.intervalDays = 2; }
-      else if (fiSub === 2) { sched.freq = 'interval'; sched.intervalDays = 3; }
-      else if (fiSub === 3) {
+      if (fm.freq === 'interval') { sched.freq = 'interval'; sched.intervalDays = fm.intervalDays; }
+      else if (fm.freq === 'weekly') {
         if (this.data.selWeekdays.length) { sched.freq = 'weekly'; sched.weekdays = this.data.selWeekdays; }
       }
       data.schedule = sched;

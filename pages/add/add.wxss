@@ -327,6 +327,17 @@
   align-items: center;
   justify-content: space-between;
 }
+.pill-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+.pill-board-summary {
+  display: block;
+  font-size: 22rpx;
+  color: var(--text-tertiary, #94A3B8);
+  margin-top: 10rpx;
+}
 .pill-photo-btn {
   font-size: 24rpx;
   color: var(--color-primary, #4A90D9);

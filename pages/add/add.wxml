@@ -106,7 +106,7 @@
               <text class="field-picker-arrow">▼</text>
             </view>
           </picker>
-          <view class="week-chips" wx:if="{{freqIndex === 3}}">
+          <view class="week-chips" wx:if="{{showWeekChips}}">
             <view class="week-chip {{item.sel ? 'wc-active' : ''}}" wx:for="{{weekChips}}" wx:key="v" bindtap="onWeekChipTap" data-v="{{item.v}}">{{item.l}}</view>
           </view>
         </view>
@@ -122,8 +122,13 @@
         <view class="field">
           <view class="pill-head-row">
             <text class="field-label">药板设置</text>
-            <view class="pill-photo-btn" bindtap="onPillPhoto">📷 拍药板识别</view>
+            <view class="pill-head-actions">
+              <view class="pill-photo-btn" bindtap="onPillPhoto">📷 拍药板识别</view>
+              <view class="pill-photo-btn" bindtap="onTogglePillBoard">{{pillBoardOpen ? '收起 ▲' : '展开 ▼'}}</view>
+            </view>
           </view>
+          <text class="pill-board-summary" wx:if="{{!pillBoardOpen}}">当前：{{pillInfo.rows}}×{{pillInfo.cols}} · {{pillInfo.boards}} 版 · 点「展开」调颜色/形状</text>
+          <block wx:if="{{pillBoardOpen}}">
           <view class="pill-colors">
             <view class="pill-color-dot {{pillInfo.color === item ? 'pc-active' : ''}}" wx:for="{{pillColorOptions}}" wx:key="*this" style="background:{{pillColorHex[item]}}" bindtap="onPillColorTap" data-color="{{item}}"></view>
           </view>
@@ -144,6 +149,7 @@
               <view class="stepper"><view class="step-btn" bindtap="onPillStep" data-field="boards" data-delta="-1">−</view><text class="step-val">{{pillInfo.boards}}</text><view class="step-btn" bindtap="onPillStep" data-field="boards" data-delta="1">＋</view></view>
             </view>
           </view>
+          </block>
           <text class="field-hint">一版 {{pillInfo.rows}}×{{pillInfo.cols}} 共 {{pillInfo.rows * pillInfo.cols}} 颗，一盒 {{pillInfo.boards}} 版；详情页打开仿真药板打卡</text>
         </view>
       </block>
