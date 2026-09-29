@@ -60,7 +60,7 @@ Page({
     var gd = app.globalData;
     var decorated = helpers.decorate(raw, gd.members);
     this.setData({ pkg: decorated });
-    var titleMap = { pickup: '取件详情', todo: '备忘详情', debt: '待还详情' };
+    var titleMap = { pickup: '取件详情', todo: '备忘详情', debt: '待还详情', medication: '用药详情' };
     wx.setNavigationBarTitle({ title: titleMap[decorated.type] || '详情' });
   },
 
@@ -93,6 +93,10 @@ Page({
   onEdit: function () {
     var id = this.data.pkg.id;
     wx.navigateTo({ url: '/pages/add/add?id=' + id });
+  },
+
+  onOpenMedboard: function () {
+    wx.navigateTo({ url: '/pages/medboard/medboard?id=' + this.data.pkg.id });
   },
 
   onDelete: function () {

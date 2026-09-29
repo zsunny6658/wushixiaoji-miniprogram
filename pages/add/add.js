@@ -17,6 +17,15 @@ Page({
     doseOptions: ['每日1次', '每日2次', '每日3次', '每日4次'],
     doseIndex: 1,
     medTimes: ['08:00', '20:00'],
+    pillColorOptions: ['white', 'yellow', 'pink', 'red', 'blue', 'green', 'purple', 'orange', 'brown'],
+    pillColorHex: { white: '#F1F5F9', yellow: '#FBBF24', pink: '#F9A8D4', red: '#EF4444', blue: '#60A5FA', green: '#34D399', purple: '#A78BFA', orange: '#FB923C', brown: '#B45309' },
+    pillShapeOptions: [
+      { value: 'round', label: '圆形' },
+      { value: 'oval', label: '椭圆形' },
+      { value: 'capsule', label: '胶囊' },
+      { value: 'square', label: '方形' }
+    ],
+    pillInfo: { color: 'white', shape: 'round', rows: 2, cols: 5, boards: 2, boardNo: 1 },
     form: { station: '', code: '', company: '', trackingNo: '', note: '', institution: '', amount: '' },
     dueDateStr: '',
     isPrivate: false,
@@ -68,7 +77,7 @@ Page({
           editId: pkg.id,
           editTitle: pkg.code || '',
           type: pkg.type || 'pickup',
-          typeIndex: pkg.type === 'todo' ? 1 : (pkg.type === 'debt' ? 2 : 0),
+          typeIndex: this.typeIndexOf(pkg.type),
           form: { station: pkg.station || '', code: pkg.code || '', company: pkg.company || '', trackingNo: pkg.trackingNo || '', note: pkg.note || '', institution: pkg.institution || '', amount: pkg.amount ? String(pkg.amount) : '' },
           dueDateStr: pkg.dueDate || '',
           isPrivate: !!pkg.isPrivate,
@@ -78,8 +87,13 @@ Page({
           assigneeIndex: this.findMemberIndex(pkg.assignee),
           assignerIndex: this.findMemberIndex(pkg.assigner),
           impIndex: ['high', 'medium', 'low'].indexOf(pkg.importance || 'medium'),
-          urgIndex: ['urgent', 'normal'].indexOf(pkg.urgency || 'normal')
+          urgIndex: ['urgent', 'normal'].indexOf(pkg.urgency || 'normal'),
+          pillInfo: this.normalizePillForm(pkg.pillInfo)
         });
+        // 编辑模式：用药类型回填服药次数/时间
+        if (pkg.type === 'medication' && pkg.schedule && Array.isArray(pkg.schedule.times) && pkg.schedule.times.length) {
+          this.setData({ medTimes: pkg.schedule.times, doseIndex: Math.min(3, pkg.schedule.times.length - 1) });
+        }
         // 编辑模式：折叠区有非默认值时自动展开并标记已填写
         var hasMore = this.data.memberIndex > 0 || this.data.assigneeIndex > 0 ||
           this.data.assignerIndex > 0 || (pkg.note || '') !== '' ||
@@ -94,6 +108,20 @@ Page({
     var members = (app.globalData.members || []).map(function (m) { return m.name; });
     var idx = members.indexOf(name);
     return idx >= 0 ? idx + 1 : 0;
+  },
+
+  normalizePillForm: function (pi) {
+    var dft = { color: 'white', shape: 'round', rows: 2, cols: 5, boards: 2, boardNo: 1 };
+    if (!pi || typeof pi !== 'object') return dft;
+    var clamp = function (v, min, max, d) { var n = parseInt(v, 10); return isNaN(n) ? d : Math.max(min, Math.min(max, n)); };
+    return {
+      color: this.data.pillColorOptions.indexOf(pi.color) >= 0 ? pi.color : dft.color,
+      shape: this.data.pillShapeOptions.some(function (s) { return s.value === pi.shape; }) ? pi.shape : dft.shape,
+      rows: clamp(pi.rows, 1, 4, 2),
+      cols: clamp(pi.cols, 1, 8, 5),
+      boards: clamp(pi.boards, 1, 6, 2),
+      boardNo: clamp(pi.boardNo, 1, clamp(pi.boards, 1, 6, 2), 1)
+    };
   },
 
   typeIndexOf: function (type) {
@@ -120,6 +148,24 @@ Page({
     var times = this.data.medTimes.slice();
     times[idx] = e.detail.value;
     this.setData({ medTimes: times });
+  },
+  onPillColorTap: function (e) {
+    this.setData({ 'pillInfo.color': e.currentTarget.dataset.color });
+  },
+  onPillShapeTap: function (e) {
+    this.setData({ 'pillInfo.shape': e.currentTarget.dataset.shape });
+  },
+  onPillStep: function (e) {
+    var field = e.currentTarget.dataset.field;
+    var delta = parseInt(e.currentTarget.dataset.delta, 10);
+    var limits = { rows: [1, 4], cols: [1, 8], boards: [1, 6] };
+    var lim = limits[field] || [1, 8];
+    var cur = this.data.pillInfo[field] || 1;
+    var next = Math.max(lim[0], Math.min(lim[1], cur + delta));
+    if (next === cur) return;
+    var patch = {};
+    patch['pillInfo.' + field] = next;
+    this.setData(patch);
   },
   onToggleMore: function () {
     if (this.data.showMore) this.updateMoreFilled(); // 收起时刷新徽标
@@ -342,6 +388,7 @@ Page({
     };
     if (this.data.type === 'medication') {
       data.schedule = { times: this.data.medTimes, active: true };
+      data.pillInfo = this.data.pillInfo;
     }
     wx.showLoading({ title: '保存中...' });
     if (this.data.editId) {

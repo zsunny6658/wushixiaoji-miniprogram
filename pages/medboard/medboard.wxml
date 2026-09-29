@@ -1,0 +1,82 @@
+<view class="medboard-page">
+  <!-- 加载/错误态 -->
+  <view class="mb-state" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+  <view class="mb-state" wx:elif="{{error}}">
+    <text>{{error}}</text>
+  </view>
+
+  <block wx:if="{{!loading && !error}}">
+    <!-- 药品信息头 -->
+    <view class="med-header">
+      <view class="med-title-row">
+        <ficon name="pill" size="32" color="#10B981" />
+        <text class="med-name">{{pkg.code}}</text>
+        <text class="med-note" wx:if="{{pkg.note}}">{{pkg.note}}</text>
+      </view>
+      <view class="med-progress">
+        <view class="progress-head">
+          <text class="progress-label">今日已服 {{todayTaken}}/{{todayTotal}}</text>
+          <text class="box-remaining">盒内剩余 {{boxRemaining}} 颗</text>
+        </view>
+        <view class="progress-bar">
+          <view class="progress-fill" style="width:{{todayPercent}}%"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 今日时段 + 对比切换 -->
+    <view class="slots-row">
+      <view class="slots">
+        <view class="slot-chip {{item.taken ? 'slot-taken' : ''}}" wx:for="{{slots}}" wx:key="index">
+          <text>{{item.time}}</text>
+          <text class="slot-check" wx:if="{{item.taken}}">✓</text>
+        </view>
+      </view>
+      <view class="compare-switch">
+        <view class="cs-item {{compare === 'current' ? 'cs-active' : ''}}" bindtap="onCompareToggle" data-mode="current">当前</view>
+        <view class="cs-item {{compare === 'full' ? 'cs-active' : ''}}" bindtap="onCompareToggle" data-mode="full">满版</view>
+      </view>
+    </view>
+
+    <!-- 版 tab -->
+    <view class="board-tabs">
+      <view class="board-tab {{boardNo === item.no ? 'bt-active' : ''}}" wx:for="{{boards}}" wx:key="no" bindtap="onBoardTap" data-no="{{item.no}}">
+        <text>第{{item.no}}版</text>
+        <text class="bt-count">{{item.taken}}/{{item.cap}}</text>
+      </view>
+    </view>
+
+    <!-- 铝箔药板 -->
+    <view class="blister">
+      <view class="blister-row" wx:for="{{rows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
+        <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
+          <view
+            wx:if="{{cell.showPill}}"
+            class="pill shape-{{pillShape}}"
+            style="background:{{colorHex}}"
+            bindtap="onPillTap"
+            data-board="{{cell.boardNo}}"
+            data-pill="{{cell.index}}"
+            data-taken="{{cell.taken}}"
+          >
+            <view wx:if="{{pillShape === 'capsule'}}" class="capsule-line"></view>
+          </view>
+          <view
+            wx:else
+            class="pill-hole"
+            bindtap="onCellLongPress"
+            bindlongpress="onCellLongPress"
+            data-board="{{cell.boardNo}}"
+            data-pill="{{cell.index}}"
+            data-taken="{{cell.taken}}"
+          >
+            <text class="hole-text">{{cell.holeText}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="board-hint">点击药丸记录服药 · 长按缺口撤销今日打卡</view>
+  </block>
+</view>

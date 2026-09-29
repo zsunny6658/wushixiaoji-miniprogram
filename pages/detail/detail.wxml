@@ -50,6 +50,16 @@
       </view>
     </view>
 
+    <!-- 仿真药板入口（用药） -->
+    <view class="medboard-entry" wx:if="{{pkg.type === 'medication' && pkg.status === 'pending'}}" bindtap="onOpenMedboard">
+      <view class="mb-entry-icon"><ficon name="pill" size="36" color="#10B981" /></view>
+      <view class="mb-entry-text">
+        <text class="mb-entry-title">仿真药板 · 点击打卡</text>
+        <text class="mb-entry-sub" wx:if="{{pkg.scheduleLabel}}">每日 {{pkg.scheduleLabel}}</text>
+      </view>
+      <text class="mb-entry-arrow">›</text>
+    </view>
+
     <!-- 原始内容 -->
     <view class="raw-section" wx:if="{{pkg.raw}}">
       <view class="raw-title"><ficon name="clipboard" size="28" color="#718096" /> 原始内容</view>

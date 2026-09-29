@@ -290,3 +290,44 @@
 .status-bar.archived {
   background: linear-gradient(135deg, #7986cb 0%, #3f51b5 100%);
 }
+
+/* 仿真药板入口（用药） */
+.medboard-entry {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(74, 144, 217, 0.06));
+  border: 2rpx solid rgba(16, 185, 129, 0.25);
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 24rpx;
+}
+.mb-entry-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mb-entry-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+.mb-entry-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #10B981;
+}
+.mb-entry-sub {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+}
+.mb-entry-arrow {
+  font-size: 40rpx;
+  color: var(--text-tertiary);
+  line-height: 1;
+}

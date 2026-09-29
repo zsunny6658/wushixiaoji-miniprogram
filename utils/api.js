@@ -211,6 +211,17 @@ var API = {
   },
   unarchivePackage: function (id, cb, errCb) {
     this.request('POST', '/api/packages/' + id + '/unarchive', {}, cb, errCb);
+  },
+
+  // 用药打卡（仿真药板）
+  getMedLogs: function (id, date, cb, errCb) {
+    this.request('GET', '/api/packages/' + id + '/medlogs' + (date ? '?date=' + date : ''), null, cb, errCb);
+  },
+  takeMed: function (id, data, cb, errCb) {
+    this.request('POST', '/api/packages/' + id + '/medlogs', data, cb, errCb);
+  },
+  untakeMed: function (id, logId, cb, errCb) {
+    this.request('DELETE', '/api/packages/' + id + '/medlogs/' + logId, null, cb, errCb);
   }
 };
 

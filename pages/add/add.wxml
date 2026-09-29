@@ -98,6 +98,30 @@
           </view>
           <text class="field-hint">到点将通过邮件/订阅消息提醒</text>
         </view>
+        <view class="field">
+          <text class="field-label">药板设置</text>
+          <view class="pill-colors">
+            <view class="pill-color-dot {{pillInfo.color === item ? 'pc-active' : ''}}" wx:for="{{pillColorOptions}}" wx:key="*this" style="background:{{pillColorHex[item]}}" bindtap="onPillColorTap" data-color="{{item}}"></view>
+          </view>
+          <view class="pill-shapes">
+            <view class="pill-shape-chip {{pillInfo.shape === item.value ? 'ps-active' : ''}}" wx:for="{{pillShapeOptions}}" wx:key="value" bindtap="onPillShapeTap" data-shape="{{item.value}}">{{item.label}}</view>
+          </view>
+          <view class="pill-layout">
+            <view class="pill-layout-item">
+              <text class="pl-label">行数</text>
+              <view class="stepper"><view class="step-btn" bindtap="onPillStep" data-field="rows" data-delta="-1">−</view><text class="step-val">{{pillInfo.rows}}</text><view class="step-btn" bindtap="onPillStep" data-field="rows" data-delta="1">＋</view></view>
+            </view>
+            <view class="pill-layout-item">
+              <text class="pl-label">列数</text>
+              <view class="stepper"><view class="step-btn" bindtap="onPillStep" data-field="cols" data-delta="-1">−</view><text class="step-val">{{pillInfo.cols}}</text><view class="step-btn" bindtap="onPillStep" data-field="cols" data-delta="1">＋</view></view>
+            </view>
+            <view class="pill-layout-item">
+              <text class="pl-label">版数</text>
+              <view class="stepper"><view class="step-btn" bindtap="onPillStep" data-field="boards" data-delta="-1">−</view><text class="step-val">{{pillInfo.boards}}</text><view class="step-btn" bindtap="onPillStep" data-field="boards" data-delta="1">＋</view></view>
+            </view>
+          </view>
+          <text class="field-hint">一版 {{pillInfo.rows}}×{{pillInfo.cols}} 共 {{pillInfo.rows * pillInfo.cols}} 颗，一盒 {{pillInfo.boards}} 版；详情页打开仿真药板打卡</text>
+        </view>
       </block>
 
       <view class="field">

@@ -10,7 +10,8 @@
     "pages/detail/detail",
     "pages/members/members",
     "pages/settings/settings",
-    "pages/archive/archive"
+    "pages/archive/archive",
+    "pages/medboard/medboard"
   ],
   "window": {
     "navigationBarBackgroundColor": "@navBgColor",

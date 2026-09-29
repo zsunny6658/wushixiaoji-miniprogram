@@ -1,0 +1,229 @@
+/* pages/medboard/medboard.wxss - 仿真药板 */
+.medboard-page {
+  padding: 24rpx;
+  padding-bottom: 60rpx;
+}
+.mb-state {
+  text-align: center;
+  color: var(--text-tertiary);
+  padding: 120rpx 0;
+  font-size: 28rpx;
+}
+
+/* 药品信息头 */
+.med-header {
+  background: linear-gradient(135deg, #4A90D9, #5B8DEF);
+  border-radius: 24rpx;
+  padding: 28rpx 32rpx;
+  color: #fff;
+  margin-bottom: 24rpx;
+}
+.med-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+.med-name {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+.med-note {
+  font-size: 24rpx;
+  opacity: 0.85;
+  margin-left: 8rpx;
+}
+.progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10rpx;
+}
+.progress-label {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.box-remaining {
+  font-size: 22rpx;
+  opacity: 0.85;
+}
+.progress-bar {
+  height: 14rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: #fff;
+  transition: width 0.3s ease;
+}
+
+/* 今日时段 + 对比切换 */
+.slots-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+.slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  flex: 1;
+}
+.slot-chip {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  background: var(--bg-card, #fff);
+  border: 2rpx solid var(--border, #E2E8F0);
+  color: var(--text-secondary, #475569);
+}
+.slot-chip.slot-taken {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #10B981;
+  font-weight: 600;
+}
+.slot-check {
+  font-size: 22rpx;
+  font-weight: 700;
+}
+.compare-switch {
+  display: flex;
+  background: var(--bg-page, #F1F5F9);
+  border-radius: 999rpx;
+  padding: 4rpx;
+  flex-shrink: 0;
+}
+.cs-item {
+  padding: 8rpx 22rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  color: var(--text-tertiary, #94A3B8);
+}
+.cs-item.cs-active {
+  background: #fff;
+  color: var(--color-primary, #4A90D9);
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(15, 42, 86, 0.08);
+}
+
+/* 版 tab */
+.board-tabs {
+  display: flex;
+  gap: 14rpx;
+  margin-bottom: 24rpx;
+  flex-wrap: wrap;
+}
+.board-tab {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 26rpx;
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  background: var(--bg-card, #fff);
+  border: 2rpx solid var(--border, #E2E8F0);
+  color: var(--text-secondary, #475569);
+}
+.board-tab.bt-active {
+  border-color: var(--color-primary, #4A90D9);
+  color: var(--color-primary, #4A90D9);
+  background: rgba(74, 144, 217, 0.08);
+  font-weight: 600;
+}
+.bt-count {
+  font-size: 22rpx;
+  color: var(--text-tertiary, #94A3B8);
+}
+.board-tab.bt-active .bt-count {
+  color: var(--color-primary, #4A90D9);
+}
+
+/* 铝箔药板 */
+.blister {
+  background: linear-gradient(160deg, #F8FAFC, #EEF2F7);
+  border: 2rpx solid var(--border, #E2E8F0);
+  border-radius: 24rpx;
+  padding: 28rpx 20rpx;
+  box-shadow: inset 0 2rpx 12rpx rgba(15, 42, 86, 0.05);
+}
+.blister-row {
+  display: flex;
+}
+.cell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 130rpx;
+}
+
+/* 药丸（形状） */
+.pill {
+  position: relative;
+  box-shadow: inset 0 -6rpx 10rpx rgba(0, 0, 0, 0.12), inset 0 4rpx 8rpx rgba(255, 255, 255, 0.55), 0 4rpx 8rpx rgba(15, 42, 86, 0.15);
+  border: 2rpx solid rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+.shape-round {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+}
+.shape-oval {
+  width: 108rpx;
+  height: 68rpx;
+  border-radius: 34rpx;
+}
+.shape-capsule {
+  width: 120rpx;
+  height: 54rpx;
+  border-radius: 27rpx;
+}
+.shape-square {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 14rpx;
+}
+.capsule-line {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  bottom: 10%;
+  width: 2rpx;
+  background: rgba(0, 0, 0, 0.14);
+  transform: translateX(-50%);
+}
+
+/* 已服缺口（铝箔凹槽） */
+.pill-hole {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: rgba(15, 42, 86, 0.06);
+  border: 3rpx dashed rgba(100, 116, 139, 0.35);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hole-text {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: rgba(100, 116, 139, 0.55);
+}
+
+.board-hint {
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--text-tertiary, #94A3B8);
+  margin-top: 20rpx;
+}
