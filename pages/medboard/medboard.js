@@ -1,5 +1,6 @@
-// pages/medboard/medboard.js - 仿真药板（点击打卡 + 前后对比）
+// pages/medboard/medboard.js - 仿真药板（点击打卡 + 前后对比 + 实时同步）
 var api = require('../../utils/api');
+var realtime = require('../../utils/realtime');
 var app = getApp();
 
 var COLOR_HEX = {
@@ -34,6 +35,9 @@ Page({
     compare: 'current',
     compareRows: [],
     weekDays: [],
+    weekRate: 0,
+    streak: 0,
+    timeline: [],
     loading: true,
     error: ''
   },
@@ -43,6 +47,26 @@ Page({
     this.pkgId = (opts && opts.id) || '';
     this.allLogs = [];
     this.load();
+    this.initRealtime();
+  },
+
+  onUnload: function () {
+    if (this._unsub) this._unsub();
+  },
+
+  // 家人打卡/撤销实时同步（SSE medlog:created/deleted）
+  initRealtime: function () {
+    var that = this;
+    this._reloadTimer = null;
+    this._unsub = realtime.subscribe(function (evt) {
+      if (!evt || (evt.type !== 'medlog:created' && evt.type !== 'medlog:deleted')) return;
+      if (evt.packageId && evt.packageId !== that.pkgId) return;
+      if (that._reloadTimer) return; // 500ms 节流
+      that._reloadTimer = setTimeout(function () {
+        that._reloadTimer = null;
+        that.load();
+      }, 500);
+    });
   },
 
   onPullDownRefresh: function () {
@@ -117,6 +141,27 @@ Page({
         none: d.taken === 0
       };
     });
+    // 7 天依从率 + 连续达标天数（从今天往前数）
+    var sumT = 0, sumN = 0, streak = 0;
+    weekDays.forEach(function (d) { sumT += d.taken; sumN += d.total; });
+    for (var wi = 0; wi < weekDays.length; wi++) {
+      if (weekDays[wi].total > 0 && weekDays[wi].taken >= weekDays[wi].total) streak++;
+      else break;
+    }
+    var weekRate = sumN ? Math.round(sumT * 100 / sumN) : 0;
+
+    // 今日打卡时间线（几点 · 谁 · 第几版第几行第几颗）
+    var cols = pi.cols;
+    var timeline = this.todayLogs.slice().sort(function (a, b) { return (a.takenAt || '').localeCompare(b.takenAt || ''); })
+      .map(function (l) {
+        var hm = (l.takenAt || '').slice(11, 16);
+        return {
+          id: l.id,
+          time: l.time || hm,
+          by: l.takenByName || '家人',
+          pos: '第' + l.boardNo + '版 第' + (Math.floor(l.pillIndex / cols) + 1) + '行第' + (l.pillIndex % cols + 1) + '颗'
+        };
+      });
 
     this.setData({
       pkg: pkg,
@@ -126,6 +171,9 @@ Page({
       boards: boards,
       slots: slots,
       weekDays: weekDays,
+      weekRate: weekRate,
+      streak: streak,
+      timeline: timeline,
       todayTaken: todayTaken,
       todayTotal: times.length,
       todayPercent: times.length ? Math.round(todayTaken * 100 / times.length) : 0,
@@ -232,6 +280,7 @@ Page({
       if (res && res.log) {
         that.allLogs.push(res.log);
         that.setData({ boardNo: boardNo });
+        wx.vibrateShort({ type: 'light' }); // 打卡触感反馈
         that.load(); // 重新拉取，服务端可能已自动推进版号
         wx.showToast({ title: '已记录 ✓', icon: 'success' });
       }

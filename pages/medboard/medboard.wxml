@@ -23,6 +23,10 @@
         <view class="progress-bar">
           <view class="progress-fill" style="width:{{todayPercent}}%"></view>
         </view>
+        <view class="week-summary" wx:if="{{weekDays.length}}">
+          <text class="ws-item">7 天依从率 {{weekRate}}%</text>
+          <text class="ws-item" wx:if="{{streak > 0}}">连续达标 {{streak}} 天 🔥</text>
+        </view>
       </view>
     </view>
 
@@ -130,6 +134,17 @@
     </view>
     <view class="board-hint" wx:if="{{compare !== 'today'}}">点击任意药丸记录服药（无需按顺序）· 长按缺口撤销今日打卡</view>
     <view class="board-hint" wx:else>上：今天开始前的药板 · 下：现在的药板，绿色「今」为今日服用</view>
+
+    <!-- 今日打卡时间线 -->
+    <view class="timeline-card" wx:if="{{timeline.length}}">
+      <view class="week-title">今日打卡记录</view>
+      <view class="tl-item" wx:for="{{timeline}}" wx:key="id">
+        <view class="tl-dot"></view>
+        <text class="tl-time">{{item.time}}</text>
+        <text class="tl-by">{{item.by}}</text>
+        <text class="tl-pos">{{item.pos}}</text>
+      </view>
+    </view>
 
     <!-- 近 7 天依从性 -->
     <view class="week-card" wx:if="{{weekDays.length}}">

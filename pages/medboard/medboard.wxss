@@ -349,3 +349,63 @@
   color: var(--text-tertiary, #94A3B8);
   flex-shrink: 0;
 }
+
+/* 7 天汇总（头部） */
+.week-summary {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 12rpx;
+}
+.ws-item {
+  font-size: 22rpx;
+  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999rpx;
+  padding: 4rpx 16rpx;
+}
+
+/* 今日打卡时间线 */
+.timeline-card {
+  background: var(--bg-card, #fff);
+  border: 2rpx solid var(--border, #E2E8F0);
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  margin-top: 24rpx;
+}
+.tl-item {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 10rpx 0;
+}
+.tl-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #10B981;
+  flex-shrink: 0;
+}
+.tl-time {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-primary, #0F172A);
+  width: 90rpx;
+}
+.tl-by {
+  font-size: 24rpx;
+  color: var(--text-secondary, #475569);
+}
+.tl-pos {
+  font-size: 22rpx;
+  color: var(--text-tertiary, #94A3B8);
+  margin-left: auto;
+}
+
+/* 今日缺口出现动画 */
+.hole-today {
+  animation: holeIn 0.35s ease;
+}
+@keyframes holeIn {
+  from { transform: scale(1.35); opacity: 0.3; }
+  to { transform: scale(1); opacity: 1; }
+}
