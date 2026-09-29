@@ -2,7 +2,9 @@
 
 .container {
   padding: var(--spacing-md);
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom)); /* 给固定底栏留位 */
   min-height: 100vh;
+  box-sizing: border-box;
 }
 
 /* 编辑模式提示 */
@@ -220,9 +222,17 @@
 
 /* 底部操作 */
 .footer-actions {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  background: var(--bg-card, #fff);
   padding: var(--spacing-md);
+  padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
   display: flex;
   gap: var(--spacing-sm);
+  box-shadow: 0 -4rpx 16rpx rgba(15, 42, 86, 0.06);
 }
 .footer-save {
   flex: 1;

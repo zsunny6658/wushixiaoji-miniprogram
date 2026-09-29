@@ -1,7 +1,7 @@
 /* pages/medboard/medboard.wxss - 仿真药板 */
 .medboard-page {
   padding: 24rpx;
-  padding-bottom: 60rpx;
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
 }
 .mb-state {
   text-align: center;
@@ -69,21 +69,26 @@
   margin-bottom: 24rpx;
 }
 .slots {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
   flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  display: flex;
+  flex-wrap: nowrap;
 }
 .slot-chip {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6rpx;
+  flex-shrink: 0;
   padding: 10rpx 22rpx;
   border-radius: 999rpx;
   font-size: 24rpx;
   background: var(--bg-card, #fff);
   border: 2rpx solid var(--border, #E2E8F0);
   color: var(--text-secondary, #475569);
+}
+.slot-chip + .slot-chip {
+  margin-left: 12rpx;
 }
 .slot-chip.slot-taken {
   background: rgba(16, 185, 129, 0.12);
@@ -226,6 +231,16 @@
   font-size: 22rpx;
   color: var(--text-tertiary, #94A3B8);
   margin-top: 20rpx;
+}
+
+/* 非服药日：药板禁用态 */
+.blister-rest {
+  opacity: 0.5;
+  filter: saturate(0.35);
+  pointer-events: none;
+}
+.board-hint-rest {
+  color: #7C93B4;
 }
 
 /* 今日前后对比（双板） */
