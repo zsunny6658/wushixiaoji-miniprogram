@@ -452,7 +452,6 @@ page {
 /* 通用 hover 反馈 */
 .hover-press {
   transform: scale(0.97);
-  opacity: 0.85;
   transition: all 0.15s;
 }
 

@@ -135,7 +135,11 @@ var pass = this.data.emailPass;
     });
   },
 
-  onDestroy: function () {
-    if (this._timer) clearInterval(this._timer);
+  onHide: function () {
+    // 切到后台时停止倒计时，避免内存泄漏
+    if (this._timer) { clearInterval(this._timer); this._timer = null; }
+  },
+  onUnload: function () {
+    if (this._timer) { clearInterval(this._timer); this._timer = null; }
   }
 });

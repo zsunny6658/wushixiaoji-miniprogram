@@ -3,6 +3,12 @@
   <block wx:if="{{action === 'profile'}}">
     <view class="section">
       <text class="section-title">个人资料</text>
+      <view class="form-item avatar-row">
+        <button open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" class="avatar-btn">
+          <image class="avatar-image" src="{{profile.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill" />
+          <text class="avatar-tip">点击更换头像</text>
+        </button>
+      </view>
       <view class="form-item">
         <text class="form-label">用户名</text>
         <input class="form-input" value="{{profile.username}}" data-field="username" bindinput="onProfileInput" />
@@ -206,6 +212,10 @@
       <view class="form-item">
         <text class="form-label">自动删除天数</text>
         <input class="form-input" type="number" value="{{config.ignoreCleanupDays}}" data-field="ignoreCleanupDays" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">逾期提醒提前天数</text>
+        <input class="form-input" type="number" value="{{config.reminderDays}}" data-field="reminderDays" bindinput="onConfigInput" />
       </view>
       <view class="btn-row">
         <button class="btn-secondary" bindtap="onSaveConfig">保存配置</button>

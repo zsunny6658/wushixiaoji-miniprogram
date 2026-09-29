@@ -60,9 +60,12 @@ Component({
           wx.showToast({ title: '录音读取失败', icon: 'none' });
           return;
         }
+        // 从文件路径检测实际音频格式（iOS 默认 m4a，Android 默认 mp3/amr）
+        var ext = res.tempFilePath.split('.').pop().toLowerCase();
+        var audioFormat = ext === 'mp3' || ext === 'm4a' || ext === 'aac' || ext === 'amr' || ext === 'wav' ? ext : 'mp3';
         that.setData({ transcribing: true, recSeconds: 0 });
         var api = require('../utils/api');
-        api.voiceTranscribe(b64, 'mp3', function (data) {
+        api.voiceTranscribe(b64, audioFormat, function (data) {
           that.setData({ transcribing: false });
           if (data.error === 'quota_exhausted') {
             wx.showToast({ title: '语音额度已用尽，请下次再试', icon: 'none' });

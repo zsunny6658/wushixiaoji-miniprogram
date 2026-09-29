@@ -9,7 +9,8 @@ Page({
     greetingText: '',
     todayStr: '',
     quadrantCounts: { q1: 0, q2: 0, q3: 0, q4: 0 },
-    latestPending: []
+    latestPending: [],
+    searchKeyword: ''
   },
 
   onLoad: function () {
@@ -25,7 +26,7 @@ Page({
     app.refreshState(function () {
       that.compute();
       wx.stopPullDownRefresh();
-    });
+    }, { force: true });
   },
 
   refresh: function () {
@@ -75,15 +76,16 @@ Page({
     var weekMap = ['日', '一', '二', '三', '四', '五', '六'];
     var todayStr = (now.getMonth() + 1) + '月' + now.getDate() + '日 周' + weekMap[now.getDay()];
 
-    // 本地计算统计（不依赖后端，确保准确）
-    var todoC = pkgs.filter(function (p) { return p.type === 'todo' && p.status === 'pending'; }).length;
-    var pickupC = pkgs.filter(function (p) { return p.type === 'pickup' && p.status === 'pending'; }).length;
-    var debtC = pkgs.filter(function (p) { return p.type === 'debt' && p.status === 'pending'; }).length;
-    var debtTotal = Math.round(pkgs.filter(function (p) { return p.type === 'debt' && p.status === 'pending'; }).reduce(function (s, p) { return s + (p.amount || 0); }, 0) * 100) / 100;
-    var overdueC = pkgs.filter(function (p) { return p.overdue && p.status === 'pending'; }).length;
-    var pickedC = pkgs.filter(function (p) { return p.status === 'picked'; }).length;
-    var ignoredC = pkgs.filter(function (p) { return p.status === 'ignored'; }).length;
-    var privateC = pkgs.filter(function (p) { return p.isPrivate && p.status === 'pending'; }).length;
+    // 直接信任后端 stats（避免本地重复计算）
+    var s = gd.stats || {};
+    var todoC = s.todo || 0;
+    var pickupC = s.pickup || 0;
+    var debtC = s.debt || 0;
+    var debtTotal = s.debtTotal || 0;
+    var overdueC = s.overdue || 0;
+    var pickedC = s.picked || 0;
+    var ignoredC = s.ignored || 0;
+    var privateC = s.privateCount || 0;
 
     this.setData({
       stats: { todo: todoC, pickup: pickupC, debt: debtC, debtTotal: debtTotal, debtTotalLabel: helpers.formatAmount(debtTotal), overdue: overdueC, picked: pickedC, ignored: ignoredC, privateCount: privateC },
@@ -94,7 +96,6 @@ Page({
     });
   },
 
-  // 跳转到小记页对应筛选（用 _deepLinkFilter 一次性传递，list.js onShow 读取后清除）
   onGoPickup: function () {
     app.globalData._deepLinkFilter = { recordType: 'pickup', filter: 'pending' };
     wx.switchTab({ url: '/pages/list/list' });
@@ -126,6 +127,14 @@ Page({
   onGoQuadrant: function () { wx.switchTab({ url: '/pages/quadrant/quadrant' }); },
   onGoPending: function () {
     app.globalData._deepLinkFilter = { recordType: 'all', filter: 'pending' };
+    wx.switchTab({ url: '/pages/list/list' });
+  },
+  onSearchInput: function (e) {
+    this.setData({ searchKeyword: e.detail.value });
+  },
+  onSearchGo: function () {
+    var kw = (this.data.searchKeyword || '').trim();
+    app.globalData._deepLinkFilter = { recordType: 'all', filter: 'all', searchQuery: kw };
     wx.switchTab({ url: '/pages/list/list' });
   },
   onGoDetail: function (e) {

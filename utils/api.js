@@ -181,6 +181,36 @@ var API = {
   },
   updateNotifyConfig: function (data, cb, errCb) {
     this.request('PUT', '/api/notify/config', data, cb, errCb);
+  },
+
+  // 智能忽略规则
+  getIgnoreRules: function (cb, errCb) {
+    this.request('GET', '/api/ignore-rules', null, cb, errCb);
+  },
+  addIgnoreRule: function (data, cb, errCb) {
+    this.request('POST', '/api/ignore-rules', data, cb, errCb);
+  },
+  deleteIgnoreRule: function (id, cb, errCb) {
+    this.request('DELETE', '/api/ignore-rules/' + id, null, cb, errCb);
+  },
+  ignoreWithRule: function (id, data, cb, errCb) {
+    this.request('POST', '/api/packages/' + id + '/ignore-with-rule', data, cb, errCb);
+  },
+
+  // 恢复
+  restorePackage: function (id, cb, errCb) {
+    this.request('POST', '/api/packages/' + id + '/restore', {}, cb, errCb);
+  },
+
+  // 归档
+  archivePackage: function (id, cb, errCb) {
+    this.request('POST', '/api/packages/' + id + '/archive', {}, cb, errCb);
+  },
+  getArchivedPackages: function (cb, errCb) {
+    this.request('GET', '/api/packages/archived', null, cb, errCb);
+  },
+  unarchivePackage: function (id, cb, errCb) {
+    this.request('POST', '/api/packages/' + id + '/unarchive', {}, cb, errCb);
   }
 };
 

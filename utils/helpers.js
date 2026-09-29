@@ -3,6 +3,19 @@ var COLORS = ['#4f6ef7', '#f59e0b', '#22c55e', '#ef4444', '#8b5cf6', '#06b6d4', 
 var IMP_RANK = { high: 0, medium: 1, low: 2 };
 var URG_RANK = { urgent: 0, normal: 1 };
 
+// decorate 缓存：按 package id 缓存装饰结果，避免每次切页/筛选重复计算
+var _decorateCache = {};
+var _cacheVersion = 0;
+
+function invalidateDecorateCache() {
+  _cacheVersion++;
+  _decorateCache = {};
+}
+
+function invalidateDecorateCacheById(id) {
+  delete _decorateCache[id];
+}
+
 function fmtTime(iso) {
   if (!iso) return '';
   var d = new Date(iso);
@@ -106,6 +119,10 @@ function sortPackages(pkgs) {
 }
 
 function decorate(p, members) {
+  // 命中缓存直接返回
+  var cached = _decorateCache[p.id];
+  if (cached && cached.version === _cacheVersion) return cached.result;
+
   var d = Object.assign({}, p, {
     arrivedLabel: fmtTime(p.arrivedAt),
     pickedAtLabel: fmtTime(p.pickedAt),
@@ -144,6 +161,8 @@ function decorate(p, members) {
       }
     }
   }
+  // 存入缓存
+  _decorateCache[p.id] = { result: d, version: _cacheVersion };
   return d;
 }
 
@@ -188,6 +207,8 @@ module.exports = {
   decorate: decorate,
   summaryText: summaryText,
   tagLabel: tagLabel,
+  invalidateDecorateCache: invalidateDecorateCache,
+  invalidateDecorateCacheById: invalidateDecorateCacheById,
   COLORS: COLORS,
   IMP_RANK: IMP_RANK,
   URG_RANK: URG_RANK

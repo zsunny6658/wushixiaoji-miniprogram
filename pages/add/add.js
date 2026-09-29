@@ -168,23 +168,42 @@ Page({
     var loaded = 0;
     var total = paths.length;
     paths.forEach(function (path) {
-      fs.readFile({
-        filePath: path,
-        encoding: 'base64',
-        success: function (res) {
-          var ext = path.match(/\.(\w+)$/);
-          var mime = ext && ext[1] === 'jpg' ? 'image/jpeg' : 'image/png';
-          base64List.push('data:' + mime + ';base64,' + res.data);
-          loaded++;
-          if (loaded === total) {
-            that.setData({ imageBase64List: base64List });
-          }
+      // 先压缩图片再读 base64，减少内存占用和传输体积
+      wx.compressImage({
+        src: path,
+        quality: 80,
+        success: function (compRes) {
+          fs.readFile({
+            filePath: compRes.tempFilePath,
+            encoding: 'base64',
+            success: function (res) {
+              base64List.push('data:image/jpeg;base64,' + res.data);
+              loaded++;
+              if (loaded === total) that.setData({ imageBase64List: base64List });
+            },
+            fail: function () {
+              loaded++;
+              if (loaded === total) that.setData({ imageBase64List: base64List });
+            }
+          });
         },
         fail: function () {
-          loaded++;
-          if (loaded === total) {
-            that.setData({ imageBase64List: base64List });
-          }
+          // 压缩失败，降级读原图
+          fs.readFile({
+            filePath: path,
+            encoding: 'base64',
+            success: function (res) {
+              var ext = path.match(/\.(\w+)$/);
+              var mime = ext && ext[1] === 'jpg' ? 'image/jpeg' : 'image/png';
+              base64List.push('data:' + mime + ';base64,' + res.data);
+              loaded++;
+              if (loaded === total) that.setData({ imageBase64List: base64List });
+            },
+            fail: function () {
+              loaded++;
+              if (loaded === total) that.setData({ imageBase64List: base64List });
+            }
+          });
         }
       });
     });

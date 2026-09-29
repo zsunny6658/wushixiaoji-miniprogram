@@ -10,7 +10,7 @@ Page({
     scope: 'all',
     importanceFilter: 'all',
     urgencyFilter: 'all',
-    group: 'none',
+    group: 'type',
     search: '',
     list: [],
     groups: [],
@@ -28,23 +28,28 @@ Page({
     emptyTitle: '当前没有记录',
     emptyDesc: '点击右下角 + 添加',
     batchMode: false,
-    batchCount: 0
+    batchCount: 0,
+    swipeTouchX: 0,
+    swipeTouchY: 0,
+    swipeOffset: 0,
+    swipeId: ''
   },
 
   onLoad: function () {
     api.setToken(app.globalData.token);
-    // 默认显示全部+待处理，不使用全局残留的筛选状态
+    var sys = wx.getSystemInfoSync();
     this.setData({
       recordType: 'all',
       filter: 'all',
       scope: 'all',
       importanceFilter: 'all',
       urgencyFilter: 'all',
-      group: app.globalData.group || 'none',
+      group: app.globalData.group || 'type',
       impIndex: 0,
       urgIndex: 0,
       scopeIndex: 0,
-      groupIndex: ['none', 'owner', 'type'].indexOf(app.globalData.group || 'none')
+      groupIndex: ['none', 'owner', 'type'].indexOf(app.globalData.group || 'type'),
+      pxToRpx: 750 / sys.windowWidth
     });
   },
   onShow: function () {
@@ -61,7 +66,8 @@ Page({
         impIndex: ['all', 'high', 'medium', 'low'].indexOf(gd._deepLinkFilter.importance || 'all'),
         urgIndex: ['all', 'urgent', 'normal'].indexOf(gd._deepLinkFilter.urgency || 'all'),
         importanceFilter: gd._deepLinkFilter.importance || 'all',
-        urgencyFilter: gd._deepLinkFilter.urgency || 'all'
+        urgencyFilter: gd._deepLinkFilter.urgency || 'all',
+        search: gd._deepLinkFilter.searchQuery || ''
       });
       gd._deepLinkFilter = null;
     }
@@ -155,10 +161,12 @@ Page({
     if (!pkg) return;
     var that = this;
     if (pkg.status === 'ignored') {
-      api.updatePackage(id, { status: 'pending' }, function () {
-        that.computeList();
-        wx.showToast({ title: '已取消忽略', icon: 'success' });
+      this.optimisticUpdate(id, { status: 'pending' });
+      api.updatePackage(id, { status: 'pending' }, null, function () {
+        that.optimisticRollback(id);
+        wx.showToast({ title: '操作失败', icon: 'none' });
       });
+      wx.showToast({ title: '已取消忽略', icon: 'success' });
     } else {
       var days = app.globalData.ignoreCleanupDays || 7;
       wx.showModal({
@@ -166,15 +174,45 @@ Page({
         content: '忽略后将在' + days + '天后自动删除，确认忽略？',
         success: function (res) {
           if (res.confirm) {
-            api.updatePackage(id, { status: 'ignored' }, function () {
-              that.computeList();
-              wx.showToast({ title: '已忽略，' + (app.globalData.ignoreCleanupDays || 7) + '天后自动删除', icon: 'none' });
+            that.optimisticUpdate(id, { status: 'ignored' });
+            api.updatePackage(id, { status: 'ignored' }, null, function () {
+              that.optimisticRollback(id);
+              wx.showToast({ title: '操作失败', icon: 'none' });
             });
+            wx.showToast({ title: '已忽略', icon: 'none' });
           }
         }
       });
     }
   },
+  // 滑动快捷操作
+  onSwipePick: function (e) {
+    var id = e.currentTarget.dataset.id;
+    this.onQuickPick({ currentTarget: { dataset: { id: id } } });
+    this.setData({ swipeOffset: 0, swipeId: '' });
+  },
+  onSwipeDelete: function (e) {
+    var id = e.currentTarget.dataset.id;
+    var that = this;
+    wx.showModal({
+      title: '确认删除',
+      content: '此操作不可恢复，确认删除？',
+      confirmColor: '#e53e3e',
+      success: function (res) {
+        if (res.confirm) {
+          that.optimisticDelete([id]);
+          api.deletePackage(id, function () {
+            wx.showToast({ title: '已删除', icon: 'success' });
+          }, function () {
+            that.optimisticRollback(id);
+            wx.showToast({ title: '删除失败', icon: 'none' });
+          });
+        }
+      }
+    });
+    this.setData({ swipeOffset: 0, swipeId: '' });
+  },
+
   onSearch: function (e) { this.setData({ search: e.detail.value }); this.computeList(); },
   onImpChange: function (e) {
     var idx = parseInt(e.detail.value, 10);
@@ -203,16 +241,120 @@ Page({
     if (!pkg) return;
     var that = this;
     if (pkg.status === 'pending') {
-      api.updatePackage(id, { status: 'picked', pickedAt: new Date().toISOString(), pickedBy: app.globalData.me }, function () {
-        that.computeList();
-        wx.showToast({ title: '已完成', icon: 'success' });
+      var patch = { status: 'picked', pickedAt: new Date().toISOString(), pickedBy: app.globalData.me };
+      this.optimisticUpdate(id, patch);
+      api.updatePackage(id, patch, null, function () {
+        that.optimisticRollback(id);
+        wx.showToast({ title: '操作失败', icon: 'none' });
       });
+      wx.showToast({ title: '已完成', icon: 'success' });
     } else {
-      api.updatePackage(id, { status: 'pending', pickedAt: '', pickedBy: '' }, function () { that.computeList(); });
+      this.optimisticUpdate(id, { status: 'pending', pickedAt: '', pickedBy: '' });
+      api.updatePackage(id, { status: 'pending', pickedAt: '', pickedBy: '' }, null, function () {
+        that.optimisticRollback(id);
+        wx.showToast({ title: '操作失败', icon: 'none' });
+      });
     }
   },
+  // 乐观更新：立即改 localData，不等 API 回调
+  optimisticUpdate: function (id, patch) {
+    var gd = app.globalData;
+    var pkgs = gd.packages || [];
+    for (var i = 0; i < pkgs.length; i++) {
+      if (pkgs[i].id === id) {
+        for (var k in patch) pkgs[i][k] = patch[k];
+        break;
+      }
+    }
+    helpers.invalidateDecorateCacheById(id);
+    this.computeList();
+  },
+  // 乐观回滚：恢复 localData 原始状态
+  optimisticRollback: function (id) {
+    helpers.invalidateDecorateCacheById(id);
+    this.computeList();
+  },
+  // 乐观删除：从列表移除
+  optimisticDelete: function (ids) {
+    var gd = app.globalData;
+    var pkgs = gd.packages || [];
+    gd.packages = pkgs.filter(function (p) {
+      for (var i = 0; i < ids.length; i++) if (p.id === ids[i]) return false;
+      return true;
+    });
+    helpers.invalidateDecorateCache();
+    this.computeList();
+  },
+
+  // 滑动检测：左滑完成/撤销，右滑红旗/取消红旗
+  onTouchStart: function (e) {
+    if (this.data.batchMode) return;
+    this._touchX = e.touches[0].clientX;
+    this._touchY = e.touches[0].clientY;
+    this._touchId = e.currentTarget.dataset.id;
+    this._touchMoved = false;
+    // 先收起其他已展开的卡片（左或右）
+    if (this.data.swipeOffset !== 0 && this.data.swipeId !== this._touchId) {
+      this.setData({ swipeOffset: 0, swipeId: '' });
+    }
+  },
+  onTouchMove: function (e) {
+    if (this.data.batchMode) return;
+    if (!this._touchId) return;
+    var deltaX = e.touches[0].clientX - this._touchX;
+    var deltaY = Math.abs(e.touches[0].clientY - this._touchY);
+    var p2r = this.data.pxToRpx || 2;
+    if (Math.abs(deltaX) > 8 && Math.abs(deltaX) > deltaY) {
+      if (!this._touchMoved) {
+        this._touchMoved = true;
+        this.setData({ swipeId: this._touchId });
+      }
+      this.setData({ swipeOffset: deltaX * p2r });
+    }
+  },
+  onTouchEnd: function (e) {
+    if (this.data.batchMode) { this.setData({ swipeOffset: 0, swipeId: '' }); this._touchMoved = false; return; }
+    if (!this._touchId) { this._touchMoved = false; return; }
+    var deltaX = e.changedTouches[0].clientX - this._touchX;
+    var deltaY = Math.abs(e.changedTouches[0].clientY - this._touchY);
+    if (this._touchMoved && Math.abs(deltaX) > 40 && Math.abs(deltaX) > deltaY * 1.5) {
+      // 左滑展开完成按钮，右滑展开红旗按钮
+      this.setData({ swipeOffset: deltaX > 0 ? 200 : -200, swipeId: this._touchId });
+    } else {
+      this.setData({ swipeOffset: 0, swipeId: '' });
+    }
+    this._touchMoved = false;
+  },
+
+  onSwipeFlag: function (e) {
+    var id = e.currentTarget.dataset.id;
+    var that = this;
+    var pkg = (app.globalData.packages || []).find(function (p) { return p.id === id; });
+    if (!pkg) return;
+    var isFlagged = pkg.importance === 'high';
+    var newImportance = isFlagged ? 'medium' : 'high';
+    var patch = { importance: newImportance };
+    that.optimisticUpdate(id, patch);
+    api.updatePackage(id, patch, null, function () {
+      that.optimisticRollback(id);
+      wx.showToast({ title: '操作失败', icon: 'none' });
+    });
+    that.setData({ swipeOffset: 0, swipeId: '' });
+    wx.showToast({ title: isFlagged ? '已取消红旗' : '已标红旗', icon: 'success' });
+  },
+
   onCardTap: function (e) {
     var id = e.currentTarget.dataset.id;
+    // 如果有卡片已展开，点击其他位置先收起
+    if (this.data.swipeOffset !== 0 && this.data.swipeId !== id) {
+      this.setData({ swipeOffset: 0, swipeId: '' });
+      return;
+    }
+    // 点击已展开的卡片，收起
+    if (this.data.swipeId === id && this.data.swipeOffset !== 0) {
+      this.setData({ swipeOffset: 0, swipeId: '' });
+      return;
+    }
     if (this.data.batchMode) {
       this.onToggleBatchSelect(id);
     } else {
@@ -277,17 +419,19 @@ Page({
       content: '将 ' + ids.length + ' 条记录标记为完成？',
       success: function (res) {
         if (res.confirm) {
-          var done = 0;
+          var now = new Date().toISOString();
+          var me = app.globalData.me;
+          var rollback = [];
           ids.forEach(function (id) {
-            api.updatePackage(id, { status: 'picked', pickedAt: new Date().toISOString(), pickedBy: app.globalData.me }, function () {
-              done++;
-              if (done === ids.length) {
-                self.onExitBatch();
-                self.computeList();
-                wx.showToast({ title: '已完成 ' + ids.length + ' 条', icon: 'success' });
-              }
-            });
+            var pkg = (app.globalData.packages || []).find(function (p) { return p.id === id; });
+            if (!pkg) return;
+            rollback.push({ id: id, prev: Object.assign({}, pkg) });
+            self.optimisticUpdate(id, { status: 'picked', pickedAt: now, pickedBy: me });
+            api.updatePackage(id, { status: 'picked', pickedAt: now, pickedBy: me });
           });
+          self.onExitBatch();
+          self.computeList();
+          wx.showToast({ title: '已完成 ' + ids.length + ' 条', icon: 'success' });
         }
       }
     });
@@ -303,6 +447,12 @@ Page({
       confirmColor: '#ef4444',
       success: function (res) {
         if (res.confirm) {
+          var rollback = [];
+          ids.forEach(function (id) {
+            var pkg = (app.globalData.packages || []).find(function (p) { return p.id === id; });
+            if (pkg) rollback.push({ id: id, prev: Object.assign({}, pkg) });
+          });
+          self.optimisticDelete(ids);
           var done = 0;
           ids.forEach(function (id) {
             api.deletePackage(id, function () {
@@ -312,26 +462,65 @@ Page({
                 self.computeList();
                 wx.showToast({ title: '已删除 ' + ids.length + ' 条', icon: 'success' });
               }
+            }, function () {
+              if (done === ids.length - 1) {
+                self.optimisticRollback(ids);
+              }
             });
           });
         }
       }
     });
   },
+  onCardLongPress: function (e) {
+    if (this.data.batchMode) return;
+    var id = e.currentTarget.dataset.id;
+    var that = this;
+    var pkg = (app.globalData.packages || []).find(function (p) { return p.id === id; });
+    if (!pkg) return;
+    var isPicked = pkg.status === 'picked';
+    var isIgnored = pkg.status === 'ignored';
+    var items = [
+      isPicked ? '↩ 撤销完成' : '✓ 标记完成',
+      isIgnored ? '📌 恢复显示' : '🚫 忽略此条'
+    ];
+    items.push('🗑 删除记录');
+    wx.showActionSheet({
+      itemList: items,
+      itemColor: '#4f6ef7',
+      success: function (res) {
+        if (res.tapIndex === 0) {
+          that.onQuickPick({ currentTarget: { dataset: { id: id } } });
+        } else if (res.tapIndex === 1) {
+          that.onToggleIgnore({ currentTarget: { dataset: { id: id } } });
+        } else if (res.tapIndex === 2) {
+          that.onSwipeDelete({ currentTarget: { dataset: { id: id } } });
+        }
+      }
+    });
+  },
+
   onQuickPick: function (e) {
     var id = e.currentTarget.dataset.id;
     var pkg = (app.globalData.packages || []).find(function (p) { return p.id === id; });
     if (!pkg) return;
     var that = this;
     if (pkg.status === 'pending') {
-      api.updatePackage(id, { status: 'picked', pickedAt: new Date().toISOString(), pickedBy: app.globalData.me }, function () {
-        app.refreshState(function () { that.computeList(); });
-        wx.showToast({ title: '已完成', icon: 'success' });
+      var patch = { status: 'picked', pickedAt: new Date().toISOString(), pickedBy: app.globalData.me };
+      that.optimisticUpdate(id, patch);
+      api.updatePackage(id, patch, null, function () {
+        that.optimisticRollback(id);
+        wx.showToast({ title: '操作失败', icon: 'none' });
       });
+      that.computeList();
+      wx.showToast({ title: '已完成', icon: 'success' });
     } else {
-      api.updatePackage(id, { status: 'pending', pickedAt: '', pickedBy: '' }, function () {
-        app.refreshState(function () { that.computeList(); });
+      that.optimisticUpdate(id, { status: 'pending', pickedAt: '', pickedBy: '' });
+      api.updatePackage(id, { status: 'pending', pickedAt: '', pickedBy: '' }, null, function () {
+        that.optimisticRollback(id);
+        wx.showToast({ title: '操作失败', icon: 'none' });
       });
+      that.computeList();
     }
   },
   onEdit: function (e) { wx.navigateTo({ url: '/pages/add/add?id=' + e.currentTarget.dataset.id }); },

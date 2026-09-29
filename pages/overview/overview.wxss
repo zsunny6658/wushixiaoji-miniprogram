@@ -83,6 +83,45 @@
   font-weight: 500;
 }
 
+/* 搜索栏 */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+.search-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 16rpx 20rpx;
+  box-shadow: var(--shadow-1);
+}
+.search-icon {
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text-primary);
+  min-width: 0;
+}
+.search-placeholder {
+  color: var(--text-tertiary);
+}
+.search-go {
+  font-size: 28rpx;
+  color: var(--color-primary);
+  font-weight: 600;
+  padding: 16rpx 20rpx;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
 /* 通用 section */
 .section {
   background: var(--bg-card);

@@ -102,7 +102,7 @@
   transition: transform 0.15s;
 }
 .card:active { transform: scale(0.99); }
-.card.picked { opacity: 0.6; }
+.card.picked .card-inner { opacity: 0.6; }
 .card.picked .code-value { text-decoration: line-through; color: var(--text-tertiary); }
 .card.urgent { border-left: 6rpx solid var(--color-warning); }
 .card.flagged { border-left: 6rpx solid var(--color-error); }
@@ -264,6 +264,68 @@
   border-radius: var(--radius-full);
   padding: 2rpx 12rpx;
   font-size: var(--font-caption);
+}
+
+/* 滑动快捷操作 */
+.card-swipe-wrap {
+  position: relative;
+  overflow: hidden;
+}
+.card-swipe-wrap .card {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.2s ease-out;
+  border-radius: 0;
+  background: var(--bg-card);
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding-left: var(--spacing-sm);
+  padding-right: var(--spacing-sm);
+}
+.card.swiping {
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.12);
+}
+.swipe-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  z-index: 0;
+}
+.swipe-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  z-index: 0;
+}
+.swipe-act {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text-white);
+  cursor: pointer;
+}
+.swipe-act:active {
+  opacity: 0.8;
+}
+.swipe-flag {
+  background: #ef4444; /* 红旗：红色 */
+}
+.swipe-flag-off {
+  background: #6b7280; /* 取消红旗：灰色 */
+}
+.swipe-done {
+  background: #10b981; /* 完成：绿色，正向确认 */
+}
+.swipe-undo {
+  background: #6b7280; /* 撤销：中性灰，可逆操作 */
 }
 
 /* FAB */

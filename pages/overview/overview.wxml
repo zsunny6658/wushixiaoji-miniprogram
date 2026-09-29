@@ -5,6 +5,15 @@
     <view class="greeting-date">{{todayStr}}</view>
   </view>
 
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索取件码、驿站、备忘..." placeholder-class="search-placeholder" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearchGo" confirm-type="search" />
+    </view>
+    <text class="search-go" bindtap="onSearchGo">搜索</text>
+  </view>
+
   <!-- 统计卡片 3+2 布局 -->
   <view class="stats">
     <view class="stats-row">

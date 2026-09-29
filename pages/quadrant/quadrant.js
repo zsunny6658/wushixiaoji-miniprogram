@@ -14,6 +14,13 @@ Page({
     var that = this;
     app.refreshState(function () { that.compute(); });
   },
+  onPullDownRefresh: function () {
+    var that = this;
+    app.refreshState(function () {
+      that.compute();
+      wx.stopPullDownRefresh();
+    }, { force: true });
+  },
 
   compute: function () {
     var gd = app.globalData;

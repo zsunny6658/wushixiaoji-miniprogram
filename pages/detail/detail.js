@@ -100,25 +100,66 @@ Page({
     });
   },
 
+  onPullDownRefresh: function () {
+    var self = this;
+    app.refreshState(function () {
+      if (self.data.pkg) self.loadDetail(self.data.pkg.id);
+      wx.stopPullDownRefresh();
+    }, { force: true });
+  },
+
+  // 乐观更新：立即更新本地 UI
+  optimisticUpdate: function (id, patch) {
+    var gd = app.globalData;
+    var pkgs = gd.packages || [];
+    for (var i = 0; i < pkgs.length; i++) {
+      if (pkgs[i].id === id) {
+        for (var k in patch) pkgs[i][k] = patch[k];
+        break;
+      }
+    }
+    helpers.invalidateDecorateCacheById(id);
+    var updated = pkgs.filter(function (p) { return p.id === id; })[0];
+    if (updated) this.applyDetail(updated);
+  },
+
   onToggleIgnore: function () {
     var self = this;
     var pkg = this.data.pkg;
     var id = pkg.id;
     if (pkg.status === 'ignored') {
-      api.updatePackage(id, { status: 'pending' }, function () {
-        app.refreshState(function () { self.loadDetail(id); });
-        wx.showToast({ title: '已取消忽略', icon: 'success' });
+      api.restorePackage(id, function () {
+        self.optimisticUpdate(id, { status: 'pending', ignoreAt: '', ignoreRuleId: '' });
+        wx.showToast({ title: '已恢复', icon: 'success' });
+      }, function () {
+        wx.showToast({ title: '操作失败', icon: 'none' });
       });
     } else {
-      var days = app.globalData.ignoreCleanupDays || 7;
-      wx.showModal({
-        title: '确认忽略',
-        content: '忽略后将在' + days + '天后自动删除，确认忽略？',
+      wx.showActionSheet({
+        itemList: ['普通忽略（仅本次）', '智能忽略（自动忽略相似待办）'],
         success: function (res) {
-          if (res.confirm) {
-            api.updatePackage(id, { status: 'ignored' }, function () {
-              app.refreshState(function () { self.loadDetail(id); });
-              wx.showToast({ title: '已忽略，' + (app.globalData.ignoreCleanupDays || 7) + '天后自动删除', icon: 'none' });
+          if (res.tapIndex === 0) {
+            var days = app.globalData.ignoreCleanupDays || 7;
+            self.optimisticUpdate(id, { status: 'ignored' });
+            api.updatePackage(id, { status: 'ignored' }, null, function () {
+              self.loadDetail(id);
+              wx.showToast({ title: '操作失败', icon: 'none' });
+            });
+            wx.showToast({ title: '已忽略，' + days + '天后自动删除', icon: 'none' });
+          } else {
+            wx.showModal({
+              title: '智能忽略',
+              content: '将创建规则自动忽略相似的待办，默认30天有效。确认？',
+              success: function (r) {
+                if (r.confirm) {
+                  api.ignoreWithRule(id, { durationDays: 30, threshold: 0.6 }, function () {
+                    self.optimisticUpdate(id, { status: 'ignored' });
+                    wx.showToast({ title: '已忽略并创建规则', icon: 'success' });
+                  }, function () {
+                    wx.showToast({ title: '操作失败', icon: 'none' });
+                  });
+                }
+              }
             });
           }
         }
@@ -126,20 +167,44 @@ Page({
     }
   },
 
+  onArchive: function () {
+    var self = this;
+    var id = this.data.pkg.id;
+    wx.showModal({
+      title: '确认归档',
+      content: '归档后待办将移到归档区，可随时恢复。确认？',
+      success: function (res) {
+        if (res.confirm) {
+          api.archivePackage(id, function () {
+            self.optimisticUpdate(id, { status: 'archived' });
+            wx.showToast({ title: '已归档', icon: 'success' });
+            setTimeout(function () { wx.navigateBack(); }, 800);
+          }, function () {
+            wx.showToast({ title: '操作失败', icon: 'none' });
+          });
+        }
+      }
+    });
+  },
+
   onToggleFlag: function () {
     var self = this;
     var pkg = this.data.pkg;
     var id = pkg.id;
     if (pkg.importance === 'high') {
-      api.updatePackage(id, { importance: 'medium' }, function () {
-        app.refreshState(function () { self.loadDetail(id); });
-        wx.showToast({ title: '已取消重点', icon: 'success' });
+      this.optimisticUpdate(id, { importance: 'medium' });
+      api.updatePackage(id, { importance: 'medium' }, null, function () {
+        self.loadDetail(id);
+        wx.showToast({ title: '操作失败', icon: 'none' });
       });
+      wx.showToast({ title: '已取消重点', icon: 'success' });
     } else {
-      api.updatePackage(id, { importance: 'high' }, function () {
-        app.refreshState(function () { self.loadDetail(id); });
-        wx.showToast({ title: '已标记重点', icon: 'success' });
+      this.optimisticUpdate(id, { importance: 'high' });
+      api.updatePackage(id, { importance: 'high' }, null, function () {
+        self.loadDetail(id);
+        wx.showToast({ title: '操作失败', icon: 'none' });
       });
+      wx.showToast({ title: '已标记重点', icon: 'success' });
     }
   },
 
@@ -148,15 +213,20 @@ Page({
     var pkg = this.data.pkg;
     var id = pkg.id;
     if (pkg.status === 'picked') {
-      api.updatePackage(id, { status: 'pending', pickedAt: '', pickedBy: '' }, function () {
-        app.refreshState(function () { self.loadDetail(id); });
-        wx.showToast({ title: '已撤销', icon: 'success' });
+      this.optimisticUpdate(id, { status: 'pending', pickedAt: '', pickedBy: '' });
+      api.updatePackage(id, { status: 'pending', pickedAt: '', pickedBy: '' }, null, function () {
+        self.loadDetail(id);
+        wx.showToast({ title: '操作失败', icon: 'none' });
       });
+      wx.showToast({ title: '已撤销', icon: 'success' });
     } else {
-      api.updatePackage(id, { status: 'picked', pickedAt: new Date().toISOString(), pickedBy: app.globalData.me }, function () {
-        app.refreshState(function () { self.loadDetail(id); });
-        wx.showToast({ title: '已完成', icon: 'success' });
+      var patch = { status: 'picked', pickedAt: new Date().toISOString(), pickedBy: app.globalData.me };
+      this.optimisticUpdate(id, patch);
+      api.updatePackage(id, patch, null, function () {
+        self.loadDetail(id);
+        wx.showToast({ title: '操作失败', icon: 'none' });
       });
+      wx.showToast({ title: '已完成', icon: 'success' });
     }
   },
   onShareAppMessage: function () {

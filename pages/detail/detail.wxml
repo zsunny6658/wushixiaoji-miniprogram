@@ -1,9 +1,9 @@
 <view class="detail-page">
   <!-- 顶部状态栏 -->
-  <view class="status-bar {{pkg.status === 'picked' ? 'done' : ''}} {{pkg.status === 'ignored' ? 'ignored' : ''}}">
-    <text class="status-icon">{{pkg.status === 'picked' ? '✅' : (pkg.status === 'ignored' ? '🚫' : '⏳')}}</text>
-    <text class="status-text">{{pkg.status === 'picked' ? '已完成' : (pkg.status === 'ignored' ? '已忽略' : '待处理')}}</text>
-    <view class="status-right" wx:if="{{pkg.overdue && pkg.status !== 'ignored' && pkg.status !== 'picked'}}">
+  <view class="status-bar {{pkg.status === 'picked' ? 'done' : ''}} {{pkg.status === 'ignored' ? 'ignored' : ''}} {{pkg.status === 'archived' ? 'archived' : ''}}">
+    <text class="status-icon">{{pkg.status === 'picked' ? '✅' : (pkg.status === 'ignored' ? '🚫' : (pkg.status === 'archived' ? '📦' : '⏳'))}}</text>
+    <text class="status-text">{{pkg.status === 'picked' ? '已完成' : (pkg.status === 'ignored' ? '已忽略' : (pkg.status === 'archived' ? '已归档' : '待处理'))}}</text>
+    <view class="status-right" wx:if="{{pkg.overdue && pkg.status !== 'ignored' && pkg.status !== 'picked' && pkg.status !== 'archived'}}">
       <text class="overdue-badge">逾期</text>
     </view>
   </view>
@@ -11,6 +11,11 @@
   <view class="ignore-notice" wx:if="{{pkg.status === 'ignored'}}">
     <text class="ignore-notice-icon">🗑️</text>
     <text class="ignore-notice-text">已忽略，{{pkg.ignoreDeleteLabel}}</text>
+  </view>
+  <!-- 归档提示 -->
+  <view class="archive-notice" wx:if="{{pkg.status === 'archived'}}">
+    <text class="archive-notice-icon">📦</text>
+    <text class="archive-notice-text">已归档，可恢复</text>
   </view>
 
   <!-- 主要内容 -->
@@ -125,15 +130,19 @@
       <text class="action-icon">✏️</text>
       <text>编辑</text>
     </button>
-    <button class="action-btn action-ignore {{pkg.status === 'ignored' ? 'action-ignored' : ''}}" bindtap="onToggleIgnore">
+    <button class="action-btn action-ignore {{pkg.status === 'ignored' ? 'action-ignored' : ''}}" bindtap="onToggleIgnore" wx:if="{{pkg.status !== 'archived'}}">
       <text class="action-icon">🚫</text>
-      <text>{{pkg.status === 'ignored' ? '取消忽略' : '忽略'}}</text>
+      <text>{{pkg.status === 'ignored' ? '恢复' : '忽略'}}</text>
     </button>
-    <button class="action-btn action-main {{pkg.status === 'picked' ? 'action-unpick' : ''}}" bindtap="onTogglePick">
+    <button class="action-btn action-main {{pkg.status === 'picked' ? 'action-unpick' : ''}}" bindtap="onTogglePick" wx:if="{{pkg.status !== 'archived'}}">
       <text class="action-icon">{{pkg.status === 'picked' ? '↩️' : '✓'}}</text>
       <text>{{pkg.status === 'picked' ? '撤销' : '完成'}}</text>
     </button>
-    <button class="action-btn action-delete" bindtap="onDelete">
+    <button class="action-btn action-archive" bindtap="onArchive" wx:if="{{pkg.status !== 'archived'}}">
+      <text class="action-icon">📦</text>
+      <text>归档</text>
+    </button>
+    <button class="action-btn action-delete" bindtap="onDelete" wx:if="{{pkg.status !== 'archived'}}">
       <text class="action-icon">🗑️</text>
       <text>删除</text>
     </button>

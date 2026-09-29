@@ -241,6 +241,7 @@
 .action-flag-active { background: #ef4444; color: #fff; }
 .action-ignore { background: var(--text-tertiary); color: var(--text-white); }
 .action-ignored { background: var(--color-warning); color: var(--text-white); }
+.action-archive { background: #e8eaf6; color: #3f51b5; }
 .action-main {
   flex: 1.5;
   background: linear-gradient(135deg, var(--color-primary) 0%, #6C8AFF 100%);
@@ -266,4 +267,21 @@
 .ignore-notice-text {
   font-size: 24rpx;
   color: #92400e;
+}
+
+/* 归档提示条 */
+.archive-notice {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 16rpx 24rpx;
+  background: #e8eaf6;
+  border-bottom: 1px solid #c5cae9;
+}
+.archive-notice-icon { font-size: 28rpx; }
+.archive-notice-text { font-size: 24rpx; color: #283593; }
+
+/* 归档状态栏 */
+.status-bar.archived {
+  background: linear-gradient(135deg, #7986cb 0%, #3f51b5 100%);
 }

@@ -6,7 +6,7 @@ Page({
   data: {
     action: '', // profile | password | tokens | webhooks | mail
     // 个人设置
-    profile: { username: '', displayName: '', email: '' },
+    profile: { username: '', displayName: '', email: '', avatarUrl: '' },
     hasAccount: false,
     // 密码
     pwdForm: { oldPassword: '', familyPasscode: '', newPassword: '', confirm: '' },
@@ -31,7 +31,8 @@ Page({
       smtpHost: '', smtpPort: '465', smtpSecure: true,
       smtpUser: '', smtpPass: '', smtpFrom: '', smtpFromName: '',
       aiProvider: '', aiModel: '', aiBaseUrl: '', aiApiKey: '',
-      ignoreCleanupDays: 7
+      ignoreCleanupDays: 7,
+      reminderDays: 3
     },
     mailConfigured: false,
     testEmailTo: '',
@@ -106,7 +107,8 @@ Page({
             profile: {
               username: data.user.username || '',
               displayName: data.user.displayName || '',
-              email: data.user.email || ''
+              email: data.user.email || '',
+              avatarUrl: data.user.avatarUrl || ''
             }
           });
         } else {
@@ -139,7 +141,8 @@ Page({
             aiModel: a.textModel || '',
             aiBaseUrl: a.baseURL || '',
             aiApiKey: '',
-            ignoreCleanupDays: c.ignoreCleanupDays || 7
+            ignoreCleanupDays: c.ignoreCleanupDays || 7,
+            reminderDays: (c.notify && c.notify.daysBefore) || 3
           },
           mailConfigured: data && data.mailConfigured
         });
@@ -152,9 +155,19 @@ Page({
     var f = e.currentTarget.dataset.field;
     this.setData({ ['profile.' + f]: e.detail.value });
   },
+  onChooseAvatar: function (e) {
+    var avatarUrl = e.detail.avatarUrl;
+    this.setData({ 'profile.avatarUrl': avatarUrl });
+  },
   onSaveProfile: function () {
+    var that = this;
     var p = this.data.profile;
     api.updateProfile(p, function () {
+      // 头像变了要刷新全局状态
+      if (p.avatarUrl) {
+        app.globalData.meAvatar = p.avatarUrl;
+      }
+      app.refreshState();
       wx.showToast({ title: '已保存', icon: 'success' });
     });
   },
@@ -328,11 +341,13 @@ Page({
         apiKey: c.aiApiKey || undefined,
         textModel: c.aiModel
       },
-      ignoreCleanupDays: Math.max(1, parseInt(c.ignoreCleanupDays, 10) || 7)
+      ignoreCleanupDays: Math.max(1, parseInt(c.ignoreCleanupDays, 10) || 7),
+      notify: { daysBefore: Math.max(1, parseInt(c.reminderDays, 10) || 3) }
     };
     api.updateConfig(patch, this.data.familyId, function () {
       app.globalData.ignoreCleanupDays = patch.ignoreCleanupDays;
       wx.setStorageSync('parcel.ignoreCleanupDays', String(patch.ignoreCleanupDays));
+      wx.setStorageSync('parcel.reminderDays', String(patch.notify.daysBefore));
       wx.showToast({ title: '已保存', icon: 'success' });
     });
   },

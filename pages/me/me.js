@@ -6,6 +6,7 @@ Page({
   data: {
     meName: '',
     meFirstChar: '?',
+    meAvatar: '',
     meEmail: '',
     roleLabel: '成员',
     familyName: '',
@@ -16,10 +17,25 @@ Page({
     viewOptions: ['📋 列表', '🎯 四象限'],
     viewIndex: 0,
     groupOptions: ['不分组', '按成员', '按待办类型'],
-    groupIndex: 0,
+    groupIndex: 2,
     showCreateFamily: false,
     newFamilyName: '',
-    notifyEnabled: true
+    // 通知设置
+    notifyEnabled: true,
+    notifyDays: 3,
+    notifyCleanupDays: 7,
+    showNotifyModal: false,
+    mpNotifyConfigured: false,
+    mailConfigured: false,
+    notifyTemplateId: '',
+    pickupHour8: true,
+    pickupHour20: true,
+    debtHour8: true,
+    debtHour20: true,
+    summaryHour: 8,
+    subscribeAuthorized: false,
+    // 关于
+    showAboutModal: false
   },
 
   onLoad: function () {
@@ -39,6 +55,7 @@ Page({
     this.setData({
       meName: me || '未登录',
       meFirstChar: me ? me.charAt(0) : '?',
+      meAvatar: gd.meAvatar || '',
       meEmail: gd.meEmail || '',
       roleLabel: roleMap[role] || role,
       isAdmin: !!gd.isAdmin,
@@ -47,8 +64,10 @@ Page({
       families: gd.families || [],
       baseUrl: gd.baseUrl || 'https://parcel.zsunny.top',
       viewIndex: (gd.viewMode === 'quadrant') ? 1 : 0,
-      groupIndex: ['none', 'owner', 'type'].indexOf(gd.group || 'none'),
-      showCreateFamily: false
+      groupIndex: ['none', 'owner', 'type'].indexOf(gd.group || 'type'),
+      showCreateFamily: false,
+      notifyDays: parseInt(wx.getStorageSync('parcel.reminderDays') || '3', 10) || 3,
+      notifyCleanupDays: parseInt(wx.getStorageSync('parcel.ignoreCleanupDays') || '7', 10) || 7
     });
   },
 
@@ -97,16 +116,139 @@ Page({
     this.setData({ groupIndex: i });
   },
 
-  onToggleNotify: function (e) {
-    var enabled = e.detail.value;
+  // 通知设置弹窗 - 立即打开，异步加载配置
+  onOpenNotifyModal: function () {
     var that = this;
-    that.setData({ notifyEnabled: enabled });
-    api.request('PUT', '/api/notify/config', { enabled: enabled }, function () {
-      wx.showToast({ title: enabled ? '已开启' : '已关闭', icon: 'success' });
-    }, function () {
-      that.setData({ notifyEnabled: !enabled });
-      wx.showToast({ title: '设置失败', icon: 'none' });
+    // 立即打开弹窗（用当前缓存值）
+    that.setData({ showNotifyModal: true });
+    // 异步从服务端读取最新配置
+    api.request('GET', '/api/notify/config', null, function (data) {
+      if (data && data.notify) {
+        var n = data.notify;
+        var ph = n.pickupHours || [8, 20];
+        var dh = n.debtHours || [8, 20];
+        that.setData({
+          notifyEnabled: n.enabled !== false,
+          notifyDays: n.daysBefore || 3,
+          pickupHour8: ph.indexOf(8) >= 0,
+          pickupHour20: ph.indexOf(20) >= 0,
+          debtHour8: dh.indexOf(8) >= 0,
+          debtHour20: dh.indexOf(20) >= 0,
+          summaryHour: n.summaryHour !== undefined ? n.summaryHour : 8
+        });
+      }
     });
+    // 读取家庭配置判断通知方式
+    api.request('GET', '/api/config' + (that.data.familyId ? '?familyId=' + that.data.familyId : ''), null, function (data) {
+      var c = (data && data.config) || {};
+      that.setData({
+        mailConfigured: !!(c.smtp && c.smtp.host),
+        mpNotifyConfigured: !!(c.notify && c.notify.templateId),
+        notifyTemplateId: (c.notify && c.notify.templateId) || ''
+      });
+    });
+  },
+  noop: function () {},
+  onCloseNotifyModal: function () {
+    this.setData({ showNotifyModal: false });
+  },
+  onNotifyToggle: function (e) {
+    this.setData({ notifyEnabled: e.detail.value });
+  },
+  onNotifyDaysBlur: function (e) {
+    var days = Math.max(1, parseInt(e.detail.value, 10) || 3);
+    this.setData({ notifyDays: days });
+  },
+  onNotifyCleanupBlur: function (e) {
+    var days = Math.max(1, parseInt(e.detail.value, 10) || 7);
+    this.setData({ notifyCleanupDays: days });
+  },
+  onNotifyTemplateInput: function (e) {
+    this.setData({ notifyTemplateId: e.detail.value.trim() });
+  },
+  onTogglePickupHour: function (e) {
+    var h = parseInt(e.currentTarget.dataset.hour, 10);
+    if (h === 8) this.setData({ pickupHour8: !this.data.pickupHour8 });
+    if (h === 20) this.setData({ pickupHour20: !this.data.pickupHour20 });
+  },
+  onToggleDebtHour: function (e) {
+    var h = parseInt(e.currentTarget.dataset.hour, 10);
+    if (h === 8) this.setData({ debtHour8: !this.data.debtHour8 });
+    if (h === 20) this.setData({ debtHour20: !this.data.debtHour20 });
+  },
+  onSetSummaryHour: function (e) {
+    var h = parseInt(e.currentTarget.dataset.hour, 10);
+    this.setData({ summaryHour: h });
+  },
+  onSubscribeNotify: function () {
+    var tmplId = this.data.notifyTemplateId || '2HWGe9LDE0bVe7abqxk7nRQA1zqqUUkUTk1ymx7rzLI';
+    var that = this;
+    wx.requestSubscribeMessage({
+      tmplIds: [tmplId],
+      success: function (res) {
+        var accepted = res[tmplId] === 'accept';
+        that.setData({ subscribeAuthorized: accepted });
+        wx.showToast({ title: accepted ? '订阅成功' : '未授权', icon: 'none' });
+        // 保存 openId 到服务端（服务端通过 session 自动获取，这里只做确认）
+        api.request('POST', '/api/notify/subscribe', {}, function () {
+          // 服务端已记录订阅
+        });
+      },
+      fail: function () {
+        wx.showToast({ title: '订阅失败', icon: 'none' });
+      }
+    });
+  },
+  onSaveNotify: function () {
+    var that = this;
+    var fid = this.data.familyId;
+    // 组装通知配置
+    var pickupHours = [];
+    if (this.data.pickupHour8) pickupHours.push(8);
+    if (this.data.pickupHour20) pickupHours.push(20);
+    if (pickupHours.length === 0) pickupHours = [8];
+    var debtHours = [];
+    if (this.data.debtHour8) debtHours.push(8);
+    if (this.data.debtHour20) debtHours.push(20);
+    if (debtHours.length === 0) debtHours = [8];
+
+    // 保存通知配置
+    var notifyPatch = {
+      enabled: this.data.notifyEnabled,
+      daysBefore: this.data.notifyDays,
+      pickupHours: pickupHours,
+      debtHours: debtHours,
+      summaryHour: this.data.summaryHour
+    };
+    api.request('PUT', '/api/notify/config' + (fid ? '?familyId=' + fid : ''), notifyPatch, function () {
+      wx.setStorageSync('parcel.reminderDays', String(that.data.notifyDays));
+      // 如果有 templateId，走 config 接口保存
+      if (that.data.notifyTemplateId) {
+        api.request('PUT', '/api/config' + (fid ? '?familyId=' + fid : ''), { notify: { templateId: that.data.notifyTemplateId } }, function () {});
+      }
+      // 保存清理天数
+      api.request('PUT', '/api/config' + (fid ? '?familyId=' + fid : ''), { ignoreCleanupDays: that.data.notifyCleanupDays }, function () {
+        wx.setStorageSync('parcel.ignoreCleanupDays', String(that.data.notifyCleanupDays));
+        app.globalData.ignoreCleanupDays = that.data.notifyCleanupDays;
+        that.setData({ showNotifyModal: false });
+        wx.showToast({ title: '已保存', icon: 'success' });
+      }, function () {
+        wx.showToast({ title: '保存失败', icon: 'none' });
+      });
+    }, function () {
+      wx.showToast({ title: '保存失败', icon: 'none' });
+    });
+  },
+
+  // 关于弹窗
+  onOpenAboutModal: function () {
+    this.setData({ showAboutModal: true });
+  },
+  onCloseAboutModal: function () {
+    this.setData({ showAboutModal: false });
+  },
+  onCopyGithub: function () {
+    wx.setClipboardData({ data: 'https://github.com/zsunny6658/family-parcel-hub-api', success: function () { wx.showToast({ title: '已复制', icon: 'success' }); } });
   },
 
   switchFamily: function (e) {

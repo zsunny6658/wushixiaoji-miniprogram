@@ -4,7 +4,8 @@
     <view class="user-bg"></view>
     <view class="user-content">
       <view class="user-avatar-wrap">
-        <view class="user-avatar">{{meFirstChar}}</view>
+        <image wx:if="{{meAvatar}}" class="user-avatar-img" src="{{meAvatar}}" mode="aspectFill" />
+        <view wx:else class="user-avatar">{{meFirstChar}}</view>
       </view>
       <view class="user-details">
         <text class="user-name">{{meName}}</text>
@@ -15,8 +16,9 @@
           <text class="user-family">{{familyName}}</text>
         </view>
       </view>
-      <view class="user-action" hover-class="hover-press">
-        <text class="action-icon">👤</text>
+      <view class="edit-btn" hover-class="hover-press" bindtap="onEditProfile">
+        <text class="edit-btn-text">编辑资料</text>
+        <text class="edit-btn-arrow">›</text>
       </view>
     </view>
   </view>
@@ -37,17 +39,24 @@
   <view class="menu-card">
     <!-- 账户 -->
     <text class="menu-group-title">账户</text>
-    <view class="cell" bindtap="onEditProfile" hover-class="cell-hover">
-      <view class="cell-left">
-        <text class="cell-icon">👤</text>
-        <text class="cell-title">编辑个人资料</text>
-      </view>
-      <text class="cell-arrow">›</text>
-    </view>
     <view class="cell" bindtap="onChangePassword" hover-class="cell-hover">
       <view class="cell-left">
         <text class="cell-icon">🔒</text>
         <text class="cell-title">修改密码</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+    <view class="cell" bindtap="onManageTokens" hover-class="cell-hover">
+      <view class="cell-left">
+        <text class="cell-icon">🔑</text>
+        <text class="cell-title">CLI Token</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+    <view class="cell" bindtap="onManageWebhooks" hover-class="cell-hover">
+      <view class="cell-left">
+        <text class="cell-icon">🔗</text>
+        <text class="cell-title">Webhook</text>
       </view>
       <text class="cell-arrow">›</text>
     </view>
@@ -59,20 +68,6 @@
         <view class="cell-left">
           <text class="cell-icon">👥</text>
           <text class="cell-title">家庭成员</text>
-        </view>
-        <text class="cell-arrow">›</text>
-      </view>
-      <view class="cell" bindtap="onManageTokens" hover-class="cell-hover">
-        <view class="cell-left">
-          <text class="cell-icon">🔑</text>
-          <text class="cell-title">CLI Token</text>
-        </view>
-        <text class="cell-arrow">›</text>
-      </view>
-      <view class="cell" bindtap="onManageWebhooks" hover-class="cell-hover">
-        <view class="cell-left">
-          <text class="cell-icon">🔗</text>
-          <text class="cell-title">Webhook</text>
         </view>
         <text class="cell-arrow">›</text>
       </view>
@@ -102,30 +97,27 @@
 
     <!-- 通知 -->
     <text class="menu-group-title">通知</text>
-    <view class="cell" bindtap="onToggleNotify" hover-class="cell-hover">
+    <view class="cell" bindtap="onOpenNotifyModal" hover-class="cell-hover">
       <view class="cell-left">
         <text class="cell-icon">🔔</text>
-        <text class="cell-title">逾期提醒</text>
+        <text class="cell-title">通知设置</text>
       </view>
       <view class="cell-right">
-        <switch checked="{{notifyEnabled}}" bindchange="onToggleNotify" color="#4f6ef7" />
+        <text class="cell-value">{{notifyEnabled ? '已开启' : '已关闭'}}</text>
+        <text class="cell-arrow">›</text>
       </view>
     </view>
 
     <!-- 关于 -->
     <text class="menu-group-title">关于</text>
-    <view class="cell">
+    <view class="cell" bindtap="onOpenAboutModal" hover-class="cell-hover">
       <view class="cell-left">
-        <text class="cell-icon">📦</text>
-        <text class="cell-title">屋事小记 v1.0.0</text>
+        <view class="cell-icon-wrap">
+          <image class="cell-icon-img" src="/images/logo.png" mode="aspectFit" />
+        </view>
+        <text class="cell-title">屋事小记</text>
       </view>
-    </view>
-    <view class="cell" bindtap="onCopyBaseUrl" hover-class="cell-hover">
-      <view class="cell-left">
-        <text class="cell-icon">🔗</text>
-        <text class="cell-title">服务地址（点击复制）</text>
-      </view>
-      <text class="cell-url">{{baseUrl}}</text>
+      <text class="cell-arrow">›</text>
     </view>
   </view>
 
@@ -145,7 +137,7 @@
 <!-- 创建家庭弹窗 -->
 <view class="modal" wx:if="{{showCreateFamily}}">
   <view class="modal-mask" bindtap="onCancelCreateFamily"></view>
-  <view class="modal-panel">
+  <view class="modal-panel" catchtap="noop">
     <view class="modal-head">
       <text class="modal-title">创建家庭</text>
       <text class="modal-close" bindtap="onCancelCreateFamily">✕</text>
@@ -154,6 +146,151 @@
     <view class="modal-foot">
       <button class="modal-btn modal-btn-cancel" bindtap="onCancelCreateFamily">取消</button>
       <button class="modal-btn modal-btn-confirm" bindtap="onCreateFamily">创建</button>
+    </view>
+  </view>
+</view>
+
+<!-- 通知设置弹窗 -->
+<view class="modal" wx:if="{{showNotifyModal}}">
+  <view class="modal-mask" catchtap="onCloseNotifyModal"></view>
+  <view class="modal-panel" catchtap="noop">
+    <view class="modal-head">
+      <text class="modal-title">通知设置</text>
+      <text class="modal-close" bindtap="onCloseNotifyModal">✕</text>
+    </view>
+    <view class="notify-item">
+      <view class="notify-item-left">
+        <text class="notify-item-icon">🔔</text>
+        <view class="notify-item-text">
+          <text class="notify-item-title">逾期提醒</text>
+          <text class="notify-item-desc">快递逾期前提醒</text>
+        </view>
+      </view>
+      <switch checked="{{notifyEnabled}}" bindchange="onNotifyToggle" color="#4f6ef7" />
+    </view>
+    <view class="notify-item" wx:if="{{notifyEnabled}}">
+      <view class="notify-item-left">
+        <text class="notify-item-icon">⏰</text>
+        <view class="notify-item-text">
+          <text class="notify-item-title">提前天数</text>
+          <text class="notify-item-desc">逾期前多少天提醒</text>
+        </view>
+      </view>
+      <input class="notify-input" type="number" value="{{notifyDays}}" bindblur="onNotifyDaysBlur" />
+    </view>
+    <view class="notify-item">
+      <view class="notify-item-left">
+        <text class="notify-item-icon">🗑️</text>
+        <view class="notify-item-text">
+          <text class="notify-item-title">忽略删除</text>
+          <text class="notify-item-desc">忽略记录自动清理天数</text>
+        </view>
+      </view>
+      <input class="notify-input" type="number" value="{{notifyCleanupDays}}" bindblur="onNotifyCleanupBlur" />
+    </view>
+    <!-- 提醒时间 -->
+    <view class="notify-divider"></view>
+    <text class="notify-section-title">提醒时间</text>
+    <view class="notify-item">
+      <view class="notify-item-left">
+        <text class="notify-item-icon">📦</text>
+        <view class="notify-item-text">
+          <text class="notify-item-title">待取件提醒</text>
+          <text class="notify-item-desc">超过24小时未取时提醒</text>
+        </view>
+      </view>
+      <view class="notify-hours">
+        <text class="hour-tag {{pickupHour8 ? 'hour-active' : ''}}" bindtap="onTogglePickupHour" data-hour="8">8:00</text>
+        <text class="hour-tag {{pickupHour20 ? 'hour-active' : ''}}" bindtap="onTogglePickupHour" data-hour="20">20:00</text>
+      </view>
+    </view>
+    <view class="notify-item">
+      <view class="notify-item-left">
+        <text class="notify-item-icon">💳</text>
+        <view class="notify-item-text">
+          <text class="notify-item-title">还款提醒</text>
+          <text class="notify-item-desc">即将逾期/已逾期时提醒</text>
+        </view>
+      </view>
+      <view class="notify-hours">
+        <text class="hour-tag {{debtHour8 ? 'hour-active' : ''}}" bindtap="onToggleDebtHour" data-hour="8">8:00</text>
+        <text class="hour-tag {{debtHour20 ? 'hour-active' : ''}}" bindtap="onToggleDebtHour" data-hour="20">20:00</text>
+      </view>
+    </view>
+    <view class="notify-item">
+      <view class="notify-item-left">
+        <text class="notify-item-icon">📋</text>
+        <view class="notify-item-text">
+          <text class="notify-item-title">每日汇总</text>
+          <text class="notify-item-desc">每天发送待办概览邮件</text>
+        </view>
+      </view>
+      <view class="notify-hours">
+        <text class="hour-tag {{summaryHour === 8 ? 'hour-active' : ''}}" bindtap="onSetSummaryHour" data-hour="8">8:00</text>
+        <text class="hour-tag {{summaryHour === 20 ? 'hour-active' : ''}}" bindtap="onSetSummaryHour" data-hour="20">20:00</text>
+      </view>
+    </view>
+
+    <!-- 通知方式 -->
+    <view class="notify-divider"></view>
+    <text class="notify-section-title">通知方式</text>
+    <view class="notify-item">
+      <view class="notify-item-left">
+        <text class="notify-item-icon">📱</text>
+        <view class="notify-item-text">
+          <text class="notify-item-title">小程序通知</text>
+          <text class="notify-item-desc">授权后可接收逾期/取件提醒</text>
+        </view>
+      </view>
+    </view>
+    <view class="notify-item notify-subscribe-row">
+      <button class="modal-btn modal-btn-sm modal-btn-outline" bindtap="onSubscribeNotify">🔔 授权订阅消息</button>
+      <text class="notify-status {{subscribeAuthorized ? 'notify-status-enabled' : 'notify-status-disabled'}}">{{subscribeAuthorized ? '已授权' : '未授权'}}</text>
+    </view>
+    <view class="notify-item">
+      <view class="notify-item-left">
+        <text class="notify-item-icon">📧</text>
+        <view class="notify-item-text">
+          <text class="notify-item-title">邮箱通知</text>
+          <text class="notify-item-desc">{{mailConfigured ? '已配置邮箱' : '未配置邮箱'}}</text>
+        </view>
+      </view>
+      <text class="notify-status {{mailConfigured ? 'notify-status-enabled' : 'notify-status-disabled'}}">{{mailConfigured ? '可用' : '不可用'}}</text>
+    </view>
+    <view class="modal-foot">
+      <button class="modal-btn modal-btn-confirm" bindtap="onSaveNotify">保存</button>
+    </view>
+  </view>
+</view>
+
+<!-- 关于弹窗 -->
+<view class="modal" wx:if="{{showAboutModal}}">
+  <view class="modal-mask" bindtap="onCloseAboutModal"></view>
+  <view class="modal-panel about-panel" catchtap="noop">
+    <view class="modal-head">
+      <text class="modal-title">关于</text>
+      <text class="modal-close" bindtap="onCloseAboutModal">✕</text>
+    </view>
+    <view class="about-center">
+      <view class="about-logo-wrap">
+        <image class="about-logo-img" src="/images/logo.png" mode="aspectFit" />
+      </view>
+      <text class="about-name">屋事小记</text>
+      <text class="about-version">v1.0.0</text>
+      <text class="about-desc">快递取件码归集 · 待办管理 · 家庭事务协作</text>
+    </view>
+    <view class="about-info">
+      <view class="about-info-row">
+        <text class="about-info-label">服务端地址</text>
+        <text class="about-info-value">{{baseUrl}}</text>
+      </view>
+      <view class="about-info-row">
+        <text class="about-info-label">开源仓库</text>
+        <text class="about-info-value about-link" bindtap="onCopyGithub">github.com/zsunny6658/family-parcel-hub-api</text>
+      </view>
+    </view>
+    <view class="modal-foot">
+      <button class="modal-btn modal-btn-confirm" bindtap="onCloseAboutModal">关闭</button>
     </view>
   </view>
 </view>
