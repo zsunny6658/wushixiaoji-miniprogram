@@ -9,7 +9,8 @@
     "pages/add/add",
     "pages/detail/detail",
     "pages/members/members",
-    "pages/settings/settings"
+    "pages/settings/settings",
+    "pages/archive/archive"
   ],
   "window": {
     "navigationBarBackgroundColor": "#4A90D9",

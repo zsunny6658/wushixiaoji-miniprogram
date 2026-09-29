@@ -11,6 +11,8 @@ Page({
     editTitle: '',
     type: 'pickup',
     typeIndex: 0,
+    showMore: false,
+    moreFilled: false,
     typeOptions: ['📦 取件码', '📝 文本备忘', '💳 待还款'],
     form: { station: '', code: '', company: '', trackingNo: '', note: '', institution: '', amount: '' },
     dueDateStr: '',
@@ -52,6 +54,7 @@ Page({
         impIndex: ['high', 'medium', 'low'].indexOf(r.importance || 'medium'),
         urgIndex: ['urgent', 'normal'].indexOf(r.urgency || 'normal')
       });
+      this.updateMoreFilled();
       app.globalData._pendingAddData = null;
     }
     if (opts && opts.id) {
@@ -74,6 +77,11 @@ Page({
           impIndex: ['high', 'medium', 'low'].indexOf(pkg.importance || 'medium'),
           urgIndex: ['urgent', 'normal'].indexOf(pkg.urgency || 'normal')
         });
+        // 编辑模式：折叠区有非默认值时自动展开并标记已填写
+        var hasMore = this.data.memberIndex > 0 || this.data.assigneeIndex > 0 ||
+          this.data.assignerIndex > 0 || (pkg.note || '') !== '' ||
+          this.data.impIndex !== 1 || this.data.urgIndex !== 1 || !!pkg.isPrivate;
+        this.setData({ showMore: hasMore, moreFilled: hasMore });
       }
     }
   },
@@ -89,6 +97,23 @@ Page({
     var i = parseInt(e.detail.value, 10);
     var typeMap = { 0: 'pickup', 1: 'todo', 2: 'debt' };
     this.setData({ typeIndex: i, type: typeMap[i] || 'pickup' });
+  },
+  onTypeTap: function (e) {
+    var type = e.currentTarget.dataset.type;
+    var typeMap = { pickup: 0, todo: 1, debt: 2 };
+    if (type === this.data.type) return;
+    this.setData({ type: type, typeIndex: typeMap[type] || 0 });
+  },
+  onToggleMore: function () {
+    if (this.data.showMore) this.updateMoreFilled(); // 收起时刷新徽标
+    this.setData({ showMore: !this.data.showMore });
+  },
+  // 折叠区是否有非默认值（用于「已填写」徽标）
+  updateMoreFilled: function () {
+    var d = this.data;
+    var filled = d.memberIndex > 0 || d.assigneeIndex > 0 || d.assignerIndex > 0 ||
+      (d.form.note || '') !== '' || d.impIndex !== 1 || d.urgIndex !== 1 || d.isPrivate;
+    this.setData({ moreFilled: !!filled });
   },
   onPrivateChange: function (e) {
     this.setData({ isPrivate: e.detail.value });
@@ -266,6 +291,7 @@ Page({
   },
 
   onSave: function () {
+    this.updateMoreFilled();
     var f = this.data.form;
     if (this.data.type === 'pickup' && (!f.station || !f.code)) {
       wx.showToast({ title: '驿站和取件码必填', icon: 'none' }); return;

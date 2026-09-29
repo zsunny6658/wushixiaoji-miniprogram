@@ -278,6 +278,9 @@ Page({
   onManageWebhooks: function () {
     wx.navigateTo({ url: '/pages/settings/settings?action=webhooks' });
   },
+  onOpenArchive: function () {
+    wx.navigateTo({ url: '/pages/archive/archive' });
+  },
   onFamilySettings: function () {
     wx.navigateTo({ url: '/pages/settings/settings?action=mail' });
   },

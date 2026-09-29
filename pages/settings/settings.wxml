@@ -273,7 +273,7 @@
       <text class="section-title">关于</text>
       <view class="about-card">
         <view class="about-logo">📦</view>
-        <text class="about-name">取件小记</text>
+        <text class="about-name">屋事小记</text>
         <text class="about-desc">家庭快递取件码共享平台</text>
         <view class="about-divider"></view>
         <view class="about-row"><text class="about-label">版本</text><text class="about-value">v{{version}}</text></view>

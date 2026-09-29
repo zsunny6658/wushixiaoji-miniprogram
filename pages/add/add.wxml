@@ -27,17 +27,14 @@
 
   <!-- 表单 -->
   <view class="form-section">
-    <view class="form-grid">
-      <view class="field">
-        <text class="field-label">记录类型</text>
-        <picker range="{{typeOptions}}" value="{{typeIndex}}" bindchange="onTypeChange">
-          <view class="field-picker">
-            <text class="field-picker-value">{{typeOptions[typeIndex]}}</text>
-            <text class="field-picker-arrow">▼</text>
-          </view>
-        </picker>
-      </view>
+    <!-- 类型分段切换 -->
+    <view class="type-segmented">
+      <view class="seg-item {{type === 'pickup' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="pickup">📦 取件</view>
+      <view class="seg-item {{type === 'todo' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="todo">📝 备忘</view>
+      <view class="seg-item {{type === 'debt' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="debt">💳 还款</view>
+    </view>
 
+    <view class="form-grid">
       <block wx:if="{{type === 'pickup'}}">
         <view class="field">
           <text class="field-label">取件驿站 <text class="req">*</text></text>
@@ -46,14 +43,6 @@
         <view class="field">
           <text class="field-label">取件码 <text class="req">*</text></text>
           <input class="field-input" placeholder="如：8-3-2201" value="{{form.code}}" bindinput="onField" data-field="code" />
-        </view>
-        <view class="field">
-          <text class="field-label">快递公司</text>
-          <input class="field-input" placeholder="如：中通快递" value="{{form.company}}" bindinput="onField" data-field="company" />
-        </view>
-        <view class="field">
-          <text class="field-label">快递单号</text>
-          <input class="field-input" placeholder="如：781234567" value="{{form.trackingNo}}" bindinput="onField" data-field="trackingNo" />
         </view>
       </block>
 
@@ -68,10 +57,6 @@
         <view class="field">
           <text class="field-label">还款事项 <text class="req">*</text></text>
           <input class="field-input" placeholder="如：招行信用卡还款" value="{{form.code}}" bindinput="onField" data-field="code" />
-        </view>
-        <view class="field">
-          <text class="field-label">金融机构</text>
-          <input class="field-input" placeholder="如：招商银行、花呗、建设银行" value="{{form.institution}}" bindinput="onField" data-field="institution" />
         </view>
         <view class="field">
           <text class="field-label">金额（元）</text>
@@ -91,19 +76,46 @@
 
       <view class="field">
         <text class="field-label">时间</text>
-        <picker mode="date" value="{{dateStr}}" bindchange="onDateChange" end="{{endDate}}">
-          <view class="field-picker">
-            <text class="field-picker-value">{{dateStr}}</text>
-            <text class="field-picker-arrow">▼</text>
-          </view>
-        </picker>
-        <picker mode="time" value="{{timeStr}}" bindchange="onTimeChange">
-          <view class="field-picker field-picker-second">
-            <text class="field-picker-value">{{timeStr}}</text>
-            <text class="field-picker-arrow">▼</text>
-          </view>
-        </picker>
+        <view class="datetime-row">
+          <picker mode="date" value="{{dateStr}}" bindchange="onDateChange" end="{{endDate}}">
+            <view class="field-picker">
+              <text class="field-picker-value">{{dateStr}}</text>
+              <text class="field-picker-arrow">▼</text>
+            </view>
+          </picker>
+          <picker mode="time" value="{{timeStr}}" bindchange="onTimeChange">
+            <view class="field-picker">
+              <text class="field-picker-value">{{timeStr}}</text>
+              <text class="field-picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
       </view>
+    </view>
+
+    <!-- 更多选项折叠区 -->
+    <view class="more-toggle" bindtap="onToggleMore">
+      <text>{{showMore ? '收起选项 ▲' : '更多选项 ▼'}}</text>
+      <text class="more-badge" wx:if="{{!showMore && moreFilled}}">已填写</text>
+    </view>
+    <view class="more-section" wx:if="{{showMore}}">
+      <block wx:if="{{type === 'pickup'}}">
+        <view class="field">
+          <text class="field-label">快递公司</text>
+          <input class="field-input" placeholder="如：中通快递" value="{{form.company}}" bindinput="onField" data-field="company" />
+        </view>
+        <view class="field">
+          <text class="field-label">快递单号</text>
+          <input class="field-input" placeholder="如：781234567" value="{{form.trackingNo}}" bindinput="onField" data-field="trackingNo" />
+        </view>
+      </block>
+
+      <block wx:if="{{type === 'debt'}}">
+        <view class="field">
+          <text class="field-label">金融机构</text>
+          <input class="field-input" placeholder="如：招商银行、花呗、建设银行" value="{{form.institution}}" bindinput="onField" data-field="institution" />
+        </view>
+      </block>
 
       <view class="field">
         <text class="field-label">归属成员</text>

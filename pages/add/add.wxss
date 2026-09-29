@@ -145,6 +145,66 @@
   margin-top: var(--spacing-xs);
 }
 .req { color: var(--color-error); margin-left: 4rpx; }
+.field-hint {
+  display: block;
+  font-size: var(--font-body-sm);
+  color: var(--text-tertiary);
+  margin-top: var(--spacing-xs);
+}
+
+/* 类型分段切换 */
+.type-segmented {
+  display: flex;
+  background: var(--bg-page);
+  border-radius: var(--radius-md);
+  padding: 6rpx;
+  margin-bottom: var(--spacing-md);
+}
+.seg-item {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: var(--font-body-sm);
+  color: var(--text-secondary);
+  border-radius: calc(var(--radius-md) - 4rpx);
+  transition: all 0.15s;
+}
+.seg-active {
+  background: var(--bg-card);
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-1);
+}
+
+/* 时间双列 */
+.datetime-row {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+.datetime-row picker { flex: 1; }
+
+/* 更多选项折叠 */
+.more-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  padding: 20rpx 0 4rpx;
+  margin-top: var(--spacing-sm);
+  border-top: 2rpx solid var(--border);
+  font-size: var(--font-body-sm);
+  color: var(--text-tertiary);
+}
+.more-badge {
+  font-size: 22rpx;
+  color: var(--color-primary);
+  background: var(--bg-page);
+  border-radius: 999rpx;
+  padding: 2rpx 14rpx;
+}
+.more-section {
+  padding-top: var(--spacing-md);
+}
 
 /* 底部操作 */
 .footer-actions {

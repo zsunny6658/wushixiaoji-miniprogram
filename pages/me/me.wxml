@@ -53,6 +53,13 @@
       </view>
       <text class="cell-arrow">›</text>
     </view>
+    <view class="cell" bindtap="onOpenArchive" hover-class="cell-hover">
+      <view class="cell-left">
+        <text class="cell-icon">🗄️</text>
+        <text class="cell-title">归档记录</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
     <view class="cell" bindtap="onManageWebhooks" hover-class="cell-hover">
       <view class="cell-left">
         <text class="cell-icon">🔗</text>

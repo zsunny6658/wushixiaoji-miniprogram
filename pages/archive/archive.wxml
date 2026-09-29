@@ -1,0 +1,29 @@
+<view class="page">
+  <view class="arch-list" wx:if="{{items.length}}">
+    <view class="arch-item" wx:for="{{items}}" wx:key="id">
+      <view class="arch-main" bindtap="onViewDetail" data-id="{{item.id}}" hover-class="hover-press">
+        <view class="arch-icon">{{item.icon}}</view>
+        <view class="arch-body">
+          <view class="arch-title-row">
+            <text class="arch-title">{{item.title}}</text>
+            <text class="arch-type">{{item.typeLabel}}</text>
+          </view>
+          <view class="arch-sub" wx:if="{{item.sub}}">{{item.sub}}</view>
+          <view class="arch-time">归档于 {{item.archivedAtText}}</view>
+        </view>
+      </view>
+      <view class="arch-actions">
+        <view class="arch-btn" catchtap="onUnarchive" data-id="{{item.id}}" hover-class="hover-press">↩ 取消归档</view>
+      </view>
+    </view>
+    <view class="arch-loading" wx:if="{{loadingMore}}">加载中...</view>
+  </view>
+
+  <view class="arch-empty" wx:elif="{{!loading}}">
+    <text class="arch-empty-icon">🗄️</text>
+    <text class="arch-empty-text">暂无归档记录</text>
+    <text class="arch-empty-hint">在详情页选择「归档」后，记录会收纳到这里</text>
+  </view>
+
+  <view class="arch-bottom-spacer"></view>
+</view>
