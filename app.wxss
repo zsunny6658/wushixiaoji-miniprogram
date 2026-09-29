@@ -27,9 +27,9 @@ page {
   --shadow-3: 0 16rpx 48rpx rgba(0,0,0,0.14);
 
   /* 色彩 - 品牌（#6B9FD4 浅天蓝，调浅） */
-  --color-primary: #6B9FD4;
+  --color-primary: #4A90D9;
   --color-primary-light: #EEF4FB;
-  --color-primary-dark: #3B5976;
+  --color-primary-dark: #2F6CB3;
 
   /* 色彩 - 功能（调浅） */
   --color-success: #66BB6A;
@@ -147,7 +147,7 @@ page {
   box-sizing: border-box;
 }
 .btn::after { border: none; }
-.btn-primary { background: var(--color-primary); color: #fff; box-shadow: 0 4rpx 12rpx rgba(74,144,217,0.25); }
+.btn-primary { background: linear-gradient(135deg, #4A90D9, #5B8DEF); color: #fff; border: none; box-shadow: 0 6rpx 16rpx rgba(74,144,217,0.32); }
 .btn-secondary { background: var(--bg-card); color: var(--color-primary); border: 2rpx solid var(--color-primary); }
 .btn-danger { background: var(--color-error); color: #fff; box-shadow: 0 4rpx 12rpx rgba(229,57,53,0.2); }
 .btn-text { background: transparent; color: var(--color-primary); padding: 16rpx 24rpx; min-height: 72rpx; }

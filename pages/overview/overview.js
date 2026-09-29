@@ -58,7 +58,7 @@ Page({
     helpers.sortPackages(pendingPkgs);
     var latestPending = pendingPkgs.slice(0, 5);
     latestPending.forEach(function (p) {
-      p._iconName = p.importance === 'high' ? 'flag' : (p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : 'clipboard'));
+      p._iconName = p.importance === 'high' ? 'flag' : (p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : (p.type === 'medication' ? 'pill' : 'clipboard')));
       p._iconColor = p.importance === 'high' ? '#EF4444' : '#718096';
       p._text = p.summaryText || p.title || p.code;
       p._time = p.arrivedLabel;
@@ -71,7 +71,7 @@ Page({
     var acts = [];
     pkgs.forEach(function (p) {
       if (p.createdAt && p.createdAt.indexOf(todayPrefix) === 0) {
-        acts.push({ id: p.id + ':new', time: p.createdAt, iconName: p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : 'clipboard'),
+        acts.push({ id: p.id + ':new', time: p.createdAt, iconName: p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : (p.type === 'medication' ? 'pill' : 'clipboard')),
           text: '新增「' + (p.summaryText || p.title || p.code || '') + '」', cls: 'act-new' });
       }
       if (p.status === 'picked' && p.pickedAt && p.pickedAt.indexOf(todayPrefix) === 0) {

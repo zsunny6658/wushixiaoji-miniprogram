@@ -8,16 +8,20 @@
 /* 问候语 */
 .greeting {
   margin-bottom: var(--spacing-md);
+  background: linear-gradient(135deg, #4A90D9 0%, #5B8DEF 65%, #6FA6F0 100%);
+  border-radius: var(--radius-lg);
+  padding: 32rpx 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(74, 144, 217, 0.28);
 }
 .greeting-text {
   font-size: var(--font-title);
   font-weight: 700;
-  color: var(--text-primary);
+  color: #fff;
   letter-spacing: -0.02em;
 }
 .greeting-date {
   font-size: var(--font-body-sm);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85);
   margin-top: var(--spacing-xs);
 }
 
@@ -47,10 +51,23 @@
   transform: scale(0.97);
 }
 .stat-icon {
+  width: 72rpx;
+  height: 72rpx;
+  margin: 0 auto 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   font-size: 40rpx;
   line-height: 1;
-  margin-bottom: 4rpx;
 }
+.s-pickup .stat-icon { background: rgba(74, 144, 217, 0.12); }
+.s-todo .stat-icon { background: rgba(255, 167, 38, 0.15); }
+.s-debt .stat-icon { background: rgba(239, 83, 80, 0.10); }
+.s-private .stat-icon { background: rgba(100, 116, 139, 0.14); }
+.s-overdue .stat-icon { background: rgba(239, 83, 80, 0.12); }
+.s-done .stat-icon { background: rgba(16, 185, 129, 0.12); }
+.s-ignored .stat-icon { background: rgba(156, 163, 175, 0.16); }
 .stat-num {
   font-size: var(--font-heading);
   font-weight: 700;

@@ -410,3 +410,9 @@
   background: var(--color-error) !important;
   box-shadow: 0 8rpx 24rpx rgba(229, 57, 53, 0.4) !important;
 }
+
+/* 用药标签 */
+.tag-med {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10B981;
+}

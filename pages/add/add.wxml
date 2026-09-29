@@ -32,6 +32,7 @@
       <view class="seg-item {{type === 'pickup' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="pickup"><ficon name="box" size="30" color="{{type === 'pickup' ? '#4A90D9' : '#718096'}}" /> 取件</view>
       <view class="seg-item {{type === 'todo' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="todo"><ficon name="clipboard" size="30" color="{{type === 'todo' ? '#4A90D9' : '#718096'}}" /> 备忘</view>
       <view class="seg-item {{type === 'debt' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="debt"><ficon name="creditcard" size="30" color="{{type === 'debt' ? '#4A90D9' : '#718096'}}" /> 还款</view>
+      <view class="seg-item {{type === 'medication' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="medication"><ficon name="pill" size="30" color="{{type === 'medication' ? '#4A90D9' : '#718096'}}" /> 用药</view>
     </view>
 
     <view class="form-grid">
@@ -71,6 +72,31 @@
             </view>
           </picker>
           <text class="field-hint">到期将收到逾期提醒</text>
+        </view>
+      </block>
+
+      <block wx:if="{{type === 'medication'}}">
+        <view class="field">
+          <text class="field-label">药品名称 <text class="req">*</text></text>
+          <input class="field-input" placeholder="如：阿莫西林" value="{{form.code}}" bindinput="onField" data-field="code" />
+        </view>
+        <view class="field">
+          <text class="field-label">每日次数</text>
+          <picker range="{{doseOptions}}" value="{{doseIndex}}" bindchange="onDoseChange">
+            <view class="field-picker">
+              <text class="field-picker-value">{{doseOptions[doseIndex]}}</text>
+              <text class="field-picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+        <view class="field">
+          <text class="field-label">服药时间</text>
+          <view class="med-times">
+            <picker wx:for="{{medTimes}}" wx:key="index" mode="time" value="{{item}}" data-idx="{{index}}" bindchange="onMedTimeChange">
+              <view class="med-time-chip">{{item}}</view>
+            </picker>
+          </view>
+          <text class="field-hint">到点将通过邮件/订阅消息提醒</text>
         </view>
       </block>
 
@@ -175,7 +201,7 @@
       <view class="field">
         <text class="field-label">可见范围</text>
         <view class="private-toggle">
-          <switch checked="{{isPrivate}}" bindchange="onPrivateChange" color="#4f6ef7" />
+          <switch checked="{{isPrivate}}" bindchange="onPrivateChange" color="#4A90D9" />
           <view class="private-label"><ficon style="vertical-align:-4rpx;margin-right:6rpx" name="{{isPrivate ? 'lock' : 'users'}}" size="26" color="{{isPrivate ? '#64748B' : '#4A90D9'}}" /> {{isPrivate ? '仅本人可见' : '家庭成员可见'}}</view>
         </view>
       </view>

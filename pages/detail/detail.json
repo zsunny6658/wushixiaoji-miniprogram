@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "详情",
-  "navigationBarBackgroundColor": "#4f6ef7",
+  "navigationBarBackgroundColor": "#4A90D9",
   "navigationBarTextStyle": "white",
   "usingComponents": { "ficon": "/components/ficon/index" }
 }

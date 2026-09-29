@@ -19,7 +19,7 @@ Page({
     urgOptions: ['紧迫性：全部', '⚡ 紧急', '🕐 普通'],
     urgIndex: 0,
     groupOptions: ['不分组', '按成员', '按待办类型'],
-    typeOptions: ['全部', '取件', '备忘', '待还'],
+    typeOptions: ['全部', '取件', '备忘', '待还', '用药'],
     scopeOptions: ['全部', '👨‍👩‍👧 家庭', '🔒 个人'],
     scopeIndex: 0,
     groupIndex: 0,

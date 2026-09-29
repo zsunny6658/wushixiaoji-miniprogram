@@ -13,7 +13,10 @@ Page({
     typeIndex: 0,
     showMore: false,
     moreFilled: false,
-    typeOptions: ['📦 取件码', '📝 文本备忘', '💳 待还款'],
+    typeOptions: ['📦 取件码', '📝 文本备忘', '💳 待还款', '💊 用药提醒'],
+    doseOptions: ['每日1次', '每日2次', '每日3次', '每日4次'],
+    doseIndex: 1,
+    medTimes: ['08:00', '20:00'],
     form: { station: '', code: '', company: '', trackingNo: '', note: '', institution: '', amount: '' },
     dueDateStr: '',
     isPrivate: false,
@@ -47,7 +50,7 @@ Page({
       var r = app.globalData._pendingAddData;
       this.setData({
         type: r.type || 'pickup',
-        typeIndex: (r.type === 'todo') ? 1 : (r.type === 'debt' ? 2 : 0),
+        typeIndex: this.typeIndexOf(r.type),
         form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '', institution: r.institution || '', amount: r.amount ? String(r.amount) : '' },
         dueDateStr: r.dueDate || '',
         isPrivate: !!r.isPrivate,
@@ -93,16 +96,30 @@ Page({
     return idx >= 0 ? idx + 1 : 0;
   },
 
+  typeIndexOf: function (type) {
+    return type === 'todo' ? 1 : (type === 'debt' ? 2 : (type === 'medication' ? 3 : 0));
+  },
   onTypeChange: function (e) {
     var i = parseInt(e.detail.value, 10);
-    var typeMap = { 0: 'pickup', 1: 'todo', 2: 'debt' };
+    var typeMap = { 0: 'pickup', 1: 'todo', 2: 'debt', 3: 'medication' };
     this.setData({ typeIndex: i, type: typeMap[i] || 'pickup' });
   },
   onTypeTap: function (e) {
     var type = e.currentTarget.dataset.type;
-    var typeMap = { pickup: 0, todo: 1, debt: 2 };
+    var typeMap = { pickup: 0, todo: 1, debt: 2, medication: 3 };
     if (type === this.data.type) return;
     this.setData({ type: type, typeIndex: typeMap[type] || 0 });
+  },
+  onDoseChange: function (e) {
+    var idx = parseInt(e.detail.value, 10);
+    var defaults = [['08:00'], ['08:00', '20:00'], ['08:00', '13:00', '20:00'], ['08:00', '12:00', '18:00', '22:00']];
+    this.setData({ doseIndex: idx, medTimes: defaults[idx] || ['08:00', '20:00'] });
+  },
+  onMedTimeChange: function (e) {
+    var idx = parseInt(e.currentTarget.dataset.idx, 10);
+    var times = this.data.medTimes.slice();
+    times[idx] = e.detail.value;
+    this.setData({ medTimes: times });
   },
   onToggleMore: function () {
     if (this.data.showMore) this.updateMoreFilled(); // 收起时刷新徽标
@@ -274,7 +291,7 @@ Page({
       var d = new Date(r.arrivedAt || Date.now());
       that.setData({
         type: r.type || 'pickup',
-        typeIndex: (r.type === 'todo') ? 1 : (r.type === 'debt' ? 2 : 0),
+        typeIndex: this.typeIndexOf(r.type),
         form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '', institution: r.institution || '', amount: r.amount ? String(r.amount) : '' },
       dueDateStr: r.dueDate || '',
         isPrivate: r.type === 'debt' ? true : false,
@@ -299,6 +316,9 @@ Page({
     if (this.data.type === 'todo' && !f.code) {
       wx.showToast({ title: '备忘内容必填', icon: 'none' }); return;
     }
+    if (this.data.type === 'medication' && !f.code) {
+      wx.showToast({ title: '药品名称必填', icon: 'none' }); return;
+    }
     var that = this;
     var arrivedAt = this.data.dateStr + 'T' + this.data.timeStr;
     var memberName = this.data.memberOptions[this.data.memberIndex];
@@ -320,6 +340,9 @@ Page({
       dueDate: this.data.dueDateStr || '',
       isPrivate: this.data.isPrivate
     };
+    if (this.data.type === 'medication') {
+      data.schedule = { times: this.data.medTimes, active: true };
+    }
     wx.showLoading({ title: '保存中...' });
     if (this.data.editId) {
       api.updatePackage(this.data.editId, data, function () {

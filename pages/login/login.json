@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "登录",
-  "navigationBarBackgroundColor": "#667eea",
+  "navigationBarBackgroundColor": "#4A90D9",
   "navigationBarTextStyle": "white",
   "usingComponents": {
     "ficon": "/components/ficon/index"

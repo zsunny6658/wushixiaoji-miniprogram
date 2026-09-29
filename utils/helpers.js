@@ -141,6 +141,7 @@ function decorate(p, members) {
   d.amount = p.amount || 0;
   d.amountLabel = p.amount ? formatAmount(p.amount) : '';
   d.institution = p.institution || '';
+  d.scheduleLabel = (p.schedule && Array.isArray(p.schedule.times) && p.schedule.times.length) ? p.schedule.times.join(' / ') : '';
   d.dueDate = p.dueDate || '';
   d.dueLabel = dueLabel(p.dueDate);
   d.dueDays = dueDays(p.dueDate);

@@ -6,6 +6,7 @@
       <view class="seg-item {{recordType === 'pickup' ? 'seg-active' : ''}}" bindtap="switchType" data-type="pickup">取件</view>
       <view class="seg-item {{recordType === 'todo' ? 'seg-active' : ''}}" bindtap="switchType" data-type="todo">备忘</view>
       <view class="seg-item {{recordType === 'debt' ? 'seg-active' : ''}}" bindtap="switchType" data-type="debt">待还</view>
+      <view class="seg-item {{recordType === 'medication' ? 'seg-active' : ''}}" bindtap="switchType" data-type="medication">用药</view>
     </view>
   </view>
   <!-- 状态 tab -->
@@ -91,10 +92,11 @@
                     <text class="tag tag-primary" wx:if="{{item.type === 'pickup'}}">取件</text>
                     <text class="tag tag-warning" wx:if="{{item.type === 'todo'}}">备忘</text>
                     <text class="tag tag-debt" wx:if="{{item.type === 'debt'}}">待还</text>
+                    <text class="tag tag-med" wx:if="{{item.type === 'medication'}}">用药</text>
                     <view class="tag tag-private" wx:if="{{item.isPrivate}}"><ficon style="vertical-align:-4rpx" name="lock" size="22" color="#64748B" /></view>
                   </view>
                   <view class="card-info-group">
-                    <view class="meta-item {{item.overdue ? 'time-warn' : ''}}" wx:if="{{item.arrivedAt}}"><ficon wx:if="{{item.type === 'debt'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="creditcard" size="24" color="#9CA3AF" /><ficon wx:else name="clock" size="24" color="#9CA3AF" /> {{item.arrivedLabel}}</view>
+                    <view class="meta-item {{item.overdue ? 'time-warn' : ''}}" wx:if="{{item.arrivedAt}}"><ficon wx:if="{{item.type === 'debt'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="creditcard" size="24" color="#9CA3AF" /><ficon wx:elif="{{item.type === 'medication'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="pill" size="24" color="#9CA3AF" /><ficon wx:else name="clock" size="24" color="#9CA3AF" /> {{item.arrivedLabel}}</view>
                     <text class="meta-item imp-{{item.importance}}">{{item.impLabel}}</text>
                     <text class="meta-item urg-{{item.urgency}}">{{item.urgLabel}}</text>
                     <text class="tag tag-success" wx:if="{{item.assignee}}">@{{item.assignee}}</text>
@@ -134,10 +136,11 @@
                     <text class="tag tag-primary" wx:if="{{pkg.type === 'pickup'}}">取件</text>
                     <text class="tag tag-warning" wx:if="{{pkg.type === 'todo'}}">备忘</text>
                     <text class="tag tag-debt" wx:if="{{pkg.type === 'debt'}}">待还</text>
+                    <text class="tag tag-med" wx:if="{{pkg.type === 'medication'}}">用药</text>
                     <view class="tag tag-private" wx:if="{{pkg.isPrivate}}"><ficon style="vertical-align:-4rpx" name="lock" size="22" color="#64748B" /></view>
                   </view>
                   <view class="card-info-group">
-                    <view class="meta-item {{pkg.overdue ? 'time-warn' : ''}}" wx:if="{{pkg.arrivedAt}}"><ficon wx:if="{{pkg.type === 'debt'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="creditcard" size="24" color="#9CA3AF" /><ficon wx:else name="clock" size="24" color="#9CA3AF" /> {{pkg.arrivedLabel}}</view>
+                    <view class="meta-item {{pkg.overdue ? 'time-warn' : ''}}" wx:if="{{pkg.arrivedAt}}"><ficon wx:if="{{pkg.type === 'debt'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="creditcard" size="24" color="#9CA3AF" /><ficon wx:elif="{{pkg.type === 'medication'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="pill" size="24" color="#9CA3AF" /><ficon wx:else name="clock" size="24" color="#9CA3AF" /> {{pkg.arrivedLabel}}</view>
                     <text class="meta-item imp-{{pkg.importance}}">{{pkg.impLabel}}</text>
                     <text class="meta-item urg-{{pkg.urgency}}">{{pkg.urgLabel}}</text>
                     <text class="tag tag-success" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>

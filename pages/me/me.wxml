@@ -173,7 +173,7 @@
           <text class="notify-item-desc">快递逾期前提醒</text>
         </view>
       </view>
-      <switch checked="{{notifyEnabled}}" bindchange="onNotifyToggle" color="#4f6ef7" />
+      <switch checked="{{notifyEnabled}}" bindchange="onNotifyToggle" color="#4A90D9" />
     </view>
     <view class="notify-item" wx:if="{{notifyEnabled}}">
       <view class="notify-item-left">
