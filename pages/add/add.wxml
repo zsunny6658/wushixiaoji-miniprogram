@@ -87,6 +87,7 @@
               <text class="ds-name">{{item.name}}</text>
               <text class="ds-note">{{item.note}}</text>
             </view>
+            <view class="ds-empty" wx:if="{{suggestEmpty}}">词库暂无此药 · 可直接保存，或点「搜形态」AI 推测</view>
           </view>
         </view>
         <view class="field">

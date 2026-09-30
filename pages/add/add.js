@@ -268,13 +268,16 @@ Page({
     var that = this;
     if (this._suggestTimer) clearTimeout(this._suggestTimer);
     if (!v || !v.trim()) {
-      this.setData({ showDrugSuggest: false, drugSuggests: [] });
+      this.setData({ showDrugSuggest: false, drugSuggests: [], suggestEmpty: false });
       return;
     }
     this._suggestTimer = setTimeout(function () {
       api.suggestDrugs(v.trim(), function (res) {
         var items = (res && res.items) || [];
-        that.setData({ showDrugSuggest: items.length > 0, drugSuggests: items });
+        // 有候选显示候选；无候选显示空态提示（证明联想链路已通，方便区分"功能没生效"与"词库无此药"）
+        that.setData({ showDrugSuggest: true, drugSuggests: items, suggestEmpty: items.length === 0 });
+      }, function () {
+        that.setData({ showDrugSuggest: false, drugSuggests: [], suggestEmpty: false });
       });
     }, 300);
   },
@@ -282,7 +285,7 @@ Page({
   // 点击联想项：填入药名并搜索形态
   onDrugSuggestTap: function (e) {
     var name = e.currentTarget.dataset.name;
-    this.setData({ 'form.code': name, showDrugSuggest: false, drugSuggests: [] });
+    this.setData({ 'form.code': name, showDrugSuggest: false, drugSuggests: [], suggestEmpty: false });
     this.lookupDrugAppearance(name);
   },
 

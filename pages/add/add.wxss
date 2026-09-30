@@ -439,3 +439,8 @@
   border: 2rpx solid rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
 }
+.ds-empty {
+  padding: 18rpx 24rpx;
+  font-size: 24rpx;
+  color: var(--text-tertiary, #94A3B8);
+}
