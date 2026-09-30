@@ -177,6 +177,20 @@
     </view>
     <view class="notify-item" wx:if="{{notifyEnabled}}">
       <view class="notify-item-left">
+        <ficon class="notify-item-icon" name="flag" size="36" color="#EF4444" />
+        <view class="notify-item-text">
+          <text class="notify-item-title">通知范围</text>
+          <text class="notify-item-desc">默认重要或紧急才推送；用药/逾期不受限</text>
+        </view>
+      </view>
+      <view class="level-seg">
+        <view class="level-seg-item {{minLevel === 'all' ? 'level-seg-active' : ''}}" bindtap="onMinLevelTap" data-level="all">全部</view>
+        <view class="level-seg-item {{minLevel === 'important' ? 'level-seg-active' : ''}}" bindtap="onMinLevelTap" data-level="important">重要</view>
+        <view class="level-seg-item {{minLevel === 'flag' ? 'level-seg-active' : ''}}" bindtap="onMinLevelTap" data-level="flag">红旗</view>
+      </view>
+    </view>
+    <view class="notify-item" wx:if="{{notifyEnabled}}">
+      <view class="notify-item-left">
         <ficon class="notify-item-icon" name="clock" size="36" color="#718096" />
         <view class="notify-item-text">
           <text class="notify-item-title">提前天数</text>

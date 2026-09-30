@@ -14,6 +14,7 @@ Page({
     isAdmin: false,
     familyId: '',
     families: [],
+    minLevel: 'important',
     baseUrl: 'https://parcel.zsunny.top',
     viewOptions: ['📋 列表', '🎯 四象限'],
     viewIndex: 0,
@@ -131,6 +132,7 @@ Page({
         that.setData({
           notifyEnabled: n.enabled !== false,
           notifyDays: n.daysBefore || 3,
+          minLevel: n.minLevel || 'important',
           pickupHour8: ph.indexOf(8) >= 0,
           pickupHour20: ph.indexOf(20) >= 0,
           debtHour8: dh.indexOf(8) >= 0,
@@ -159,6 +161,9 @@ Page({
   onNotifyDaysBlur: function (e) {
     var days = Math.max(1, parseInt(e.detail.value, 10) || 3);
     this.setData({ notifyDays: days });
+  },
+  onMinLevelTap: function (e) {
+    this.setData({ minLevel: e.currentTarget.dataset.level });
   },
   onNotifyCleanupBlur: function (e) {
     var days = Math.max(1, parseInt(e.detail.value, 10) || 7);
@@ -219,7 +224,8 @@ Page({
       daysBefore: this.data.notifyDays,
       pickupHours: pickupHours,
       debtHours: debtHours,
-      summaryHour: this.data.summaryHour
+      summaryHour: this.data.summaryHour,
+      minLevel: this.data.minLevel
     };
     api.request('PUT', '/api/notify/config' + (fid ? '?familyId=' + fid : ''), notifyPatch, function () {
       wx.setStorageSync('parcel.reminderDays', String(that.data.notifyDays));

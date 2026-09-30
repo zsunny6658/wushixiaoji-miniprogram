@@ -589,3 +589,24 @@
   padding: 12rpx 24rpx;
   font-size: var(--font-body-sm);
 }
+
+/* 通知范围三档选择 */
+.level-seg {
+  display: flex;
+  background: var(--bg-page, #F1F5F9);
+  border-radius: 999rpx;
+  padding: 4rpx;
+  flex-shrink: 0;
+}
+.level-seg-item {
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  color: var(--text-tertiary, #94A3B8);
+}
+.level-seg-item.level-seg-active {
+  background: #fff;
+  color: #EF4444;
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(15, 42, 86, 0.08);
+}
