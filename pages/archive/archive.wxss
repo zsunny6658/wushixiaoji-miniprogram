@@ -104,3 +104,8 @@
   background: rgba(16, 185, 129, 0.12);
   color: #0F6E56;
 }
+
+.arch-type-ignored {
+  background: rgba(245, 158, 11, 0.14);
+  color: #854F0B;
+}

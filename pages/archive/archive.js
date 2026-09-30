@@ -46,6 +46,7 @@ Page({
         else if (p.type === 'debt') {
           sub = (p.institution ? p.institution + ' · ' : '') + (p.amount ? '¥' + p.amount : '');
         }
+        var fromLabel = p.archiveFrom === 'picked' ? '已完成归档' : (p.archiveFrom === 'ignored' ? '已忽略归档' : '');
         return {
           id: p.id,
           icon: meta.icon,
@@ -53,7 +54,7 @@ Page({
           title: p.title || p.code || '(无标题)',
           sub: sub,
           archivedAtText: fmtTime(p.updatedAt),
-          fromPicked: p.archiveFrom === 'picked'
+          fromLabel: fromLabel
         };
       });
       that.setData({ items: items, loading: false });

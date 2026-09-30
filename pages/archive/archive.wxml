@@ -7,7 +7,7 @@
           <view class="arch-title-row">
             <text class="arch-title">{{item.title}}</text>
             <text class="arch-type">{{item.typeLabel}}</text>
-            <text class="arch-type arch-type-done" wx:if="{{item.fromPicked}}">已完成归档</text>
+            <text class="arch-type {{item.fromLabel === '已忽略归档' ? 'arch-type-ignored' : 'arch-type-done'}}" wx:if="{{item.fromLabel}}">{{item.fromLabel}}</text>
           </view>
           <view class="arch-sub" wx:if="{{item.sub}}">{{item.sub}}</view>
           <view class="arch-time">归档于 {{item.archivedAtText}}</view>

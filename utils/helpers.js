@@ -156,20 +156,22 @@ function decorate(p, members) {
   d.dueDate = p.dueDate || '';
   d.dueLabel = dueLabel(p.dueDate);
   d.dueDays = dueDays(p.dueDate);
-  // 忽略自动删除倒计时：天数从 globalData 读取
-  var cleanupDays = (typeof getApp === 'function') && getApp().globalData.ignoreCleanupDays
-    ? getApp().globalData.ignoreCleanupDays : 7;
+  // 忽略超期处理倒计时：天数/模式从 globalData 读取（delete=删除 | archive=转归档）
+  var gd2 = (typeof getApp === 'function') && getApp().globalData ? getApp().globalData : {};
+  var cleanupDays = gd2.ignoreCleanupDays ? gd2.ignoreCleanupDays : 7;
+  var cleanupMode = gd2.ignoreCleanupMode === 'archive' ? 'archive' : 'delete';
+  var actionText = cleanupMode === 'archive' ? '转入归档' : '自动删除';
   d.ignoreDeleteLabel = '';
   if (p.status === 'ignored' && p.ignoreAt) {
     var ignoreTs = Date.parse(p.ignoreAt);
     if (!isNaN(ignoreTs)) {
       var remainMs = (ignoreTs + cleanupDays * 86400000) - Date.now();
       if (remainMs <= 0) {
-        d.ignoreDeleteLabel = '将自动删除';
+        d.ignoreDeleteLabel = '将' + actionText;
       } else {
         var remainDate = new Date(ignoreTs + cleanupDays * 86400000);
         var dateStr = (remainDate.getMonth() + 1) + '月' + remainDate.getDate() + '日';
-        d.ignoreDeleteLabel = '将在' + dateStr + '自动删除';
+        d.ignoreDeleteLabel = '将在' + dateStr + actionText;
       }
     }
   }

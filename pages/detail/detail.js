@@ -172,14 +172,15 @@ Page({
         var opt = options[res.tapIndex];
         if (!opt) return;
         if (opt.days < 0) {
-          // 仅忽略本次：进入忽略态，按清理天数自动删除
+          // 仅忽略本次：进入忽略态，按清理模式到期删除或转归档
           var days = app.globalData.ignoreCleanupDays || 7;
+          var toArch = app.globalData.ignoreCleanupMode === 'archive';
           self.optimisticUpdate(id, { status: 'ignored' });
           api.updatePackage(id, { status: 'ignored' }, null, function () {
             self.loadDetail(id);
             wx.showToast({ title: '操作失败', icon: 'none' });
           });
-          wx.showToast({ title: '已忽略，' + days + '天后自动删除', icon: 'none' });
+          wx.showToast({ title: '已忽略，' + days + '天后' + (toArch ? '转入归档' : '自动删除'), icon: 'none' });
         } else {
           // 长期/永久忽略：创建规则，相似待办自动忽略
           self.optimisticUpdate(id, { status: 'ignored' });

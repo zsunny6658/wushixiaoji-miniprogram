@@ -210,11 +210,18 @@
       <view class="notify-item-left">
         <ficon class="notify-item-icon" name="trash" size="36" color="#718096" />
         <view class="notify-item-text">
-          <text class="notify-item-title">忽略删除</text>
-          <text class="notify-item-desc">忽略记录自动清理天数</text>
+          <text class="notify-item-title">忽略处理</text>
+          <text class="notify-item-desc">忽略超过保留天数后自动处理</text>
         </view>
       </view>
       <input class="notify-input" type="number" value="{{notifyCleanupDays}}" bindblur="onNotifyCleanupBlur" />
+    </view>
+    <view class="notify-item notify-subscribe-row">
+      <view class="notify-hours">
+        <text class="hour-tag {{ignoreCleanupMode === 'delete' ? 'hour-active' : ''}}" bindtap="onIgnoreModeTap" data-mode="delete">删除</text>
+        <text class="hour-tag {{ignoreCleanupMode === 'archive' ? 'hour-active' : ''}}" bindtap="onIgnoreModeTap" data-mode="archive">转归档</text>
+      </view>
+      <text class="notify-item-desc">超期后 {{ignoreCleanupMode === 'archive' ? '转入归档区，可恢复' : '直接删除，不可恢复'}}</text>
     </view>
     <view class="notify-item">
       <view class="notify-item-left">

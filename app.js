@@ -25,6 +25,7 @@ App({
     group: 'type',
     search: '',
     ignoreCleanupDays: 7,
+    ignoreCleanupMode: 'delete',
     meId: '',
     stateLastFetch: 0
   },
@@ -37,6 +38,7 @@ App({
     this.globalData.recordType = wx.getStorageSync('parcel.recordType') || 'all';
     this.globalData.group = wx.getStorageSync('parcel.group') || 'type';
     this.globalData.ignoreCleanupDays = parseInt(wx.getStorageSync('parcel.ignoreCleanupDays'), 10) || 7;
+    this.globalData.ignoreCleanupMode = wx.getStorageSync('parcel.ignoreCleanupMode') === 'archive' ? 'archive' : 'delete';
     api.setBaseUrl(this.globalData.baseUrl);
     if (this.globalData.token) {
       this.refreshState();

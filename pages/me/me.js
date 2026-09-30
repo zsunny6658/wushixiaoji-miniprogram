@@ -35,6 +35,7 @@ Page({
     notifyEnabled: true,
     notifyDays: 3,
     notifyCleanupDays: 7,
+    ignoreCleanupMode: 'delete',
     pickArchiveDays: 7,
     showNotifyModal: false,
     mpNotifyConfigured: false,
@@ -83,6 +84,7 @@ Page({
       showCreateFamily: false,
       notifyDays: parseInt(wx.getStorageSync('parcel.reminderDays') || '3', 10) || 3,
       notifyCleanupDays: parseInt(wx.getStorageSync('parcel.ignoreCleanupDays') || '7', 10) || 7,
+      ignoreCleanupMode: wx.getStorageSync('parcel.ignoreCleanupMode') === 'archive' ? 'archive' : 'delete',
       pickArchiveDays: mePickArchiveDays()
     });
   },
@@ -189,6 +191,11 @@ Page({
     if (isNaN(v) || v < 0) v = 7;
     this.setData({ pickArchiveDays: v });
   },
+  // 忽略超期处理模式：delete=删除 | archive=转归档
+  onIgnoreModeTap: function (e) {
+    var mode = e.currentTarget.dataset.mode === 'archive' ? 'archive' : 'delete';
+    this.setData({ ignoreCleanupMode: mode });
+  },
   onNotifyTemplateInput: function (e) {
     this.setData({ notifyTemplateId: e.detail.value.trim() });
   },
@@ -253,11 +260,14 @@ Page({
       if (that.data.notifyTemplateId) {
         api.request('PUT', '/api/config' + (fid ? '?familyId=' + fid : ''), { notify: { templateId: that.data.notifyTemplateId } }, function () {});
       }
-      // 保存清理天数 + 完成自动归档天数（0=关闭）
+      // 保存清理天数/模式 + 完成自动归档天数（0=关闭）
       var pad = that.data.pickArchiveDays;
-      api.request('PUT', '/api/config' + (fid ? '?familyId=' + fid : ''), { ignoreCleanupDays: that.data.notifyCleanupDays, pickArchiveDays: pad }, function () {
+      var mode = that.data.ignoreCleanupMode === 'archive' ? 'archive' : 'delete';
+      api.request('PUT', '/api/config' + (fid ? '?familyId=' + fid : ''), { ignoreCleanupDays: that.data.notifyCleanupDays, ignoreCleanupMode: mode, pickArchiveDays: pad }, function () {
         wx.setStorageSync('parcel.ignoreCleanupDays', String(that.data.notifyCleanupDays));
         app.globalData.ignoreCleanupDays = that.data.notifyCleanupDays;
+        wx.setStorageSync('parcel.ignoreCleanupMode', mode);
+        app.globalData.ignoreCleanupMode = mode;
         wx.setStorageSync('parcel.pickArchiveDays', String(pad));
         that.setData({ showNotifyModal: false });
         wx.showToast({ title: '已保存', icon: 'success' });

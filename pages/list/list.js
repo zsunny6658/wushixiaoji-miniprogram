@@ -185,12 +185,13 @@ Page({
       wx.showToast({ title: '已取消忽略', icon: 'success' });
     } else {
       var days = app.globalData.ignoreCleanupDays || 7;
+      var toArch = app.globalData.ignoreCleanupMode === 'archive';
       this.optimisticUpdate(id, { status: 'ignored' });
       api.updatePackage(id, { status: 'ignored' }, null, function () {
         that.optimisticRollback(id);
         wx.showToast({ title: '操作失败', icon: 'none' });
       });
-      wx.showToast({ title: '已忽略，' + days + '天后自动删除', icon: 'none' });
+      wx.showToast({ title: '已忽略，' + days + '天后' + (toArch ? '转入归档' : '自动删除'), icon: 'none' });
     }
   },
   // 长期忽略：创建规则，相似待办在有效期内自动忽略
