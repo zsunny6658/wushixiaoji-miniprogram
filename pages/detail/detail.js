@@ -73,20 +73,18 @@ Page({
     });
   },
 
-  // 「更多」收纳低频操作：复制 / 归档 / 删除
+  // 「更多」收纳低频操作：编辑 / 复制 / 归档 / 删除（忽略为高频操作，提到底栏）
   onMoreActions: function () {
     var that = this;
     var isArchived = this.data.pkg.status === 'archived';
-    // 忽略/恢复也收进更多菜单（低频操作，底栏只留主次两组）
-    var ignoreLabel = this.data.pkg.status === 'ignored' ? '恢复提醒' : '忽略';
-    var items = ['复制'];
-    if (!isArchived) items = items.concat([ignoreLabel, '归档', '删除']);
+    var items = ['编辑', '复制'];
+    if (!isArchived) items = items.concat(['归档', '删除']);
     wx.showActionSheet({
       itemList: items,
       success: function (res) {
         var label = items[res.tapIndex];
-        if (label === '复制') that.onCopy();
-        else if (label === ignoreLabel) that.onToggleIgnore();
+        if (label === '编辑') that.onEdit();
+        else if (label === '复制') that.onCopy();
         else if (label === '归档') that.onArchive();
         else if (label === '删除') that.onDelete();
       }
@@ -147,6 +145,7 @@ Page({
     if (updated) this.applyDetail(updated);
   },
 
+  // 忽略：高频操作，一步弹出忽略方式并直接执行（不再二次确认）
   onToggleIgnore: function () {
     var self = this;
     var pkg = this.data.pkg;
@@ -158,37 +157,42 @@ Page({
       }, function () {
         wx.showToast({ title: '操作失败', icon: 'none' });
       });
-    } else {
-      wx.showActionSheet({
-        itemList: ['普通忽略（仅本次）', '智能忽略（自动忽略相似待办）'],
-        success: function (res) {
-          if (res.tapIndex === 0) {
-            var days = app.globalData.ignoreCleanupDays || 7;
-            self.optimisticUpdate(id, { status: 'ignored' });
-            api.updatePackage(id, { status: 'ignored' }, null, function () {
-              self.loadDetail(id);
-              wx.showToast({ title: '操作失败', icon: 'none' });
-            });
-            wx.showToast({ title: '已忽略，' + days + '天后自动删除', icon: 'none' });
-          } else {
-            wx.showModal({
-              title: '智能忽略',
-              content: '将创建规则自动忽略相似的待办，默认30天有效。确认？',
-              success: function (r) {
-                if (r.confirm) {
-                  api.ignoreWithRule(id, { durationDays: 30, threshold: 0.6 }, function () {
-                    self.optimisticUpdate(id, { status: 'ignored' });
-                    wx.showToast({ title: '已忽略并创建规则', icon: 'success' });
-                  }, function () {
-                    wx.showToast({ title: '操作失败', icon: 'none' });
-                  });
-                }
-              }
-            });
-          }
-        }
-      });
+      return;
     }
+    var options = [
+      { label: '仅忽略本次', days: -1 },
+      { label: '长期忽略 · 相似待办 30 天不再提醒', days: 30 },
+      { label: '长期忽略 · 相似待办 90 天不再提醒', days: 90 },
+      { label: '永久忽略 · 相似待办不再提醒', days: 0 }
+    ];
+    wx.showActionSheet({
+      alertText: '选择忽略方式',
+      itemList: options.map(function (o) { return o.label; }),
+      success: function (res) {
+        var opt = options[res.tapIndex];
+        if (!opt) return;
+        if (opt.days < 0) {
+          // 仅忽略本次：进入忽略态，按清理天数自动删除
+          var days = app.globalData.ignoreCleanupDays || 7;
+          self.optimisticUpdate(id, { status: 'ignored' });
+          api.updatePackage(id, { status: 'ignored' }, null, function () {
+            self.loadDetail(id);
+            wx.showToast({ title: '操作失败', icon: 'none' });
+          });
+          wx.showToast({ title: '已忽略，' + days + '天后自动删除', icon: 'none' });
+        } else {
+          // 长期/永久忽略：创建规则，相似待办自动忽略
+          self.optimisticUpdate(id, { status: 'ignored' });
+          api.ignoreWithRule(id, { durationDays: opt.days, threshold: 0.6 }, function () {
+            self.loadDetail(id);
+            wx.showToast({ title: opt.days === 0 ? '已永久忽略相似待办' : '已忽略并创建' + opt.days + '天规则', icon: 'success' });
+          }, function () {
+            self.optimisticUpdate(id, { status: 'pending', ignoreAt: '', ignoreRuleId: '' });
+            wx.showToast({ title: '操作失败', icon: 'none' });
+          });
+        }
+      }
+    });
   },
 
   onArchive: function () {

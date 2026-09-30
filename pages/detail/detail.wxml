@@ -130,15 +130,15 @@
     </view>
   </view>
 
-  <!-- 底部操作栏（主次分组：完成为主，编辑/标重点次之，低频操作收进「更多」） -->
+  <!-- 底部操作栏（忽略为高频操作占底栏；编辑等低频操作收进「更多」） -->
   <view class="action-bar">
     <button class="action-btn action-flag {{pkg.importance === 'high' ? 'action-flag-active' : ''}}" bindtap="onToggleFlag">
       <ficon class="action-icon-vec" name="flag" size="34" color="{{pkg.importance === 'high' ? '#EF5350' : '#718096'}}" />
       <text>{{pkg.importance === 'high' ? '取消重点' : '标重点'}}</text>
     </button>
-    <button class="action-btn action-edit" bindtap="onEdit">
-      <ficon class="action-icon-vec" name="edit" size="34" color="#718096" />
-      <text>编辑</text>
+    <button class="action-btn action-ignore {{pkg.status === 'ignored' ? 'action-ignored' : ''}}" bindtap="onToggleIgnore" wx:if="{{pkg.status !== 'archived'}}">
+      <ficon class="action-icon-vec" name="slash" size="34" color="{{pkg.status === 'ignored' ? '#F59E0B' : '#718096'}}" />
+      <text>{{pkg.status === 'ignored' ? '恢复提醒' : '忽略'}}</text>
     </button>
     <button class="action-btn action-main {{pkg.status === 'picked' ? 'action-unpick' : ''}}" bindtap="onTogglePick" wx:if="{{pkg.status !== 'archived'}}">
       <ficon class="action-icon-vec" name="check-circle" size="34" color="#FFFFFF" />

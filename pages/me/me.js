@@ -37,7 +37,10 @@ Page({
     summaryHour: 8,
     subscribeAuthorized: false,
     // 关于
-    showAboutModal: false
+    showAboutModal: false,
+    // 忽略规则管理
+    showRulesModal: false,
+    ignoreRules: []
   },
 
   onLoad: function () {
@@ -287,6 +290,61 @@ Page({
   },
   onOpenArchive: function () {
     wx.navigateTo({ url: '/pages/archive/archive' });
+  },
+
+  // 忽略规则管理：查看 / 删除（长期忽略产生的自动忽略规则）
+  onManageIgnoreRules: function () {
+    this.loadIgnoreRules();
+    this.setData({ showRulesModal: true });
+  },
+  onCloseRulesModal: function () {
+    this.setData({ showRulesModal: false });
+  },
+  loadIgnoreRules: function () {
+    var self = this;
+    this.setData({ ignoreRules: [] });
+    api.getIgnoreRules(function (data) {
+      var rules = (data && data.rules) || [];
+      var now = Date.now();
+      var typeMap = { pickup: '取件', todo: '备忘', debt: '待还', medication: '用药' };
+      var decorated = rules.map(function (r) {
+        var duration = parseInt(r.durationDays, 10) || 0;
+        var created = Date.parse(r.createdAt);
+        var remain = '';
+        if (duration > 0 && !isNaN(created)) {
+          var left = Math.ceil((created + duration * 86400000 - now) / 86400000);
+          remain = left > 0 ? '剩余 ' + left + ' 天' : '已过期';
+        }
+        return {
+          id: r.id,
+          pattern: r.pattern || '（无匹配内容）',
+          typeLabel: r.type ? (typeMap[r.type] || r.type) : '全部类型',
+          durationLabel: duration > 0 ? duration + ' 天有效' : '永久有效',
+          remain: remain
+        };
+      });
+      self.setData({ ignoreRules: decorated });
+    }, function () {
+      wx.showToast({ title: '加载规则失败', icon: 'none' });
+    });
+  },
+  onDeleteIgnoreRule: function (e) {
+    var self = this;
+    var id = e.currentTarget.dataset.id;
+    wx.showModal({
+      title: '删除规则',
+      content: '删除后相似待办将恢复提醒，确认删除？',
+      confirmColor: '#ef4444',
+      success: function (res) {
+        if (!res.confirm) return;
+        api.deleteIgnoreRule(id, function () {
+          wx.showToast({ title: '已删除', icon: 'success' });
+          self.loadIgnoreRules();
+        }, function () {
+          wx.showToast({ title: '删除失败', icon: 'none' });
+        });
+      }
+    });
   },
   onFamilySettings: function () {
     wx.navigateTo({ url: '/pages/settings/settings?action=mail' });

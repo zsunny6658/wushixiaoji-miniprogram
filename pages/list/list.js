@@ -170,6 +170,7 @@ Page({
     this.computeList();
   },
 
+  // 忽略：高频操作，直接执行不弹确认（撤销：切到「忽略」筛选恢复）
   onToggleIgnore: function (e) {
     var id = e.currentTarget.dataset.id;
     var pkg = (app.globalData.packages || []).find(function (p) { return p.id === id; });
@@ -184,21 +185,38 @@ Page({
       wx.showToast({ title: '已取消忽略', icon: 'success' });
     } else {
       var days = app.globalData.ignoreCleanupDays || 7;
-      wx.showModal({
-        title: '确认忽略',
-        content: '忽略后将在' + days + '天后自动删除，确认忽略？',
-        success: function (res) {
-          if (res.confirm) {
-            that.optimisticUpdate(id, { status: 'ignored' });
-            api.updatePackage(id, { status: 'ignored' }, null, function () {
-              that.optimisticRollback(id);
-              wx.showToast({ title: '操作失败', icon: 'none' });
-            });
-            wx.showToast({ title: '已忽略', icon: 'none' });
-          }
-        }
+      this.optimisticUpdate(id, { status: 'ignored' });
+      api.updatePackage(id, { status: 'ignored' }, null, function () {
+        that.optimisticRollback(id);
+        wx.showToast({ title: '操作失败', icon: 'none' });
       });
+      wx.showToast({ title: '已忽略，' + days + '天后自动删除', icon: 'none' });
     }
+  },
+  // 长期忽略：创建规则，相似待办在有效期内自动忽略
+  onLongIgnore: function (id) {
+    var that = this;
+    var options = [
+      { label: '长期忽略 30 天 · 相似待办不再提醒', days: 30 },
+      { label: '长期忽略 90 天 · 相似待办不再提醒', days: 90 },
+      { label: '永久忽略 · 相似待办不再提醒', days: 0 }
+    ];
+    wx.showActionSheet({
+      alertText: '选择长期忽略时长',
+      itemList: options.map(function (o) { return o.label; }),
+      success: function (res) {
+        var opt = options[res.tapIndex];
+        if (!opt) return;
+        that.optimisticUpdate(id, { status: 'ignored' });
+        api.ignoreWithRule(id, { durationDays: opt.days, threshold: 0.6 }, function () {
+          that.computeList();
+          wx.showToast({ title: opt.days === 0 ? '已永久忽略相似待办' : '已忽略并创建' + opt.days + '天规则', icon: 'success' });
+        }, function () {
+          that.optimisticRollback(id);
+          wx.showToast({ title: '操作失败', icon: 'none' });
+        });
+      }
+    });
   },
   // 滑动快捷操作
   onSwipePick: function (e) {
@@ -519,20 +537,23 @@ Page({
     if (!pkg) return;
     var isPicked = pkg.status === 'picked';
     var isIgnored = pkg.status === 'ignored';
-    var items = [
-      isPicked ? '↩ 撤销完成' : '✓ 标记完成',
-      isIgnored ? '📌 恢复显示' : '🚫 忽略此条'
-    ];
+    var pickLabel = isPicked ? '↩ 撤销完成' : '✓ 标记完成';
+    var ignoreLabel = isIgnored ? '📌 恢复显示' : '🚫 忽略此条';
+    var items = [pickLabel, ignoreLabel];
+    if (!isIgnored) items.push('🔕 长期忽略…');
     items.push('🗑 删除记录');
     wx.showActionSheet({
       itemList: items,
       itemColor: '#4f6ef7',
       success: function (res) {
-        if (res.tapIndex === 0) {
+        var label = items[res.tapIndex];
+        if (label === pickLabel) {
           that.onQuickPick({ currentTarget: { dataset: { id: id } } });
-        } else if (res.tapIndex === 1) {
+        } else if (label === ignoreLabel) {
           that.onToggleIgnore({ currentTarget: { dataset: { id: id } } });
-        } else if (res.tapIndex === 2) {
+        } else if (label === '🔕 长期忽略…') {
+          that.onLongIgnore(id);
+        } else if (label === '🗑 删除记录') {
           that.onSwipeDelete({ currentTarget: { dataset: { id: id } } });
         }
       }

@@ -60,6 +60,13 @@
       </view>
       <text class="cell-arrow">›</text>
     </view>
+    <view class="cell" bindtap="onManageIgnoreRules" hover-class="cell-hover">
+      <view class="cell-left">
+        <ficon class="cell-icon-vec" name="slash" size="36" />
+        <text class="cell-title">忽略规则</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
     <view class="cell" bindtap="onManageWebhooks" hover-class="cell-hover">
       <view class="cell-left">
         <ficon class="cell-icon-vec" name="link" size="36" />
@@ -280,6 +287,39 @@
     </view>
     <view class="modal-foot">
       <button class="modal-btn modal-btn-confirm" bindtap="onSaveNotify">保存</button>
+    </view>
+  </view>
+</view>
+
+<!-- 忽略规则管理弹窗 -->
+<view class="modal" wx:if="{{showRulesModal}}">
+  <view class="modal-mask" catchtap="onCloseRulesModal"></view>
+  <view class="modal-panel" catchtap="noop">
+    <view class="modal-head">
+      <text class="modal-title">忽略规则</text>
+      <text class="modal-close" bindtap="onCloseRulesModal">✕</text>
+    </view>
+    <text class="rules-hint">长期忽略待办时自动创建；有效期内相似的新待办不再提醒。</text>
+    <view class="rules-list" wx:if="{{ignoreRules.length}}">
+      <view class="rule-item" wx:for="{{ignoreRules}}" wx:key="id">
+        <view class="rule-main">
+          <text class="rule-pattern">{{item.pattern}}</text>
+          <view class="rule-meta">
+            <text class="rule-tag">{{item.typeLabel}}</text>
+            <text class="rule-duration">{{item.durationLabel}}</text>
+            <text class="rule-remain {{item.remain === '已过期' ? 'rule-expired' : ''}}" wx:if="{{item.remain}}">{{item.remain}}</text>
+          </view>
+        </view>
+        <view class="rule-del" catchtap="onDeleteIgnoreRule" data-id="{{item.id}}">删除</view>
+      </view>
+    </view>
+    <view class="rules-empty" wx:else>
+      <text class="rules-empty-icon">🔕</text>
+      <text class="rules-empty-text">暂无规则</text>
+      <text class="rules-empty-desc">在待办详情或长按菜单中选择「长期忽略」即可创建</text>
+    </view>
+    <view class="modal-foot">
+      <button class="modal-btn modal-btn-confirm" bindtap="onCloseRulesModal">关闭</button>
     </view>
   </view>
 </view>
