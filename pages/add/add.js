@@ -1,5 +1,6 @@
 // pages/add/add.js
 var api = require('../../utils/api');
+var subscribe = require('../../utils/subscribe');
 var app = getApp();
 
 // freqOptions 下标 → schedule.freq 映射（统一维护，模板/保存共用，勿再硬编码下标）
@@ -589,6 +590,8 @@ Page({
       api.updatePackage(this.data.editId, data, function () {
         wx.hideLoading();
         wx.showToast({ title: '已保存', icon: 'success' });
+        // 用药记录保存后顺带请求订阅授权（勾选"总是保持"后静默续配额）
+        if (that.data.type === 'medication') subscribe.askSubscribe();
         setTimeout(function () { wx.navigateBack(); }, 600);
       }, function () {
         wx.hideLoading();
@@ -597,6 +600,7 @@ Page({
       api.addPackages([data], function () {
         wx.hideLoading();
         wx.showToast({ title: '已保存', icon: 'success' });
+        if (that.data.type === 'medication') subscribe.askSubscribe();
         setTimeout(function () { wx.navigateBack(); }, 600);
       }, function () {
         wx.hideLoading();

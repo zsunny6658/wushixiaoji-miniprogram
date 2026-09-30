@@ -1,6 +1,7 @@
 // pages/medboard/medboard.js - 仿真药板（点击打卡 + 前后对比 + 实时同步）
 var api = require('../../utils/api');
 var realtime = require('../../utils/realtime');
+var subscribe = require('../../utils/subscribe');
 var app = getApp();
 
 var COLOR_HEX = {
@@ -289,6 +290,8 @@ Page({
         that.allLogs.push(res.log);
         that.setData({ boardNo: boardNo });
         wx.vibrateShort({ type: 'light' }); // 打卡触感反馈
+        // 打卡后顺带请求订阅授权（勾选"总是保持"后静默续配额，保障下次到点能推送）
+        subscribe.askSubscribe();
         that.load(); // 重新拉取，服务端可能已自动推进版号
         wx.showToast({ title: '已记录 ✓', icon: 'success' });
       }

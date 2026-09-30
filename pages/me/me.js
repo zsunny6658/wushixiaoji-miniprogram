@@ -1,5 +1,6 @@
 // pages/me/me.js
 var api = require('../../utils/api');
+var subscribe = require('../../utils/subscribe');
 var app = getApp();
 
 Page({
@@ -181,7 +182,7 @@ Page({
     this.setData({ summaryHour: h });
   },
   onSubscribeNotify: function () {
-    var tmplId = this.data.notifyTemplateId || '2HWGe9LDE0bVe7abqxk7nRQA1zqqUUkUTk1ymx7rzLI';
+    var tmplId = this.data.notifyTemplateId || subscribe.DEFAULT_TMPL;
     var that = this;
     wx.requestSubscribeMessage({
       tmplIds: [tmplId],
