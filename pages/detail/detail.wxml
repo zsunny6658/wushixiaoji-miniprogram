@@ -50,8 +50,8 @@
       </view>
     </view>
 
-    <!-- 仿真药板入口（用药） -->
-    <view class="medboard-entry" wx:if="{{pkg.type === 'medication' && pkg.status === 'pending'}}" bindtap="onOpenMedboard">
+    <!-- 仿真药板入口（用药；已完成/已归档仍可查看，仅打卡由药板页按状态拦截） -->
+    <view class="medboard-entry" wx:if="{{pkg.type === 'medication'}}" bindtap="onOpenMedboard">
       <view class="mb-entry-icon"><ficon name="pill" size="36" color="#10B981" /></view>
       <view class="mb-entry-text">
         <text class="mb-entry-title">仿真药板 · 点击打卡</text>

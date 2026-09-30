@@ -154,6 +154,20 @@ Page({
     }
     var weekRate = sumN ? Math.round(sumT * 100 / sumN) : 0;
 
+    // 按列数自适应药丸/缺口尺寸（防止 6-8 列时固定 88rpx 药丸互相重叠）
+    // 主板可用宽 ≈ 750 - 页面 padding48 - 药板 padding44；对比小板再缩 0.66
+    var SH = { round: [88, 88], oval: [108, 68], capsule: [120, 54], square: [88, 88] }[pi.shape] || [88, 88];
+    var cellW = Math.floor((750 - 48 - 44) / pi.cols);
+    var maxW = Math.floor(cellW * 0.8);
+    var minH = Math.max(Math.floor(cellW * 0.55), 34);
+    var pw = Math.min(SH[0], maxW), ph = Math.min(SH[1], minH);
+    var pwM = Math.floor(pw * 0.66), phM = Math.floor(ph * 0.66);
+    var radOf = function (h) { return pi.shape === 'square' ? Math.round(h * 0.16) : (pi.shape === 'round' ? 999 : Math.round(h / 2)); };
+    var pillStyle = 'width:' + pw + 'rpx;height:' + ph + 'rpx;border-radius:' + radOf(ph) + 'rpx;';
+    var holeStyle = 'width:' + Math.min(88, maxW) + 'rpx;height:' + Math.min(88, minH) + 'rpx;border-radius:' + radOf(minH) + 'rpx;';
+    var pillStyleMini = 'width:' + pwM + 'rpx;height:' + phM + 'rpx;border-radius:' + radOf(phM) + 'rpx;';
+    var holeStyleMini = 'width:' + Math.floor(Math.min(88, maxW) * 0.66) + 'rpx;height:' + Math.floor(Math.min(88, minH) * 0.66) + 'rpx;border-radius:' + radOf(Math.floor(minH * 0.66)) + 'rpx;';
+
     // 今日打卡时间线（几点 · 谁 · 第几版第几行第几颗）
     var cols = pi.cols;
     var timeline = this.todayLogs.slice().sort(function (a, b) { return (a.takenAt || '').localeCompare(b.takenAt || ''); })
@@ -172,6 +186,10 @@ Page({
       colorHex: COLOR_HEX[pi.color],
       shapeLabel: SHAPE_LABEL[pi.shape],
       pillShape: pi.shape,
+      pillStyle: pillStyle,
+      holeStyle: holeStyle,
+      pillStyleMini: pillStyleMini,
+      holeStyleMini: holeStyleMini,
       boards: boards,
       slots: slots,
       weekDays: weekDays,

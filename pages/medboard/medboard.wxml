@@ -63,10 +63,10 @@
       <view class="blister blister-mini">
         <view class="blister-row" wx:for="{{compareRows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
           <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
-            <view wx:if="{{cell.showPill}}" class="pill shape-{{pillShape}}" style="background:{{colorHex}}">
+            <view wx:if="{{cell.showPill}}" class="pill shape-{{pillShape}}" style="{{pillStyleMini}}background:{{colorHex}}">
               <view wx:if="{{pillShape === 'capsule'}}" class="capsule-line"></view>
             </view>
-            <view wx:else class="pill-hole">
+            <view wx:else class="pill-hole" style="{{holeStyleMini}}">
               <text class="hole-text">{{cell.holeText}}</text>
             </view>
           </view>
@@ -78,7 +78,7 @@
             <view
               wx:if="{{cell.showPill}}"
               class="pill shape-{{pillShape}}"
-              style="background:{{colorHex}}"
+              style="{{pillStyleMini}}background:{{colorHex}}"
               bindtap="onPillTap"
               data-board="{{cell.boardNo}}"
               data-pill="{{cell.index}}"
@@ -89,6 +89,7 @@
             <view
               wx:else
               class="pill-hole {{cell.isToday ? 'hole-today' : ''}}"
+              style="{{holeStyleMini}}"
               bindtap="onTodayHoleTap"
               data-board="{{cell.boardNo}}"
               data-pill="{{cell.index}}"
@@ -110,7 +111,7 @@
           <view
             wx:if="{{cell.showPill}}"
             class="pill shape-{{pillShape}}"
-            style="background:{{colorHex}}"
+            style="{{pillStyle}}background:{{colorHex}}"
             bindtap="onPillTap"
             data-board="{{cell.boardNo}}"
             data-pill="{{cell.index}}"
@@ -121,6 +122,7 @@
           <view
             wx:else
             class="pill-hole {{cell.isToday ? 'hole-today' : ''}}"
+            style="{{holeStyle}}"
             bindtap="onTodayHoleTap"
             bindlongpress="onCellLongPress"
             data-board="{{cell.boardNo}}"

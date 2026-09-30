@@ -128,6 +128,13 @@
             </view>
           </view>
           <text class="pill-board-summary" wx:if="{{!pillBoardOpen}}">当前：{{pillInfo.rows}}×{{pillInfo.cols}} · {{pillInfo.boards}} 版 · 点「展开」调颜色/形状</text>
+          <view class="pill-preview">
+            <view class="pp-row" wx:for="{{pillPreviewRows}}" wx:for-item="prow" wx:key="*this">
+              <view class="pp-cell" wx:for="{{prow}}" wx:for-item="pci" wx:key="*this">
+                <view class="pp-pill" style="{{pillPrevStyle}}"></view>
+              </view>
+            </view>
+          </view>
           <block wx:if="{{pillBoardOpen}}">
           <view class="pill-colors">
             <view class="pill-color-dot {{pillInfo.color === item ? 'pc-active' : ''}}" wx:for="{{pillColorOptions}}" wx:key="*this" style="background:{{pillColorHex[item]}}" bindtap="onPillColorTap" data-color="{{item}}"></view>

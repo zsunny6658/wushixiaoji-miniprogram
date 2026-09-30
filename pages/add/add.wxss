@@ -412,3 +412,30 @@
   border-color: var(--color-primary, #4A90D9);
   font-weight: 600;
 }
+
+/* 药板实时预览（铝箔板样式） */
+.pill-preview {
+  margin-top: 16rpx;
+  background: linear-gradient(160deg, #F8FAFC, #EEF2F7);
+  border: 2rpx solid var(--border, #E2E8F0);
+  border-radius: 16rpx;
+  padding: 16rpx 12rpx;
+  box-shadow: inset 0 2rpx 10rpx rgba(15, 42, 86, 0.05);
+}
+.pp-row {
+  display: flex;
+}
+.pp-row + .pp-row {
+  margin-top: 8rpx;
+}
+.pp-cell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pp-pill {
+  box-shadow: inset 0 -4rpx 8rpx rgba(0, 0, 0, 0.12), inset 0 3rpx 6rpx rgba(255, 255, 255, 0.55), 0 3rpx 6rpx rgba(15, 42, 86, 0.15);
+  border: 2rpx solid rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}

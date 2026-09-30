@@ -41,6 +41,8 @@ Page({
       { value: 'square', label: '方形' }
     ],
     pillInfo: { color: 'white', shape: 'round', rows: 2, cols: 5, boards: 2, boardNo: 1 },
+    pillPreviewRows: [],
+    pillPrevStyle: '',
     form: { station: '', code: '', company: '', trackingNo: '', note: '', institution: '', amount: '' },
     dueDateStr: '',
     isPrivate: false,
@@ -65,6 +67,7 @@ Page({
     api.setToken(app.globalData.token);
     var members = (app.globalData.members || []).map(function (m) { return m.name; });
     this.setData({ memberOptions: ['不指定'].concat(members) });
+    this.refreshPillPreview();
     // 从 tabBar 语音转写结果读取
     if (app.globalData._pendingSmartText) {
       this.setData({ smartText: app.globalData._pendingSmartText });
@@ -105,6 +108,7 @@ Page({
           urgIndex: ['urgent', 'normal'].indexOf(pkg.urgency || 'normal'),
           pillInfo: this.normalizePillForm(pkg.pillInfo)
         });
+        this.refreshPillPreview();
         // 编辑模式：用药类型回填服药次数/时间 + 服药频率
         if (pkg.type === 'medication' && pkg.schedule && Array.isArray(pkg.schedule.times) && pkg.schedule.times.length) {
           this.setData({ medTimes: pkg.schedule.times, doseIndex: Math.min(3, pkg.schedule.times.length - 1) });
@@ -194,11 +198,35 @@ Page({
     times[idx] = e.detail.value;
     this.setData({ medTimes: times });
   },
+  // 药板实时预览：根据 pillInfo 计算预览网格与药丸内联样式（列数多时自动缩小防重叠）
+  refreshPillPreview: function () {
+    var pi = this.data.pillInfo;
+    var hex = this.data.pillColorHex[pi.color] || '#F1F5F9';
+    var dims = { round: [88, 88], oval: [108, 68], capsule: [120, 54], square: [88, 88] }[pi.shape] || [88, 88];
+    var cellW = Math.floor(620 / Math.max(pi.cols, 1));
+    var maxW = Math.floor(cellW * 0.8);
+    var w = Math.min(dims[0], maxW);
+    var h = Math.min(dims[1], Math.max(Math.floor(cellW * 0.55), 34));
+    var r = pi.shape === 'square' ? Math.round(h * 0.16) : (pi.shape === 'round' ? 999 : Math.round(h / 2));
+    var rows = [];
+    for (var i = 0; i < pi.rows; i++) {
+      var row = [];
+      for (var j = 0; j < pi.cols; j++) row.push(j);
+      rows.push(row);
+    }
+    this.setData({
+      pillPreviewRows: rows,
+      pillPrevStyle: 'width:' + w + 'rpx;height:' + h + 'rpx;border-radius:' + r + 'rpx;background:' + hex + ';'
+    });
+  },
+
   onPillColorTap: function (e) {
     this.setData({ 'pillInfo.color': e.currentTarget.dataset.color });
+    this.refreshPillPreview();
   },
   onPillShapeTap: function (e) {
     this.setData({ 'pillInfo.shape': e.currentTarget.dataset.shape });
+    this.refreshPillPreview();
   },
   onPillStep: function (e) {
     var field = e.currentTarget.dataset.field;
@@ -211,6 +239,7 @@ Page({
     var patch = {};
     patch['pillInfo.' + field] = next;
     this.setData(patch);
+    this.refreshPillPreview();
   },
   onToggleMore: function () {
     if (this.data.showMore) this.updateMoreFilled(); // 收起时刷新徽标
@@ -298,6 +327,7 @@ Page({
   // 应用药品形态：回填仿真药板（颜色/形状/行列/板数），并展开药板设置方便核对
   applyDrugAppearance: function (d, source) {
     this.setData({ pillInfo: this.normalizePillForm(d), pillBoardOpen: true });
+    this.refreshPillPreview();
     wx.showToast({ title: source === 'ai' ? 'AI 已生成药板·请核对' : '已生成仿真药板', icon: 'none' });
   },
 
@@ -327,6 +357,7 @@ Page({
     if (r.owner) patch.memberIndex = this.findMemberIndex(r.owner);
     if (r.pillInfo) { patch.pillInfo = this.normalizePillForm(r.pillInfo); patch.pillBoardOpen = true; }
     this.setData(patch);
+    if (r.pillInfo) this.refreshPillPreview();
     var times = r.schedule && Array.isArray(r.schedule.times) && r.schedule.times.length ? r.schedule.times : null;
     if (times) {
       this.setData({ medTimes: times, doseIndex: Math.min(3, times.length - 1) });
