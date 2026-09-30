@@ -99,3 +99,8 @@
 }
 
 .arch-bottom-spacer { height: env(safe-area-inset-bottom); }
+
+.arch-type-done {
+  background: rgba(16, 185, 129, 0.12);
+  color: #0F6E56;
+}

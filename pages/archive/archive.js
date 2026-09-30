@@ -52,7 +52,8 @@ Page({
           typeLabel: meta.label,
           title: p.title || p.code || '(无标题)',
           sub: sub,
-          archivedAtText: fmtTime(p.updatedAt)
+          archivedAtText: fmtTime(p.updatedAt),
+          fromPicked: p.archiveFrom === 'picked'
         };
       });
       that.setData({ items: items, loading: false });

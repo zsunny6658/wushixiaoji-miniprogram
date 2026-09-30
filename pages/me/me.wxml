@@ -216,6 +216,16 @@
       </view>
       <input class="notify-input" type="number" value="{{notifyCleanupDays}}" bindblur="onNotifyCleanupBlur" />
     </view>
+    <view class="notify-item">
+      <view class="notify-item-left">
+        <ficon class="notify-item-icon" name="archive" size="36" color="#718096" />
+        <view class="notify-item-text">
+          <text class="notify-item-title">完成归档</text>
+          <text class="notify-item-desc">完成 N 天后自动归档，0=不自动</text>
+        </view>
+      </view>
+      <input class="notify-input" type="number" value="{{pickArchiveDays}}" bindblur="onPickArchiveDaysBlur" />
+    </view>
     <!-- 提醒时间 -->
     <view class="notify-divider"></view>
     <text class="notify-section-title">提醒时间</text>

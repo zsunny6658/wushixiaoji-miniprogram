@@ -3,6 +3,15 @@ var api = require('../../utils/api');
 var subscribe = require('../../utils/subscribe');
 var app = getApp();
 
+// 读取本地缓存的完成自动归档天数（0=关闭；异常回退 7）
+function mePickArchiveDays() {
+  var raw = wx.getStorageSync('parcel.pickArchiveDays');
+  if (raw === '' || raw === undefined || raw === null) return 7;
+  var v = parseInt(raw, 10);
+  if (isNaN(v) || v < 0) return 7;
+  return v;
+}
+
 Page({
   data: {
     meName: '',
@@ -26,6 +35,7 @@ Page({
     notifyEnabled: true,
     notifyDays: 3,
     notifyCleanupDays: 7,
+    pickArchiveDays: 7,
     showNotifyModal: false,
     mpNotifyConfigured: false,
     mailConfigured: false,
@@ -72,7 +82,8 @@ Page({
       groupIndex: ['none', 'owner', 'type'].indexOf(gd.group || 'type'),
       showCreateFamily: false,
       notifyDays: parseInt(wx.getStorageSync('parcel.reminderDays') || '3', 10) || 3,
-      notifyCleanupDays: parseInt(wx.getStorageSync('parcel.ignoreCleanupDays') || '7', 10) || 7
+      notifyCleanupDays: parseInt(wx.getStorageSync('parcel.ignoreCleanupDays') || '7', 10) || 7,
+      pickArchiveDays: mePickArchiveDays()
     });
   },
 
@@ -172,6 +183,12 @@ Page({
     var days = Math.max(1, parseInt(e.detail.value, 10) || 7);
     this.setData({ notifyCleanupDays: days });
   },
+  // 完成自动归档天数输入（0=关闭）
+  onPickArchiveDaysBlur: function (e) {
+    var v = parseInt(e.detail.value, 10);
+    if (isNaN(v) || v < 0) v = 7;
+    this.setData({ pickArchiveDays: v });
+  },
   onNotifyTemplateInput: function (e) {
     this.setData({ notifyTemplateId: e.detail.value.trim() });
   },
@@ -236,10 +253,12 @@ Page({
       if (that.data.notifyTemplateId) {
         api.request('PUT', '/api/config' + (fid ? '?familyId=' + fid : ''), { notify: { templateId: that.data.notifyTemplateId } }, function () {});
       }
-      // 保存清理天数
-      api.request('PUT', '/api/config' + (fid ? '?familyId=' + fid : ''), { ignoreCleanupDays: that.data.notifyCleanupDays }, function () {
+      // 保存清理天数 + 完成自动归档天数（0=关闭）
+      var pad = that.data.pickArchiveDays;
+      api.request('PUT', '/api/config' + (fid ? '?familyId=' + fid : ''), { ignoreCleanupDays: that.data.notifyCleanupDays, pickArchiveDays: pad }, function () {
         wx.setStorageSync('parcel.ignoreCleanupDays', String(that.data.notifyCleanupDays));
         app.globalData.ignoreCleanupDays = that.data.notifyCleanupDays;
+        wx.setStorageSync('parcel.pickArchiveDays', String(pad));
         that.setData({ showNotifyModal: false });
         wx.showToast({ title: '已保存', icon: 'success' });
       }, function () {
