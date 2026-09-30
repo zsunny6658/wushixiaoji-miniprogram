@@ -416,3 +416,13 @@
   background: rgba(16, 185, 129, 0.12);
   color: #10B981;
 }
+
+/* SSE 断线黄条 */
+.rt-banner {
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 24rpx;
+  padding: 14rpx 20rpx;
+  border-radius: 12rpx;
+  margin: 0 24rpx 12rpx;
+}

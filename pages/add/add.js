@@ -68,6 +68,35 @@ Page({
     var members = (app.globalData.members || []).map(function (m) { return m.name; });
     this.setData({ memberOptions: ['不指定'].concat(members) });
     this.refreshPillPreview();
+    // 恢复草稿：仅新建模式（编辑模式不恢复），草稿 3 天过期
+    if (!opts || !opts.id) {
+      try {
+        var raw = wx.getStorageSync('fph_add_draft_v1');
+        if (raw) {
+          var draft = typeof raw === 'string' ? JSON.parse(raw) : raw;
+          if (draft && draft.ts && Date.now() - draft.ts < 3 * 86400000 && draft.type) {
+            this.setData({
+              type: draft.type,
+              typeIndex: draft.typeIndex || 0,
+              form: draft.form || this.data.form,
+              dueDateStr: draft.dueDateStr || '',
+              medTimes: draft.medTimes || this.data.medTimes,
+              doseIndex: draft.doseIndex != null ? draft.doseIndex : this.data.doseIndex,
+              freqIndex: draft.freqIndex != null ? draft.freqIndex : 0,
+              selWeekdays: draft.selWeekdays || this.data.selWeekdays,
+              pillInfo: draft.pillInfo || this.data.pillInfo,
+              isPrivate: !!draft.isPrivate,
+              impIndex: draft.impIndex != null ? draft.impIndex : this.data.impIndex,
+              urgIndex: draft.urgIndex != null ? draft.urgIndex : this.data.urgIndex,
+              memberIndex: draft.memberIndex != null ? draft.memberIndex : 0,
+              assigneeIndex: draft.assigneeIndex != null ? draft.assigneeIndex : 0
+            });
+            this.refreshPillPreview();
+            wx.showToast({ title: '已恢复上次草稿', icon: 'none', duration: 1500 });
+          }
+        }
+      } catch (e) { /* 草稿损坏直接忽略 */ }
+    }
     // 从 tabBar 语音转写结果读取
     if (app.globalData._pendingSmartText) {
       this.setData({ smartText: app.globalData._pendingSmartText });
@@ -624,6 +653,7 @@ Page({
       api.updatePackage(this.data.editId, data, function () {
         wx.hideLoading();
         wx.showToast({ title: '已保存', icon: 'success' });
+        that.clearDraft();
         // 用药记录保存后顺带请求订阅授权（勾选"总是保持"后静默续配额）
         if (that.data.type === 'medication') subscribe.askSubscribe();
         setTimeout(function () { wx.navigateBack(); }, 600);
@@ -634,12 +664,34 @@ Page({
       api.addPackages([data], function () {
         wx.hideLoading();
         wx.showToast({ title: '已保存', icon: 'success' });
+        that.clearDraft();
         if (that.data.type === 'medication') subscribe.askSubscribe();
         setTimeout(function () { wx.navigateBack(); }, 600);
       }, function () {
         wx.hideLoading();
       });
     }
+  },
+
+  // ── 草稿暂存：onHide 自动保存，onLoad 恢复，保存成功清除 ──
+  saveDraft: function () {
+    if (this.data.editId) return; // 编辑模式不存草稿
+    var d = this.data;
+    try {
+      wx.setStorageSync('fph_add_draft_v1', JSON.stringify({
+        type: d.type, typeIndex: d.typeIndex, form: d.form,
+        dueDateStr: d.dueDateStr, medTimes: d.medTimes, doseIndex: d.doseIndex,
+        freqIndex: d.freqIndex, selWeekdays: d.selWeekdays, pillInfo: d.pillInfo,
+        isPrivate: d.isPrivate, impIndex: d.impIndex, urgIndex: d.urgIndex,
+        memberIndex: d.memberIndex, assigneeIndex: d.assigneeIndex, ts: Date.now()
+      }));
+    } catch (e) { /* 存储失败忽略 */ }
+  },
+  clearDraft: function () {
+    try { wx.removeStorageSync('fph_add_draft_v1'); } catch (e) { /* noop */ }
+  },
+  onHide: function () {
+    this.saveDraft();
   },
 
   onDelete: function () {

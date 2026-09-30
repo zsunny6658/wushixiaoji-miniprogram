@@ -1,4 +1,6 @@
 <view class="page">
+  <!-- SSE 断线提示 -->
+  <view class="rt-banner" wx:if="{{rtOff}}">⚡ 实时同步已断开，正在重连…（家人操作可能延迟显示）</view>
   <!-- 类型 tab -->
   <view class="toolbar">
     <view class="segmented segmented-fill">

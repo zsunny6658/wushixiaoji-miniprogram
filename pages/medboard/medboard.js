@@ -20,6 +20,61 @@ function clamp(v, min, max, dft) {
   return isNaN(n) ? dft : Math.max(min, Math.min(max, n));
 }
 
+// 与服务端 store.isDueDate 保持一致的客户端复刻（月度热力图用）
+function isDueClient(sched, ds) {
+  if (!sched) return true;
+  var freq = sched.freq || 'daily';
+  if (freq === 'daily') return true;
+  if (freq === 'weekly') {
+    var wd = new Date(ds + 'T00:00:00').getDay();
+    var days = Array.isArray(sched.weekdays) ? sched.weekdays : [];
+    return days.indexOf(wd) >= 0;
+  }
+  if (freq === 'interval') {
+    var anchor = String(sched.startDate || '');
+    var iv = Math.max(2, parseInt(sched.intervalDays, 10) || 2);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(anchor)) return true;
+    var diff = Math.round((new Date(ds + 'T00:00:00') - new Date(anchor + 'T00:00:00')) / 86400000);
+    return diff >= 0 && diff % iv === 0;
+  }
+  return true;
+}
+
+// 当前月热力图：{monthLabel, cells:[{d,state,taken,total}], blanks}
+// state: full=达标绿 / part=部分黄 / due=未吃灰红 / off=非服药日浅灰 / future=未到
+function buildMonthCells(sched, allLogs, times) {
+  var now = new Date();
+  var y = now.getFullYear(), m = now.getMonth();
+  var dim = new Date(y, m + 1, 0).getDate();
+  var offset = new Date(y, m, 1).getDay(); // 周日=0 起
+  var cells = [];
+  for (var d = 1; d <= dim; d++) {
+    var ds = y + '-' + ('0' + (m + 1)).slice(-2) + '-' + ('0' + d).slice(-2);
+    var due = isDueClient(sched, ds);
+    var total = due ? times.length : 0;
+    var taken = allLogs.filter(function (l) { return l.date === ds; }).length;
+    var state;
+    if (d > now.getDate()) state = 'future';
+    else if (!due) state = 'off';
+    else if (total && taken >= total) state = 'full';
+    else if (taken > 0) state = 'part';
+    else state = 'due';
+    cells.push({ d: d, state: state, taken: taken, total: total });
+  }
+  var rate = 0, dueCnt = 0, fullCnt = 0;
+  cells.forEach(function (c) {
+    if (c.state === 'full') { dueCnt++; fullCnt++; }
+    else if (c.state === 'part' || c.state === 'due') dueCnt++;
+  });
+  if (dueCnt) rate = Math.round(fullCnt * 100 / dueCnt);
+  return {
+    monthLabel: (m + 1) + ' 月',
+    monthRate: rate,
+    blanks: new Array(offset).fill(0),
+    cells: cells
+  };
+}
+
 Page({
   data: {
     pkg: null,
@@ -56,7 +111,7 @@ Page({
     if (this._unsub) this._unsub();
   },
 
-  // 家人打卡/撤销实时同步（SSE medlog:created/deleted）
+  // 家人打卡/撤销实时同步（SSE medlog:created/deleted）+ 连接状态黄条
   initRealtime: function () {
     var that = this;
     this._reloadTimer = null;
@@ -68,6 +123,8 @@ Page({
         that._reloadTimer = null;
         that.load();
       }, 500);
+    }, function (st) {
+      that.setData({ rtOff: st === 'offline' });
     });
   },
 
@@ -140,6 +197,8 @@ Page({
         label: label,
         taken: d.taken,
         total: d.total,
+        due: !!d.due,
+        catchable: i === 1 && !!d.due && d.taken < d.total, // 昨天+服药日+没吃满 → 可补记
         percent: d.total ? Math.round(d.taken * 100 / d.total) : 0,
         full: d.total > 0 && d.taken >= d.total,
         none: d.taken === 0
@@ -181,6 +240,9 @@ Page({
         };
       });
 
+    // 月度依从热力图
+    var month = buildMonthCells(pkg.schedule || null, this.allLogs, times);
+
     this.setData({
       pkg: pkg,
       colorHex: COLOR_HEX[pi.color],
@@ -195,6 +257,10 @@ Page({
       weekDays: weekDays,
       weekRate: weekRate,
       streak: streak,
+      monthLabel: month.monthLabel,
+      monthRate: month.monthRate,
+      monthBlanks: month.blanks,
+      monthCells: month.cells,
       timeline: timeline,
       todayTaken: todayTaken,
       todayTotal: todayTotal,
@@ -350,6 +416,66 @@ Page({
       that.load();
       wx.showToast({ title: '已撤销', icon: 'success' });
     }, function () {});
+  },
+
+  // 补记昨天：ActionSheet 选昨天漏掉的时段，药位取当前版第一个未吃位置
+  onWeekCatchup: function (e) {
+    var date = e.currentTarget.dataset.date;
+    if (!date) return;
+    if (!this.data.dueToday && !this.pkg) { /* 非服药日但昨天可补，继续 */ }
+    var sched = (this.pkg && this.pkg.schedule) || {};
+    var times = this.times || (sched.times || []);
+    var yLogs = this.allLogs.filter(function (l) { return l.date === date; });
+    var untaken = [];
+    times.forEach(function (t, i) {
+      if (!yLogs.some(function (l) { return l.slotIndex === i; })) untaken.push({ index: i, time: t });
+    });
+    if (!untaken.length) {
+      wx.showToast({ title: '昨天已全部记录 ✓', icon: 'none' });
+      return;
+    }
+    // 药位：当前版第一个未吃的位置（补记 = 那颗药昨天实际已吃掉）
+    var boardNo = this.data.boardNo;
+    var cap = this.pi.rows * this.pi.cols;
+    var pillIndex = -1;
+    for (var i = 0; i < cap; i++) {
+      var used = this.allLogs.some(function (l) { return l.boardNo === boardNo && l.pillIndex === i && l.date <= date; });
+      if (!used) { pillIndex = i; break; }
+    }
+    if (pillIndex < 0) {
+      wx.showToast({ title: '当前版已无未吃药丸，请先切版', icon: 'none' });
+      return;
+    }
+    var that = this;
+    var pick = function (slotIndex) {
+      api.takeMed(that.pkgId, {
+        slotIndex: slotIndex,
+        boardNo: boardNo,
+        pillIndex: pillIndex,
+        date: date
+      }, function (res) {
+        if (res && res.log) {
+          that.allLogs.push(res.log);
+          wx.vibrateShort({ type: 'light' });
+          that.load();
+          wx.showToast({ title: '已补记昨天 ✓', icon: 'success' });
+        }
+      }, function () {});
+    };
+    if (untaken.length === 1) {
+      wx.showModal({
+        title: '补记昨天',
+        content: '将这颗药记为昨天 ' + untaken[0].time + ' 那次服药？',
+        success: function (r) { if (r.confirm) pick(untaken[0].index); }
+      });
+      return;
+    }
+    wx.showActionSheet({
+      itemList: untaken.map(function (s) { return s.time + ' 那次'; }),
+      success: function (r) {
+        if (untaken[r.tapIndex]) pick(untaken[r.tapIndex].index);
+      }
+    });
   },
 
   onShareAppMessage: function () {

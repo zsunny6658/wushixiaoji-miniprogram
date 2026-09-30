@@ -10,10 +10,12 @@
  *   onUnload 时调用 this._unsub()
  */
 var clients = [];       // 已注册的 handler
+var statusClients = []; // 连接状态回调（'connected' / 'offline'）
 var task = null;        // wx.RequestTask
 var retryTimer = null;
 var buf = '';           // 分帧缓冲
 var destroyed = false;
+var gotChunk = false;   // 本次连接是否已收到数据（用于判定 connected）
 
 function decodeChunk(arrayBuffer) {
   var bytes = new Uint8Array(arrayBuffer);
@@ -39,6 +41,12 @@ function decodeChunk(arrayBuffer) {
 function dispatch(event) {
   clients.forEach(function (fn) {
     try { fn(event); } catch (e) { /* 单个 handler 异常不影响其他 */ }
+  });
+}
+
+function dispatchStatus(st) {
+  statusClients.forEach(function (fn) {
+    try { fn(st); } catch (e) { /* noop */ }
   });
 }
 
@@ -70,17 +78,19 @@ function connect() {
   if (!baseUrl || !token) return;
   buf = '';
   destroyed = false;
+  gotChunk = false;
   task = wx.request({
     url: baseUrl + '/api/stream?token=' + encodeURIComponent(token),
     method: 'GET',
     enableChunked: true,
     header: { Accept: 'text/event-stream' },
-    success: function () { /* 正常断开（服务端关闭） */ },
-    fail: function () { scheduleRetry(); }
+    success: function () { /* 正常断开（服务端关闭） */ dispatchStatus('offline'); scheduleRetry(); },
+    fail: function () { dispatchStatus('offline'); scheduleRetry(); }
   });
   if (task && task.onChunkReceived) {
     task.onChunkReceived(function (res) {
       try {
+        if (!gotChunk) { gotChunk = true; dispatchStatus('connected'); }
         buf += decodeChunk(res.data || res.arrayBuffer || new ArrayBuffer(0));
         processBuffer();
       } catch (e) { /* 忽略解析异常 */ }
@@ -108,13 +118,19 @@ function closeTask() {
 
 module.exports = {
   // 注册监听，返回解绑函数。同一事件会广播给所有 handler。
-  subscribe: function (handler) {
+  // handler: (evt) => 业务事件；statusHandler: ('connected'|'offline') => 连接状态（可选）
+  subscribe: function (handler, statusHandler) {
     clients.push(handler);
+    if (statusHandler) statusClients.push(statusHandler);
     connect();
     var self = this;
     return function unsubscribe() {
       var i = clients.indexOf(handler);
       if (i >= 0) clients.splice(i, 1);
+      if (statusHandler) {
+        var j = statusClients.indexOf(statusHandler);
+        if (j >= 0) statusClients.splice(j, 1);
+      }
       if (!clients.length) {
         destroyed = true;
         closeTask();

@@ -8,6 +8,8 @@
   </view>
 
   <block wx:if="{{!loading && !error}}">
+    <!-- SSE 断线提示 -->
+    <view class="rt-banner" wx:if="{{rtOff}}">⚡ 实时同步已断开，正在重连…（家人打卡可能延迟显示）</view>
     <!-- 药品信息头 -->
     <view class="med-header">
       <view class="med-title-row">
@@ -164,7 +166,27 @@
             <view class="week-bar-fill {{item.full ? 'wbf-full' : (item.none ? 'wbf-none' : '')}}" style="width:{{item.percent}}%"></view>
           </view>
           <text class="week-count">{{item.taken}}/{{item.total}}</text>
+          <text class="week-catchup" wx:if="{{item.catchable}}" catchtap="onWeekCatchup" data-date="{{item.date}}">补记</text>
         </view>
+      </view>
+    </view>
+
+    <!-- 本月依从热力图 -->
+    <view class="month-card" wx:if="{{monthCells.length}}">
+      <view class="week-title">{{monthLabel}}依从 {{monthRate}}%</view>
+      <view class="month-grid">
+        <text class="mg-blank" wx:for="{{monthBlanks}}" wx:key="index"></text>
+        <view class="mg-cell mg-{{item.state}}" wx:for="{{monthCells}}" wx:key="d">
+          <text class="mg-num">{{item.d}}</text>
+          <text class="mg-mark" wx:if="{{item.state === 'full'}}">✓</text>
+          <text class="mg-mark" wx:elif="{{item.state === 'part'}}">…</text>
+        </view>
+      </view>
+      <view class="month-legend">
+        <text class="lg-item"><view class="lg-dot lg-full"></view>达标</text>
+        <text class="lg-item"><view class="lg-dot lg-part"></view>部分</text>
+        <text class="lg-item"><view class="lg-dot lg-due"></view>未服</text>
+        <text class="lg-item"><view class="lg-dot lg-off"></view>休息日</text>
       </view>
     </view>
   </block>

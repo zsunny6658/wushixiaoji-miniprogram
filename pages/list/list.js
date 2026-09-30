@@ -1,6 +1,7 @@
 // pages/list/list.js
 var api = require('../../utils/api');
 var helpers = require('../../utils/helpers');
+var realtime = require('../../utils/realtime');
 var app = getApp();
 
 Page({
@@ -53,6 +54,14 @@ Page({
       groupIndex: ['none', 'owner', 'type'].indexOf(app.globalData.group || 'type'),
       pxToRpx: 750 / sys.windowWidth
     });
+    // SSE 连接状态黄条（首页列表最常看，断线要有感知）
+    var that = this;
+    this._unsubRt = realtime.subscribe(function () {}, function (st) {
+      that.setData({ rtOff: st === 'offline' });
+    });
+  },
+  onUnload: function () {
+    if (this._unsubRt) { this._unsubRt(); this._unsubRt = null; }
   },
   onShow: function () {
     if (!app.globalData.token) { wx.reLaunch({ url: '/pages/login/login' }); return; }
