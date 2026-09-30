@@ -97,7 +97,7 @@
   gap: 12rpx;
   margin-top: 12rpx;
   padding: 12rpx 16rpx;
-  background: #f5f3ff;
+  background: rgba(124, 58, 237, 0.10);
   border-radius: var(--radius-sm);
 }
 .debt-inst-label {
@@ -115,8 +115,8 @@
   padding: 4rpx 12rpx;
   border-radius: var(--radius-sm);
   font-size: var(--font-caption);
-  background: #f0f0f0;
-  color: #666;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
@@ -242,11 +242,11 @@
 .action-copy { background: var(--color-info-light); color: var(--color-info); }
 .action-edit { background: var(--color-primary-light); color: var(--color-primary); }
 .action-delete { background: var(--color-error-light); color: var(--color-error); }
-.action-flag { background: #fce4e4; color: #ef4444; }
+.action-flag { background: rgba(239, 68, 68, 0.14); color: #ef4444; }
 .action-flag-active { background: #ef4444; color: #fff; }
 .action-ignore { background: var(--text-tertiary); color: var(--text-white); }
 .action-ignored { background: var(--color-warning); color: var(--text-white); }
-.action-archive { background: #e8eaf6; color: #3f51b5; }
+.action-archive { background: rgba(63, 81, 181, 0.15); color: #7986cb; }
 .action-main {
   flex: 1.5;
   background: linear-gradient(135deg, var(--color-primary) 0%, #6C8AFF 100%);
@@ -263,15 +263,15 @@
   align-items: center;
   gap: 8rpx;
   padding: 16rpx 24rpx;
-  background: #fef3c7;
-  border-bottom: 1px solid #fde68a;
+  background: rgba(245, 158, 11, 0.15);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.30);
 }
 .ignore-notice-icon {
   font-size: 28rpx;
 }
 .ignore-notice-text {
   font-size: 24rpx;
-  color: #92400e;
+  color: var(--color-warning, #F59E0B);
 }
 
 /* 归档提示条 */
@@ -280,8 +280,8 @@
   align-items: center;
   gap: 8rpx;
   padding: 16rpx 24rpx;
-  background: #e8eaf6;
-  border-bottom: 1px solid #c5cae9;
+  background: rgba(63, 81, 181, 0.15);
+  border-bottom: 1px solid rgba(63, 81, 181, 0.30);
 }
 .archive-notice-icon { font-size: 28rpx; }
 .archive-notice-text { font-size: 24rpx; color: #283593; }

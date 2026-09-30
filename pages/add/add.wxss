@@ -304,7 +304,7 @@
   width: 48rpx;
   height: 48rpx;
   border-radius: 12rpx;
-  background: #fff;
+  background: var(--bg-card, #fff);
   border: 2rpx solid var(--border);
   display: flex;
   align-items: center;

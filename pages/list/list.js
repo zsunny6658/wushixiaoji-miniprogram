@@ -411,7 +411,8 @@ Page({
     var groups = (this.data.groups || []).map(function (g) {
       return Object.assign({}, g, { items: g.items.map(function (p) { return Object.assign({}, p, { batchSelected: false }); }) });
     });
-    this.setData({ batchMode: true, list: list, groups: groups, batchCount: 0 });
+    // 批量模式下左滑手势禁用，先收起已展开的滑动卡片避免视觉冲突
+    this.setData({ batchMode: true, list: list, groups: groups, batchCount: 0, swipeOffset: 0, swipeId: '' });
   },
   onExitBatch: function () {
     var list = (this.data.list || []).map(function (p) { delete p.batchSelected; return p; });

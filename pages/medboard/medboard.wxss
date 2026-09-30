@@ -114,7 +114,7 @@
   color: var(--text-tertiary, #94A3B8);
 }
 .cs-item.cs-active {
-  background: #fff;
+  background: var(--bg-card, #fff);
   color: var(--color-primary, #4A90D9);
   font-weight: 600;
   box-shadow: 0 2rpx 8rpx rgba(15, 42, 86, 0.08);

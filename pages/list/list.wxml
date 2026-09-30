@@ -83,7 +83,7 @@
           <view class="swipe-actions">
             <view class="swipe-act {{item.status === 'picked' ? 'swipe-undo' : 'swipe-done'}}" catchtap="onSwipePick" data-id="{{item.id}}">{{item.status === 'picked' ? '↩ 撤销' : '✓ 完成'}}</view>
           </view>
-          <view class="card {{item.importance === 'high' ? 'flagged' : ''}} {{item.status === 'picked' ? 'picked' : ''}} {{item.overdue ? 'urgent' : ''}} {{batchMode && item.batchSelected ? 'selected' : ''}} {{item.id === swipeId && swipeOffset !== 0 ? 'swiping' : ''}}" bindtap="onCardTap" bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd" bindlongpress="onCardLongPress" data-id="{{item.id}}" style="transform:translateX({{item.id === swipeId ? swipeOffset : 0}}rpx)">
+          <view hover-class="card-press" hover-stay-time="60" class="card {{item.importance === 'high' ? 'flagged' : ''}} {{item.status === 'picked' ? 'picked' : ''}} {{item.overdue ? 'urgent' : ''}} {{batchMode && item.batchSelected ? 'selected' : ''}} {{item.id === swipeId && swipeOffset !== 0 ? 'swiping' : ''}}" bindtap="onCardTap" bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd" bindlongpress="onCardLongPress" data-id="{{item.id}}" style="transform:translateX({{item.id === swipeId ? swipeOffset : 0}}rpx)">
             <view class="card-inner">
               <view class="batch-check" wx:if="{{batchMode}}" data-id="{{item.id}}">
                 <text class="checkbox {{item.batchSelected ? 'checked' : ''}}">{{item.batchSelected ? '✓' : ''}}</text>
@@ -127,7 +127,7 @@
           <view class="swipe-actions">
             <view class="swipe-act {{pkg.status === 'picked' ? 'swipe-undo' : 'swipe-done'}}" catchtap="onSwipePick" data-id="{{pkg.id}}">{{pkg.status === 'picked' ? '↩ 撤销' : '✓ 完成'}}</view>
           </view>
-          <view class="card {{pkg.importance === 'high' ? 'flagged' : ''}} {{pkg.status === 'picked' ? 'picked' : ''}} {{pkg.overdue ? 'urgent' : ''}} {{batchMode && pkg.batchSelected ? 'selected' : ''}} {{pkg.id === swipeId && swipeOffset !== 0 ? 'swiping' : ''}}" bindtap="onCardTap" bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd" bindlongpress="onCardLongPress" data-id="{{pkg.id}}" style="transform:translateX({{pkg.id === swipeId ? swipeOffset : 0}}rpx)">
+          <view hover-class="card-press" hover-stay-time="60" class="card {{pkg.importance === 'high' ? 'flagged' : ''}} {{pkg.status === 'picked' ? 'picked' : ''}} {{pkg.overdue ? 'urgent' : ''}} {{batchMode && pkg.batchSelected ? 'selected' : ''}} {{pkg.id === swipeId && swipeOffset !== 0 ? 'swiping' : ''}}" bindtap="onCardTap" bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd" bindlongpress="onCardLongPress" data-id="{{pkg.id}}" style="transform:translateX({{pkg.id === swipeId ? swipeOffset : 0}}rpx)">
             <view class="card-inner">
               <view class="batch-check" wx:if="{{batchMode}}" data-id="{{pkg.id}}">
                 <text class="checkbox {{pkg.batchSelected ? 'checked' : ''}}">{{pkg.batchSelected ? '✓' : ''}}</text>

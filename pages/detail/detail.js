@@ -77,13 +77,16 @@ Page({
   onMoreActions: function () {
     var that = this;
     var isArchived = this.data.pkg.status === 'archived';
+    // 忽略/恢复也收进更多菜单（低频操作，底栏只留主次两组）
+    var ignoreLabel = this.data.pkg.status === 'ignored' ? '恢复提醒' : '忽略';
     var items = ['复制'];
-    if (!isArchived) items = items.concat(['归档', '删除']);
+    if (!isArchived) items = items.concat([ignoreLabel, '归档', '删除']);
     wx.showActionSheet({
       itemList: items,
       success: function (res) {
         var label = items[res.tapIndex];
         if (label === '复制') that.onCopy();
+        else if (label === ignoreLabel) that.onToggleIgnore();
         else if (label === '归档') that.onArchive();
         else if (label === '删除') that.onDelete();
       }
