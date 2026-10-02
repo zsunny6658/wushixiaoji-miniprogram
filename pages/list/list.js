@@ -122,14 +122,17 @@ Page({
     // 基于当前筛选条件（不含状态筛选）计算各状态计数，使数字随筛选变化
     var basePkgs = pkgs.slice();
     var counts = {
-      all: basePkgs.length,
+      // 'all' 视图排除归档/忽略后 = 待办 + 完成
+      all: basePkgs.filter(function (p) { return p.status !== 'archived' && p.status !== 'ignored'; }).length,
       pending: basePkgs.filter(function (p) { return p.status === 'pending'; }).length,
       picked: basePkgs.filter(function (p) { return p.status === 'picked'; }).length,
       overdue: basePkgs.filter(function (p) { return p.overdue && p.status === 'pending'; }).length,
       ignored: basePkgs.filter(function (p) { return p.status === 'ignored'; }).length
     };
     // 应用状态筛选（影响列表显示，不影响上面的计数）
-    if (this.data.filter === 'pending') pkgs = pkgs.filter(function (p) { return p.status === 'pending'; });
+    // 'all' 只承接活跃生命周期：排除归档（专门页面）与忽略（专门 tab）；近期完成保留 7 天回顾窗口（到期自动归档）
+    if (this.data.filter === 'all') pkgs = pkgs.filter(function (p) { return p.status !== 'archived' && p.status !== 'ignored'; });
+    else if (this.data.filter === 'pending') pkgs = pkgs.filter(function (p) { return p.status === 'pending'; });
     else if (this.data.filter === 'picked') pkgs = pkgs.filter(function (p) { return p.status === 'picked'; });
     else if (this.data.filter === 'overdue') pkgs = pkgs.filter(function (p) { return p.overdue && p.status === 'pending'; });
     else if (this.data.filter === 'ignored') pkgs = pkgs.filter(function (p) { return p.status === 'ignored'; });
