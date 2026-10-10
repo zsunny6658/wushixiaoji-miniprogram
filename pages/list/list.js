@@ -473,7 +473,11 @@ Page({
   onBatchPick: function () {
     var self = this;
     var all = (this.data.list.length ? this.data.list : (this.data.groups || []).reduce(function (a, g) { return a.concat(g.items); }, []));
-    var ids = all.filter(function (p) { return p.batchSelected && p.status === 'pending'; }).map(function (p) { return p.id; });
+    var ids = all.filter(function (p) { return p.batchSelected && p.status === 'pending' && p.type !== 'medication'; }).map(function (p) { return p.id; });
+    if (!ids.length) {
+      wx.showToast({ title: '用药记录请在药板打卡', icon: 'none' });
+      return;
+    }
     if (!ids.length) { wx.showToast({ title: '没有可选记录', icon: 'none' }); return; }
     wx.showModal({
       title: '批量完成',
@@ -541,7 +545,8 @@ Page({
     if (!pkg) return;
     var isPicked = pkg.status === 'picked';
     var isIgnored = pkg.status === 'ignored';
-    var pickLabel = isPicked ? '↩ 撤销完成' : '✓ 标记完成';
+    var isMed = pkg.type === 'medication';
+    var pickLabel = isPicked ? '↩ 撤销完成' : (isMed ? '💊 打卡服药' : '✓ 标记完成');
     var ignoreLabel = isIgnored ? '📌 恢复显示' : '🚫 忽略此条';
     var items = [pickLabel, ignoreLabel];
     if (!isIgnored) items.push('🔕 长期忽略…');
@@ -569,6 +574,11 @@ Page({
     var pkg = (app.globalData.packages || []).find(function (p) { return p.id === id; });
     if (!pkg) return;
     var that = this;
+    // 用药记录不走通用完成：打卡服药去仿真药板
+    if (pkg.type === 'medication' && pkg.status === 'pending') {
+      wx.navigateTo({ url: '/pages/medboard/medboard?id=' + id });
+      return;
+    }
     if (pkg.status === 'pending') {
       var patch = { status: 'picked', pickedAt: new Date().toISOString(), pickedBy: app.globalData.me };
       that.optimisticUpdate(id, patch);

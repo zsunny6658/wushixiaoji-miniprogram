@@ -244,6 +244,11 @@ Page({
     var self = this;
     var pkg = this.data.pkg;
     var id = pkg.id;
+    // 用药记录不走通用完成：打卡服药去仿真药板
+    if (pkg.type === 'medication' && pkg.status !== 'picked') {
+      wx.navigateTo({ url: '/pages/medboard/medboard?id=' + id });
+      return;
+    }
     if (pkg.status === 'picked') {
       this.optimisticUpdate(id, { status: 'pending', pickedAt: '', pickedBy: '' });
       api.updatePackage(id, { status: 'pending', pickedAt: '', pickedBy: '' }, null, function () {

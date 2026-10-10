@@ -142,7 +142,7 @@
     </button>
     <button class="action-btn action-main {{pkg.status === 'picked' ? 'action-unpick' : ''}}" bindtap="onTogglePick" wx:if="{{pkg.status !== 'archived'}}">
       <ficon class="action-icon-vec" name="check-circle" size="34" color="#FFFFFF" />
-      <text>{{pkg.status === 'picked' ? '撤销' : '完成'}}</text>
+      <text>{{pkg.status === 'picked' ? '撤销' : (pkg.type === 'medication' ? '打卡服药' : '完成')}}</text>
     </button>
     <button class="action-btn action-more" bindtap="onMoreActions">
       <ficon class="action-icon-vec" name="copy" size="34" color="#718096" />

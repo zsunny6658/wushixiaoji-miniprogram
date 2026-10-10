@@ -81,7 +81,7 @@
             <view class="swipe-act {{item.importance === 'high' ? 'swipe-flag-off' : 'swipe-flag'}}" catchtap="onSwipeFlag" data-id="{{item.id}}"><ficon name="flag" size="26" color="#fff" /> {{item.importance === 'high' ? '取消红旗' : '红旗'}}</view>
           </view>
           <view class="swipe-actions">
-            <view class="swipe-act {{item.status === 'picked' ? 'swipe-undo' : 'swipe-done'}}" catchtap="onSwipePick" data-id="{{item.id}}">{{item.status === 'picked' ? '↩ 撤销' : '✓ 完成'}}</view>
+            <view class="swipe-act {{item.status === 'picked' ? 'swipe-undo' : 'swipe-done'}}" catchtap="onSwipePick" data-id="{{item.id}}">{{item.status === 'picked' ? '↩ 撤销' : (item.type === 'medication' ? '💊 打卡' : '✓ 完成')}}</view>
           </view>
           <view hover-class="card-press" hover-stay-time="60" class="card {{item.importance === 'high' ? 'flagged' : ''}} {{item.status === 'picked' ? 'picked' : ''}} {{item.overdue ? 'urgent' : ''}} {{batchMode && item.batchSelected ? 'selected' : ''}} {{item.id === swipeId && swipeOffset !== 0 ? 'swiping' : ''}}" bindtap="onCardTap" bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd" bindlongpress="onCardLongPress" data-id="{{item.id}}" style="transform:translateX({{item.id === swipeId ? swipeOffset : 0}}rpx)">
             <view class="card-inner">
@@ -125,7 +125,7 @@
             <view class="swipe-act {{pkg.importance === 'high' ? 'swipe-flag-off' : 'swipe-flag'}}" catchtap="onSwipeFlag" data-id="{{pkg.id}}"><ficon name="flag" size="26" color="#fff" /> {{pkg.importance === 'high' ? '取消红旗' : '红旗'}}</view>
           </view>
           <view class="swipe-actions">
-            <view class="swipe-act {{pkg.status === 'picked' ? 'swipe-undo' : 'swipe-done'}}" catchtap="onSwipePick" data-id="{{pkg.id}}">{{pkg.status === 'picked' ? '↩ 撤销' : '✓ 完成'}}</view>
+            <view class="swipe-act {{pkg.status === 'picked' ? 'swipe-undo' : 'swipe-done'}}" catchtap="onSwipePick" data-id="{{pkg.id}}">{{pkg.status === 'picked' ? '↩ 撤销' : (pkg.type === 'medication' ? '💊 打卡' : '✓ 完成')}}</view>
           </view>
           <view hover-class="card-press" hover-stay-time="60" class="card {{pkg.importance === 'high' ? 'flagged' : ''}} {{pkg.status === 'picked' ? 'picked' : ''}} {{pkg.overdue ? 'urgent' : ''}} {{batchMode && pkg.batchSelected ? 'selected' : ''}} {{pkg.id === swipeId && swipeOffset !== 0 ? 'swiping' : ''}}" bindtap="onCardTap" bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd" bindlongpress="onCardLongPress" data-id="{{pkg.id}}" style="transform:translateX({{pkg.id === swipeId ? swipeOffset : 0}}rpx)">
             <view class="card-inner">
