@@ -48,8 +48,8 @@
       </view>
     </view>
 
-    <!-- 版 tab -->
-    <view class="board-tabs">
+    <!-- 版 tab（初始化模式下隐藏，用初始化条内的版 tab） -->
+    <view class="board-tabs" wx:if="{{!initializing}}">
       <view class="board-tab {{boardNo === item.no ? 'bt-active' : ''}}" wx:for="{{boards}}" wx:key="no" bindtap="onBoardTap" data-no="{{item.no}}">
         <text>第{{item.no}}版</text>
         <text class="bt-count">{{item.taken}}/{{item.cap}}</text>
@@ -107,46 +107,45 @@
       </view>
     </view>
 
-    <!-- 初始化模式提示条 -->
+    <!-- 初始化模式提示条（含各版 tab：一次会话逐版设置） -->
     <view class="init-overlay" wx:if="{{initializing}}">
       <view class="init-overlay-bar">
         <view class="init-overlay-left">
           <text class="init-overlay-icon">🔄</text>
           <view class="init-overlay-info">
             <text class="init-overlay-title">初始化药板</text>
-            <text class="init-overlay-sub">点击药丸标记已吃 · 共 {{initTotalTaken}} 颗</text>
+            <text class="init-overlay-sub">已标记 {{initTotalTaken}} 颗 · 正在设置第 {{initBoardNo}} 版</text>
           </view>
         </view>
         <view class="init-overlay-actions">
           <text class="init-btn-cancel" bindtap="onInitCancel">取消</text>
-          <text class="init-btn-confirm" bindtap="onInitConfirm">✓ 提交</text>
+          <text class="init-btn-confirm" bindtap="onInitConfirm">✓ 完成</text>
         </view>
       </view>
-      <view class="init-overlay-hint">点击缺口可取消已标记的药</view>
+      <view class="init-board-tabs">
+        <view class="init-board-tab {{initBoardNo === item.no ? 'ibt-active' : ''}}" wx:for="{{initTabs}}" wx:key="no" catchtap="onInitBoardTap" data-no="{{item.no}}">
+          <text>第{{item.no}}版</text>
+          <text class="ibt-count">{{item.taken}}/{{item.cap}}</text>
+        </view>
+      </view>
+      <view class="init-overlay-hint">点击或按住划过药丸标记已吃 · 逐版设置好后点「完成」</view>
     </view>
 
-    <!-- 初始化模式药板（独立渲染，与正常模式互斥，避免 wx:if/wx:else 配对失效导致药板消失） -->
-    <view class="blister" wx:if="{{initializing}}">
+    <!-- 初始化模式药板（独立渲染，滑动连续标记，与正常模式互斥） -->
+    <view class="blister" wx:if="{{initializing}}" catchtouchmove="onInitPaintMove" bindtouchend="onInitPaintEnd">
       <view class="blister-row" wx:for="{{initCellRows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
-        <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
-          <view
-            wx:if="{{cell.showPill}}"
-            class="pill shape-{{pillShape}} init-pill"
-            style="{{pillStyle}}background:{{colorHex}}"
-            bindtap="onInitPillTap"
-            data-board="{{cell.boardNo}}"
-            data-pill="{{cell.index}}"
-          >
+        <view class="cell init-cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index" bindtouchstart="onInitPaintStart" data-board="{{cell.boardNo}}" data-pill="{{cell.index}}">
+          <view wx:if="{{cell.showPill}}" class="pill shape-{{pillShape}} init-pill" style="{{pillStyle}}background:{{colorHex}}">
             <view wx:if="{{pillShape === 'capsule'}}" class="capsule-line"></view>
           </view>
-          <view wx:else class="pill-hole init-hole" style="{{holeStyle}}" bindtap="onInitPillTap" data-board="{{cell.boardNo}}" data-pill="{{cell.index}}">
+          <view wx:else class="pill-hole init-hole" style="{{holeStyle}}">
             <text class="init-hole-check">✓</text>
             <text class="init-hole-text">已吃</text>
           </view>
         </view>
       </view>
     </view>
-    <view class="init-overlay-hint init-overlay-hint-page" wx:if="{{initializing}}">点击药丸标记已吃 · 点已吃缺口可撤销标记</view>
+    <view class="init-overlay-hint init-overlay-hint-page" wx:if="{{initializing}}">起始位置决定动作：从药丸起划 = 标记已吃，从已吃缺口起划 = 取消标记</view>
 
     <!-- 单板（当前 / 满版） -->
     <view class="blister {{!dueToday ? 'blister-rest' : ''}}" wx:elif="{{compare !== 'today'}}">

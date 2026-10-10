@@ -239,6 +239,34 @@
   color: rgba(255, 255, 255, 0.7);
   text-align: center;
 }
+/* 初始化模式内各版切换 tab */
+.init-board-tabs {
+  display: flex;
+  gap: 14rpx;
+  flex-wrap: wrap;
+  margin-top: 20rpx;
+}
+.init-board-tab {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 10rpx 24rpx;
+  border-radius: 14rpx;
+  font-size: 24rpx;
+  background: rgba(255, 255, 255, 0.16);
+  border: 2rpx solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+.init-board-tab.ibt-active {
+  background: #fff;
+  border-color: #fff;
+  color: #059669;
+  font-weight: 700;
+}
+.ibt-count {
+  font-size: 20rpx;
+  opacity: 0.75;
+}
 
 /* 初始化模式药丸 */
 .init-pill {

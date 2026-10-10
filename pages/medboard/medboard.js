@@ -97,13 +97,12 @@ Page({
     timeline: [],
     loading: true,
     error: '',
-    // 初始化模式：一次性设置所有版
+    // 初始化模式：一次会话逐版设置，最后统一提交
     initializing: false,
-    initCurrentBoard: 1,
-    initBoardStates: {},   // { boardNo: { pills: {pillIndex: true}, startFrom: bool } }
+    initBoardNo: 1,
+    initTabs: [],
     initCellRows: [],
-    initTotalTaken: 0,
-    initStartBoard: 1
+    initTotalTaken: 0
   },
 
   onLoad: function (opts) {
@@ -292,10 +291,10 @@ Page({
       boxRemaining: pi.boards * pi.rows * pi.cols - this.allLogs.length
     });
     this.buildBoard();
-    // 详情页「初始化药板」入口直达：加载完成后自动进入初始化模式（起始版 = 当前记录版号）
+    // 详情页「初始化药板」入口直达：加载完成后自动进入初始化模式（默认停在当前版）
     if (this._autoInit) {
       this._autoInit = false;
-      this.startInit(this.pi.boardNo || 1);
+      this.startInitMode(this.pi.boardNo || 1);
     }
   },
 
@@ -539,114 +538,161 @@ Page({
     });
   },
 
-  // 初始化药板：选起始版号 → 勾选已吃位置 → 提交
+  // 初始化药板：直接进入初始化模式，界面内逐版设置，最后统一完成
   onResetBoard: function () {
-    var that = this;
+    this.startInitMode(this.pi.boardNo || this.data.boardNo || 1);
+  },
+
+  // 进入初始化模式：一次会话设置所有版；预填各版已有的初始化占位标记
+  startInitMode: function (curBoard) {
     var pi = this.pi || {};
-    var boards = pi.boards || 2;
-    var itemList = [];
-    for (var b = 1; b <= boards; b++) {
-      itemList.push('从第' + b + '版开始');
-    }
-    wx.showActionSheet({
-      itemList: itemList,
-      success: function (res) {
-        that.startInit(res.tapIndex + 1);
+    var states = {};
+    (this.allLogs || []).forEach(function (l) {
+      if (l.date === '2000-01-01') {
+        var b = l.boardNo || 1;
+        if (!states[b]) states[b] = {};
+        states[b][l.pillIndex] = true;
       }
     });
+    this._initBoardStates = states;
+    this._initBoardNo = clamp(curBoard, 1, pi.boards || 2, 1);
+    this.setData({ initializing: true, initBoardNo: this._initBoardNo });
+    this.updateInitData();
+    wx.showToast({ title: '逐版划选已吃位置，完成后点「完成」', icon: 'none', duration: 2500 });
   },
 
-  // 进入初始化模式（起始版号 boardNo）；预填该版已有的初始化占位标记，避免重初始化时丢失
-  startInit: function (boardNo) {
-    this._initBoardNo = boardNo;
-    var preset = {};
-    (this.allLogs || []).forEach(function (l) {
-      if ((l.boardNo || 1) === boardNo && l.date === '2000-01-01') preset[l.pillIndex] = true;
-    });
-    this._initPillSet = preset;
-    var presetCount = Object.keys(preset).length;
-    this.setData({
-      initializing: true,
-      initTaken: Object.keys(preset).map(function (k) { return { boardNo: boardNo, pillIndex: parseInt(k, 10) }; }),
-      initPillSet: preset,
-      initTotalTaken: presetCount,
-      boardNo: boardNo
-    });
-    this.buildInitRows();
-    wx.showToast({ title: '第' + boardNo + '版：点击药丸标记已吃', icon: 'none', duration: 2500 });
-  },
-
-  // 构建初始化药板网格（所有位置默认有药丸，点击标记已吃）
-  buildInitRows: function () {
+  // 初始化模式数据刷新：各版 tab 计数 + 当前版网格 + 总标记数
+  updateInitData: function () {
     var pi = this.pi || {};
-    var boardNo = this._initBoardNo || this.data.boardNo;
+    var cap = pi.rows * pi.cols;
+    var states = this._initBoardStates || {};
+    var tabs = [];
+    var total = 0;
+    for (var b = 1; b <= pi.boards; b++) {
+      var n = Object.keys(states[b] || {}).length;
+      total += n;
+      tabs.push({ no: b, taken: n, cap: cap });
+    }
+    var boardNo = this._initBoardNo;
+    var set = states[boardNo] || {};
     var rows = [];
     var cells = [];
-    var cap = pi.rows * pi.cols;
-    var set = this._initPillSet || {};
     for (var i = 0; i < cap; i++) {
-      cells.push({
-        index: i,
-        boardNo: boardNo,
-        taken: !!set[i],
-        showPill: !set[i]
-      });
+      cells.push({ index: i, boardNo: boardNo, taken: !!set[i], showPill: !set[i] });
     }
     for (var r = 0; r < pi.rows; r++) {
       rows.push(cells.slice(r * pi.cols, (r + 1) * pi.cols));
     }
-    this.setData({ initCellRows: rows });
+    this.setData({ initTabs: tabs, initCellRows: rows, initTotalTaken: total });
   },
 
-  // 初始化模式下点击药丸/缺口：切换已吃标记
-  onInitPillTap: function (e) {
-    var ds = e.currentTarget.dataset;
-    var pill = parseInt(ds.pill, 10);
-    var board = parseInt(ds.board, 10);
-    if (!this._initPillSet) this._initPillSet = {};
-    if (this._initPillSet[pill]) {
-      delete this._initPillSet[pill];
+  // 初始化模式内切换版
+  onInitBoardTap: function (e) {
+    if (!this.data.initializing) return;
+    var no = parseInt(e.currentTarget.dataset.no, 10);
+    if (no === this._initBoardNo) return;
+    this._initBoardNo = no;
+    this.setData({ initBoardNo: no });
+    this.updateInitData();
+  },
+
+  // 初始化模式：点击/按住划过药丸标记已吃（paint：起始格取反决定涂「标记」还是「取消」，划过即应用）
+  onInitPaintStart: function (e) {
+    if (!this.data.initializing || this._paintActive) return;
+    var idx = parseInt(e.currentTarget.dataset.pill, 10);
+    var set = this._initBoardStates[this._initBoardNo] || {};
+    this._paintActive = true;
+    this._paintValue = !set[idx];
+    this.paintCell(idx, this._paintValue);
+    // 缓存所有药位位置供 touchmove 命中检测（touchmove 始终派发到起始元素，无法靠换绑目标实现）
+    var that = this;
+    this.createSelectorQuery().selectAll('.init-cell').boundingClientRect(function (rects) {
+      that._initRects = rects || [];
+    }).exec();
+  },
+
+  onInitPaintMove: function (e) {
+    if (!this._paintActive) return;
+    var t = e.touches && e.touches[0];
+    var rects = this._initRects;
+    if (!t || !rects || !rects.length) return;
+    for (var i = 0; i < rects.length; i++) {
+      var r = rects[i];
+      if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
+        this.paintCell(i, this._paintValue);
+      }
+    }
+  },
+
+  onInitPaintEnd: function () {
+    this._paintActive = false;
+    this._initRects = null;
+  },
+
+  paintCell: function (idx, value) {
+    var b = this._initBoardNo;
+    var states = this._initBoardStates;
+    if (!states[b]) states[b] = {};
+    var set = states[b];
+    if (value) {
+      if (set[idx]) return;
+      set[idx] = true;
     } else {
-      this._initPillSet[pill] = true;
+      if (!set[idx]) return;
+      delete set[idx];
     }
-    // 更新 taken 列表
-    var taken = [];
-    for (var k in this._initPillSet) {
-      taken.push({ boardNo: board, pillIndex: parseInt(k, 10) });
-    }
-    this.setData({ initTaken: taken, initPillSet: this._initPillSet, initTotalTaken: taken.length });
-    this.buildInitRows();
-    wx.vibrateShort({ type: 'light' });
+    var now = Date.now();
+    if (now - (this._lastVib || 0) > 80) { this._lastVib = now; wx.vibrateShort({ type: 'light' }); }
+    this.updateInitData();
   },
 
   // 退出初始化模式
   onInitCancel: function () {
-    this.setData({ initializing: false, initTaken: [], initPillSet: {}, initCellRows: [], initTotalTaken: 0 });
+    this._initBoardStates = null;
+    this._paintActive = false;
+    this._initRects = null;
+    this.setData({ initializing: false, initTabs: [], initCellRows: [], initTotalTaken: 0 });
   },
 
-  // 提交初始化：提交已吃位置给后端
+  // 完成初始化：对本次涉及的所有版逐版串行提交
   onInitConfirm: function () {
     var that = this;
-    var boardNo = this._initBoardNo || this.data.boardNo;
-    var taken = this.data.initTaken || [];
+    var states = this._initBoardStates || {};
+    var list = Object.keys(states).map(function (k) {
+      return { boardNo: parseInt(k, 10), set: states[k] };
+    }).filter(function (it) { return it.boardNo >= 1; }).sort(function (a, b) { return a.boardNo - b.boardNo; });
+    if (!list.length) {
+      wx.showToast({ title: '还没标记任何位置', icon: 'none' });
+      return;
+    }
+    var total = list.reduce(function (s, it) { return s + Object.keys(it.set).length; }, 0);
+    var parts = list.map(function (it) { return '第' + it.boardNo + '版 ' + Object.keys(it.set).length + ' 颗'; }).join('、');
     wx.showModal({
-      title: '确认初始化',
-      content: '重置第 ' + boardNo + ' 版：已标记 ' + taken.length + ' 颗药已吃。仅影响第 ' + boardNo + ' 版记录，其他版不受影响。确定吗？',
+      title: '完成初始化',
+      content: '共标记 ' + total + ' 颗已吃（' + parts + '）。将重置这些版的已吃记录，其他版不受影响。确定吗？',
       confirmColor: '#10B981',
       success: function (r) {
-        if (r.confirm) {
-          api.resetMedBoard(that.pkgId, boardNo, taken, function () {
-            that._initPillSet = {};
-            that.setData({ initializing: false, initTaken: [], initPillSet: {}, initCellRows: [], initTotalTaken: 0 });
-            that.allLogs = [];
-            that.setData({ boardNo: boardNo });
-            that.load();
-            wx.showToast({ title: '初始化完成', icon: 'success' });
-          }, function () {
-            wx.showToast({ title: '初始化失败', icon: 'none' });
-          });
-        }
+        if (r.confirm) that.submitInitBoards(list, 0);
       }
+    });
+  },
+
+  submitInitBoards: function (list, i) {
+    var that = this;
+    if (i >= list.length) {
+      this._initBoardStates = null;
+      this.setData({ initializing: false, initTabs: [], initCellRows: [], initTotalTaken: 0, boardNo: list[0].boardNo });
+      this.allLogs = [];
+      this.load();
+      wx.showToast({ title: '初始化完成', icon: 'success' });
+      return;
+    }
+    var item = list[i];
+    var taken = Object.keys(item.set).map(function (k) { return parseInt(k, 10); });
+    api.resetMedBoard(this.pkgId, item.boardNo, taken, function () {
+      that.submitInitBoards(list, i + 1);
+    }, function () {
+      wx.showToast({ title: '第' + item.boardNo + '版初始化失败', icon: 'none' });
     });
   },
 
