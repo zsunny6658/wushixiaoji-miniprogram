@@ -89,6 +89,9 @@
 .s-done .stat-num { color: var(--color-success); }
 .s-debt { border-top-color: #7c3aed; }
 .s-debt .stat-num { color: #7c3aed; }
+.s-med { border-top-color: #10B981; }
+.s-med .stat-icon { background: rgba(16, 185, 129, 0.12); }
+.s-med .stat-num { color: #10B981; }
 .s-private { border-top-color: #6b7280; }
 .s-private .stat-num { color: #6b7280; }
 .s-ignored { border-top-color: var(--text-tertiary); }

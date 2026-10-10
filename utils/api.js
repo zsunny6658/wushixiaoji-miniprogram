@@ -223,6 +223,9 @@ var API = {
   untakeMed: function (id, logId, cb, errCb) {
     this.request('DELETE', '/api/packages/' + id + '/medlogs/' + logId, null, cb, errCb);
   },
+  resetMedBoard: function (id, boardNo, takenPositions, cb, errCb) {
+    this.request('POST', '/api/packages/' + id + '/medlogs/reset', { boardNo: boardNo, takenPositions: takenPositions || [] }, cb, errCb);
+  },
   // 药名输入联想
   suggestDrugs: function (q, cb, errCb) {
     this.request('GET', '/api/drugs/suggest', { q: q, limit: 6 }, cb, errCb);

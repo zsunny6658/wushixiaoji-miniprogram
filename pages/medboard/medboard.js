@@ -96,13 +96,22 @@ Page({
     streak: 0,
     timeline: [],
     loading: true,
-    error: ''
+    error: '',
+    // 初始化模式：一次性设置所有版
+    initializing: false,
+    initCurrentBoard: 1,
+    initBoardStates: {},   // { boardNo: { pills: {pillIndex: true}, startFrom: bool } }
+    initCellRows: [],
+    initTotalTaken: 0,
+    initStartBoard: 1
   },
 
   onLoad: function (opts) {
     api.setToken(app.globalData.token);
     this.pkgId = (opts && opts.id) || '';
     this.allLogs = [];
+    // 详情页「初始化药板」入口：加载完成后自动进入初始化模式
+    this._autoInit = !!(opts && (opts.init === '1' || opts.init === 1));
     this.load();
     this.initRealtime();
   },
@@ -150,6 +159,7 @@ Page({
   },
 
   applyData: function (res) {
+    var that = this;
     var pkg = this.pkg || {};
     var pi = res.pillInfo || {};
     pi.color = COLOR_HEX[pi.color] ? pi.color : 'white';
@@ -269,6 +279,11 @@ Page({
       boxRemaining: pi.boards * pi.rows * pi.cols - this.allLogs.length
     });
     this.buildBoard();
+    // 详情页「初始化药板」入口直达：加载完成后自动进入初始化模式（起始版 = 当前记录版号）
+    if (this._autoInit) {
+      this._autoInit = false;
+      this.startInit(this.pi.boardNo || 1);
+    }
   },
 
   buildBoard: function () {
@@ -385,6 +400,29 @@ Page({
   },
 
   // 点按缺口 / 长按药丸：撤销今日打卡或查看历史
+  // 点按缺口：今日已服 → 撤销确认；历史缺口 → 提示服用日期
+  onTodayHoleTap: function (e) {
+    var ds = e.currentTarget.dataset;
+    var pillIndex = parseInt(ds.pill, 10);
+    var boardNo = parseInt(ds.board, 10);
+    var that = this;
+    var logs = this.allLogs.filter(function (l) { return l.boardNo === boardNo && l.pillIndex === pillIndex; });
+    if (!logs.length) return;
+    var todayLog = logs.find(function (l) { return l.date === todayStr(); });
+    if (todayLog) {
+      wx.showModal({
+        title: '撤销打卡',
+        content: '撤销今日对这颗药的打卡记录？',
+        confirmColor: '#EF4444',
+        success: function (r) {
+          if (r.confirm) that.untake(todayLog.id);
+        }
+      });
+    } else {
+      wx.showToast({ title: '这颗药 ' + logs[logs.length - 1].date + ' 已服用', icon: 'none' });
+    }
+  },
+
   onCellLongPress: function (e) {
     var ds = e.currentTarget.dataset;
     var pillIndex = parseInt(ds.pill, 10);
@@ -474,6 +512,112 @@ Page({
       itemList: untaken.map(function (s) { return s.time + ' 那次'; }),
       success: function (r) {
         if (untaken[r.tapIndex]) pick(untaken[r.tapIndex].index);
+      }
+    });
+  },
+
+  // 初始化药板：选起始版号 → 勾选已吃位置 → 提交
+  onResetBoard: function () {
+    var that = this;
+    var pi = this.pi || {};
+    var boards = pi.boards || 2;
+    var itemList = [];
+    for (var b = 1; b <= boards; b++) {
+      itemList.push('从第' + b + '版开始');
+    }
+    wx.showActionSheet({
+      itemList: itemList,
+      success: function (res) {
+        that.startInit(res.tapIndex + 1);
+      }
+    });
+  },
+
+  // 进入初始化模式（起始版号 boardNo）
+  startInit: function (boardNo) {
+    this._initBoardNo = boardNo;
+    // 重置初始化状态：已吃位置为空
+    this._initPillSet = {};
+    this.setData({
+      initializing: true,
+      initTaken: [],
+      initPillSet: {},
+      boardNo: boardNo
+    });
+    this.buildInitRows();
+    wx.showToast({ title: '第' + boardNo + '版：点击药丸标记已吃', icon: 'none', duration: 2500 });
+  },
+
+  // 构建初始化药板网格（所有位置默认有药丸，点击标记已吃）
+  buildInitRows: function () {
+    var pi = this.pi || {};
+    var boardNo = this._initBoardNo || this.data.boardNo;
+    var rows = [];
+    var cells = [];
+    var cap = pi.rows * pi.cols;
+    var set = this._initPillSet || {};
+    for (var i = 0; i < cap; i++) {
+      cells.push({
+        index: i,
+        boardNo: boardNo,
+        taken: !!set[i],
+        showPill: !set[i]
+      });
+    }
+    for (var r = 0; r < pi.rows; r++) {
+      rows.push(cells.slice(r * pi.cols, (r + 1) * pi.cols));
+    }
+    this.setData({ initCellRows: rows });
+  },
+
+  // 初始化模式下点击药丸/缺口：切换已吃标记
+  onInitPillTap: function (e) {
+    var ds = e.currentTarget.dataset;
+    var pill = parseInt(ds.pill, 10);
+    var board = parseInt(ds.board, 10);
+    if (!this._initPillSet) this._initPillSet = {};
+    if (this._initPillSet[pill]) {
+      delete this._initPillSet[pill];
+    } else {
+      this._initPillSet[pill] = true;
+    }
+    // 更新 taken 列表
+    var taken = [];
+    for (var k in this._initPillSet) {
+      taken.push({ boardNo: board, pillIndex: parseInt(k, 10) });
+    }
+    this.setData({ initTaken: taken, initPillSet: this._initPillSet, initTotalTaken: taken.length });
+    this.buildInitRows();
+    wx.vibrateShort({ type: 'light' });
+  },
+
+  // 退出初始化模式
+  onInitCancel: function () {
+    this.setData({ initializing: false, initTaken: [], initPillSet: {}, initCellRows: [], initTotalTaken: 0 });
+  },
+
+  // 提交初始化：提交已吃位置给后端
+  onInitConfirm: function () {
+    var that = this;
+    var boardNo = this._initBoardNo || this.data.boardNo;
+    var taken = this.data.initTaken || [];
+    wx.showModal({
+      title: '确认初始化',
+      content: '从第 ' + boardNo + ' 版开始，已标记 ' + taken.length + ' 颗药已吃。将清空原有打卡记录。确定吗？',
+      confirmColor: '#10B981',
+      success: function (r) {
+        if (r.confirm) {
+          api.resetMedBoard(that.pkgId, boardNo, taken, function () {
+            that._initPillSet = {};
+            that.setData({ initializing: false, initTaken: [], initPillSet: {}, initCellRows: [], initTotalTaken: 0 });
+            that.allLogs = [];
+            that.setData({ boardNo: boardNo });
+            that.load();
+            wx.showToast({ title: '初始化完成', icon: 'success' });
+          }, function () {
+            wx.showToast({ title: '初始化失败', icon: 'none' });
+          });
+        }
       }
     });
   },

@@ -54,10 +54,11 @@
         <text>第{{item.no}}版</text>
         <text class="bt-count">{{item.taken}}/{{item.cap}}</text>
       </view>
+      <view class="board-reset" bindtap="onResetBoard">🔄 初始化</view>
     </view>
 
     <!-- 今日前后对比（双板，紧凑头） -->
-    <view class="compare-card" wx:if="{{compare === 'today'}}">
+    <view class="compare-card" wx:if="{{compare === 'today' && !initializing}}">
       <view class="compare-head">
         <text class="ch-before">上 · 今天之前</text>
         <text class="ch-after">下 · 现在，绿「今」= 今日已服</text>
@@ -106,8 +107,49 @@
       </view>
     </view>
 
+    <!-- 初始化模式提示条 -->
+    <view class="init-overlay" wx:if="{{initializing}}">
+      <view class="init-overlay-bar">
+        <view class="init-overlay-left">
+          <text class="init-overlay-icon">🔄</text>
+          <view class="init-overlay-info">
+            <text class="init-overlay-title">初始化药板</text>
+            <text class="init-overlay-sub">点击药丸标记已吃 · 共 {{initTotalTaken}} 颗</text>
+          </view>
+        </view>
+        <view class="init-overlay-actions">
+          <text class="init-btn-cancel" bindtap="onInitCancel">取消</text>
+          <text class="init-btn-confirm" bindtap="onInitConfirm">✓ 提交</text>
+        </view>
+      </view>
+      <view class="init-overlay-hint">点击缺口可取消已标记的药</view>
+    </view>
+
+    <!-- 初始化模式药板（独立渲染，与正常模式互斥，避免 wx:if/wx:else 配对失效导致药板消失） -->
+    <view class="blister" wx:if="{{initializing}}">
+      <view class="blister-row" wx:for="{{initCellRows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
+        <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
+          <view
+            wx:if="{{cell.showPill}}"
+            class="pill shape-{{pillShape}} init-pill"
+            style="{{pillStyle}}background:{{colorHex}}"
+            bindtap="onInitPillTap"
+            data-board="{{cell.boardNo}}"
+            data-pill="{{cell.index}}"
+          >
+            <view wx:if="{{pillShape === 'capsule'}}" class="capsule-line"></view>
+          </view>
+          <view wx:else class="pill-hole init-hole" style="{{holeStyle}}" bindtap="onInitPillTap" data-board="{{cell.boardNo}}" data-pill="{{cell.index}}">
+            <text class="init-hole-check">✓</text>
+            <text class="init-hole-text">已吃</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="init-overlay-hint init-overlay-hint-page" wx:if="{{initializing}}">点击药丸标记已吃 · 点已吃缺口可撤销标记</view>
+
     <!-- 单板（当前 / 满版） -->
-    <view class="blister {{!dueToday ? 'blister-rest' : ''}}" wx:else>
+    <view class="blister {{!dueToday ? 'blister-rest' : ''}}" wx:elif="{{compare !== 'today'}}">
       <view class="blister-row" wx:for="{{rows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
         <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
           <view
@@ -139,8 +181,8 @@
         </view>
       </view>
     </view>
-    <view class="board-hint board-hint-rest" wx:if="{{!dueToday}}">今日非服药日 · 药板仅供参考，明晚见 🌙</view>
-    <view class="board-hint" wx:elif="{{compare !== 'today'}}">点击任意药丸记录服药（无需按顺序）· 长按缺口撤销今日打卡</view>
+    <view class="board-hint board-hint-rest" wx:if="{{!dueToday && !initializing}}">今日非服药日 · 药板仅供参考，明晚见 🌙</view>
+    <view class="board-hint" wx:elif="{{compare !== 'today' && !initializing}}">点击任意药丸记录服药（无需按顺序）· 长按缺口撤销今日打卡</view>
 
     <!-- 今日打卡时间线 -->
     <view class="timeline-card">

@@ -104,6 +104,7 @@ Page({
     var todoC = s.todo || 0;
     var pickupC = s.pickup || 0;
     var debtC = s.debt || 0;
+    var medC = s.medication || 0;
     var debtTotal = s.debtTotal || 0;
     var overdueC = s.overdue || 0;
     var pickedC = s.picked || 0;
@@ -111,7 +112,7 @@ Page({
     var privateC = s.privateCount || 0;
 
     this.setData({
-      stats: { todo: todoC, pickup: pickupC, debt: debtC, debtTotal: debtTotal, debtTotalLabel: helpers.formatAmount(debtTotal), overdue: overdueC, picked: pickedC, ignored: ignoredC, privateCount: privateC },
+      stats: { todo: todoC, pickup: pickupC, debt: debtC, medication: medC, debtTotal: debtTotal, debtTotalLabel: helpers.formatAmount(debtTotal), overdue: overdueC, picked: pickedC, ignored: ignoredC, privateCount: privateC },
       quadrantCounts: counts,
       latestPending: latestPending,
       todayActs: todayActs,
@@ -130,6 +131,10 @@ Page({
   },
   onGoDebt: function () {
     app.globalData._deepLinkFilter = { recordType: 'debt', filter: 'pending' };
+    wx.switchTab({ url: '/pages/list/list' });
+  },
+  onGoMedication: function () {
+    app.globalData._deepLinkFilter = { recordType: 'medication', filter: 'pending' };
     wx.switchTab({ url: '/pages/list/list' });
   },
   onGoPrivate: function () {

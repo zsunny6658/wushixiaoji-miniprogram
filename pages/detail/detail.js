@@ -78,6 +78,7 @@ Page({
     var that = this;
     var isArchived = this.data.pkg.status === 'archived';
     var items = ['编辑', '复制'];
+    if (this.data.pkg.type === 'medication') items.push('初始化药板');
     if (!isArchived) items = items.concat(['归档', '删除']);
     wx.showActionSheet({
       itemList: items,
@@ -85,6 +86,7 @@ Page({
         var label = items[res.tapIndex];
         if (label === '编辑') that.onEdit();
         else if (label === '复制') that.onCopy();
+        else if (label === '初始化药板') that.onOpenMedboard();
         else if (label === '归档') that.onArchive();
         else if (label === '删除') that.onDelete();
       }
@@ -96,8 +98,9 @@ Page({
     wx.navigateTo({ url: '/pages/add/add?id=' + id });
   },
 
-  onOpenMedboard: function () {
-    wx.navigateTo({ url: '/pages/medboard/medboard?id=' + this.data.pkg.id });
+  onOpenMedboard: function (autoInit) {
+    var url = '/pages/medboard/medboard?id=' + this.data.pkg.id + (autoInit === true ? '&init=1' : '');
+    wx.navigateTo({ url: url });
   },
 
   onDelete: function () {

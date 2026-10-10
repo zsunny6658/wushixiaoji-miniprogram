@@ -33,13 +33,18 @@
         <view class="stat-label">待还款项</view>
         <view class="stat-sub" wx:if="{{stats.debtTotal > 0}}">¥{{stats.debtTotalLabel}}</view>
       </view>
+      <view class="stat-card s-med" bindtap="onGoMedication" hover-class="hover-press">
+        <view class="stat-icon"><ficon name="pill" size="44" color="#10B981" /></view>
+        <view class="stat-num">{{stats.medication || 0}}</view>
+        <view class="stat-label">待服药物</view>
+      </view>
+    </view>
+    <view class="stats-row">
       <view class="stat-card s-private" bindtap="onGoPrivate" hover-class="hover-press">
         <view class="stat-icon"><ficon name="lock" size="44" color="#64748B" /></view>
         <view class="stat-num">{{stats.privateCount || 0}}</view>
         <view class="stat-label">个人事项</view>
       </view>
-    </view>
-    <view class="stats-row">
       <view class="stat-card s-overdue" bindtap="onGoOverdue" hover-class="hover-press">
         <view class="stat-icon"><ficon name="alert-circle" size="44" color="#EF4444" /></view>
         <view class="stat-num">{{stats.overdue || 0}}</view>
