@@ -130,6 +130,8 @@ Page({
       if (that._reloadTimer) return; // 500ms 节流
       that._reloadTimer = setTimeout(function () {
         that._reloadTimer = null;
+        // 自己刚操作过（乐观更新已生效）：3s 内抑制广播回环 reload，避免闪烁
+        if (Date.now() - (that._selfAction || 0) < 3000) return;
         that.load();
       }, 500);
     }, function (st) {
@@ -161,6 +163,8 @@ Page({
   applyData: function (res) {
     var that = this;
     var pkg = this.pkg || {};
+    // 缓存服务端响应供打卡/撤销后本地重算（乐观更新，免全页拉取闪烁）
+    this._lastRes = res;
     var pi = res.pillInfo || {};
     pi.color = COLOR_HEX[pi.color] ? pi.color : 'white';
     pi.shape = SHAPE_LABEL[pi.shape] ? pi.shape : 'round';
@@ -214,6 +218,14 @@ Page({
         none: d.taken === 0
       };
     });
+    // 今天一行用本地 todayLogs 实时校准（打卡/撤销后 _lastRes.days 里今天的数据会过期）
+    if (weekDays[0] && weekDays[0].date === today) {
+      var tTaken = this.todayLogs.length;
+      weekDays[0].taken = tTaken;
+      weekDays[0].percent = weekDays[0].total ? Math.round(tTaken * 100 / weekDays[0].total) : 0;
+      weekDays[0].full = weekDays[0].total > 0 && tTaken >= weekDays[0].total;
+      weekDays[0].none = tTaken === 0;
+    }
     // 7 天依从率 + 连续达标天数（从今天往前数）
     var sumT = 0, sumN = 0, streak = 0;
     weekDays.forEach(function (d) { sumT += d.taken; sumN += d.total; });
@@ -264,6 +276,7 @@ Page({
       holeStyleMini: holeStyleMini,
       boards: boards,
       slots: slots,
+      boardNo: pi.boardNo || this.data.boardNo,
       weekDays: weekDays,
       weekRate: weekRate,
       streak: streak,
@@ -386,12 +399,19 @@ Page({
       pillIndex: pillIndex
     }, function (res) {
       if (res && res.log) {
+        that._selfAction = Date.now();
         that.allLogs.push(res.log);
-        that.setData({ boardNo: boardNo });
         wx.vibrateShort({ type: 'light' }); // 打卡触感反馈
         // 打卡后顺带请求订阅授权（勾选"总是保持"后静默续配额，保障下次到点能推送）
         subscribe.askSubscribe();
-        that.load(); // 重新拉取，服务端可能已自动推进版号
+        // 服务端可能自动推进版号：当前版打满 → 本地同步推进，免拉取
+        var cap = that.pi.rows * that.pi.cols;
+        var bt = (res.boardTaken || []).find(function (b) { return b.boardNo === res.log.boardNo; });
+        var pinfo = that._lastRes && that._lastRes.pillInfo;
+        if (bt && bt.taken >= cap && res.log.boardNo < that.pi.boards && pinfo && (pinfo.boardNo || 1) === res.log.boardNo) {
+          pinfo.boardNo = res.log.boardNo + 1;
+        }
+        that.applyData(that._lastRes); // 本地重算全部统计 + 药板（乐观更新）
         wx.showToast({ title: '已记录 ✓', icon: 'success' });
       }
     }, function () {
@@ -452,8 +472,9 @@ Page({
   untake: function (logId) {
     var that = this;
     api.untakeMed(this.pkgId, logId, function () {
+      that._selfAction = Date.now();
       that.allLogs = that.allLogs.filter(function (l) { return l.id !== logId; });
-      that.load();
+      that.applyData(that._lastRes); // 本地重算（乐观更新）
       wx.showToast({ title: '已撤销', icon: 'success' });
     }, function () {});
   },

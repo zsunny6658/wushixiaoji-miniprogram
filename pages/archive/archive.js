@@ -5,7 +5,8 @@ var app = getApp();
 var TYPE_META = {
   pickup: { icon: '📦', label: '取件' },
   todo: { icon: '📝', label: '备忘' },
-  debt: { icon: '💳', label: '还款' }
+  debt: { icon: '💳', label: '还款' },
+  medication: { icon: '💊', label: '用药' }
 };
 
 function fmtTime(iso) {
@@ -45,7 +46,11 @@ Page({
         if (p.type === 'pickup') sub = p.station || '';
         else if (p.type === 'debt') {
           sub = (p.institution ? p.institution + ' · ' : '') + (p.amount ? '¥' + p.amount : '');
+        } else if (p.type === 'medication') {
+          var pi = p.pillInfo || {};
+          if (pi.boards) sub = pi.boards + '版装 · 当前第' + (pi.boardNo || 1) + '版';
         }
+        var isMed = p.type === 'medication' && !!(p.pillInfo && p.pillInfo.boards);
         var fromLabel = p.archiveFrom === 'picked' ? '已完成归档' : (p.archiveFrom === 'ignored' ? '已忽略归档' : '');
         return {
           id: p.id,
@@ -54,7 +59,8 @@ Page({
           title: p.title || p.code || '(无标题)',
           sub: sub,
           archivedAtText: fmtTime(p.updatedAt),
-          fromLabel: fromLabel
+          fromLabel: fromLabel,
+          isMed: isMed
         };
       });
       that.setData({ items: items, loading: false });
@@ -76,5 +82,10 @@ Page({
 
   onViewDetail: function (e) {
     wx.navigateTo({ url: '/pages/detail/detail?id=' + e.currentTarget.dataset.id });
+  },
+
+  // 用药归档记录：直达仿真药板
+  onOpenMedboard: function (e) {
+    wx.navigateTo({ url: '/pages/medboard/medboard?id=' + e.currentTarget.dataset.id });
   }
 });

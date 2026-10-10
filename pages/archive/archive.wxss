@@ -109,3 +109,8 @@
   background: rgba(245, 158, 11, 0.14);
   color: #854F0B;
 }
+
+.arch-btn-med {
+  color: #4A90D9;
+  background: rgba(74, 144, 217, 0.1);
+}

@@ -14,6 +14,7 @@
         </view>
       </view>
       <view class="arch-actions">
+        <view class="arch-btn arch-btn-med" wx:if="{{item.isMed}}" catchtap="onOpenMedboard" data-id="{{item.id}}" hover-class="hover-press">💊 药板</view>
         <view class="arch-btn" catchtap="onUnarchive" data-id="{{item.id}}" hover-class="hover-press">↩ 取消归档</view>
       </view>
     </view>
