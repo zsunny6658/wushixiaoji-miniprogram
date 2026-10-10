@@ -419,7 +419,9 @@ Page({
         }
       });
     } else {
-      wx.showToast({ title: '这颗药 ' + logs[logs.length - 1].date + ' 已服用', icon: 'none' });
+      var last = logs[logs.length - 1];
+      var isInitMark = last.date === '2000-01-01';
+      wx.showToast({ title: isInitMark ? '这颗药在初始化时已标记服用' : '这颗药 ' + last.date + ' 已服用', icon: 'none' });
     }
   },
 
@@ -533,15 +535,20 @@ Page({
     });
   },
 
-  // 进入初始化模式（起始版号 boardNo）
+  // 进入初始化模式（起始版号 boardNo）；预填该版已有的初始化占位标记，避免重初始化时丢失
   startInit: function (boardNo) {
     this._initBoardNo = boardNo;
-    // 重置初始化状态：已吃位置为空
-    this._initPillSet = {};
+    var preset = {};
+    (this.allLogs || []).forEach(function (l) {
+      if ((l.boardNo || 1) === boardNo && l.date === '2000-01-01') preset[l.pillIndex] = true;
+    });
+    this._initPillSet = preset;
+    var presetCount = Object.keys(preset).length;
     this.setData({
       initializing: true,
-      initTaken: [],
-      initPillSet: {},
+      initTaken: Object.keys(preset).map(function (k) { return { boardNo: boardNo, pillIndex: parseInt(k, 10) }; }),
+      initPillSet: preset,
+      initTotalTaken: presetCount,
       boardNo: boardNo
     });
     this.buildInitRows();
@@ -603,7 +610,7 @@ Page({
     var taken = this.data.initTaken || [];
     wx.showModal({
       title: '确认初始化',
-      content: '从第 ' + boardNo + ' 版开始，已标记 ' + taken.length + ' 颗药已吃。将清空原有打卡记录。确定吗？',
+      content: '重置第 ' + boardNo + ' 版：已标记 ' + taken.length + ' 颗药已吃。仅影响第 ' + boardNo + ' 版记录，其他版不受影响。确定吗？',
       confirmColor: '#10B981',
       success: function (r) {
         if (r.confirm) {
