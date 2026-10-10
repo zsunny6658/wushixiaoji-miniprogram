@@ -132,7 +132,7 @@
     </view>
 
     <!-- 初始化模式药板（独立渲染，滑动连续标记，与正常模式互斥） -->
-    <view class="blister" wx:if="{{initializing}}" catchtouchmove="onInitPaintMove" bindtouchend="onInitPaintEnd">
+    <view class="blister init-blister" wx:if="{{initializing}}" catchtouchmove="onInitPaintMove" bindtouchend="onInitPaintEnd" bindtouchcancel="onInitPaintEnd">
       <view class="blister-row" wx:for="{{initCellRows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
         <view class="cell init-cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index" bindtouchstart="onInitPaintStart" data-board="{{cell.boardNo}}" data-pill="{{cell.index}}">
           <view wx:if="{{cell.showPill}}" class="pill shape-{{pillShape}} init-pill" style="{{pillStyle}}background:{{colorHex}}">

@@ -597,36 +597,41 @@ Page({
   },
 
   // 初始化模式：点击/按住划过药丸标记已吃（paint：起始格取反决定涂「标记」还是「取消」，划过即应用）
+  // 注意：滑动期间只用定向路径 setData（不重建节点树），否则触点节点被替换会切断 touch 事件流
   onInitPaintStart: function (e) {
-    if (!this.data.initializing || this._paintActive) return;
+    if (!this.data.initializing) return;
+    this.onInitPaintEnd(); // 兜底：上一次滑动可能没收到 touchend/cancel
     var idx = parseInt(e.currentTarget.dataset.pill, 10);
     var set = this._initBoardStates[this._initBoardNo] || {};
     this._paintActive = true;
     this._paintValue = !set[idx];
     this.paintCell(idx, this._paintValue);
-    // 缓存所有药位位置供 touchmove 命中检测（touchmove 始终派发到起始元素，无法靠换绑目标实现）
+    // 缓存网格原点（第 0 个 cell 的位置与尺寸，cell flex:1 均分 + 固定高，可推算任意格；
+    // touchmove 只派发到起始元素，需自行做坐标命中）
     var that = this;
-    this.createSelectorQuery().selectAll('.init-cell').boundingClientRect(function (rects) {
-      that._initRects = rects || [];
+    this.createSelectorQuery().select('.init-cell').boundingClientRect(function (r0) {
+      that._cell0 = r0;
     }).exec();
   },
 
   onInitPaintMove: function (e) {
     if (!this._paintActive) return;
     var t = e.touches && e.touches[0];
-    var rects = this._initRects;
-    if (!t || !rects || !rects.length) return;
-    for (var i = 0; i < rects.length; i++) {
-      var r = rects[i];
-      if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
-        this.paintCell(i, this._paintValue);
-      }
-    }
+    var c0 = this._cell0;
+    if (!t || !c0 || !c0.width) return;
+    var pi = this.pi || {};
+    var cols = pi.cols || 5, rows = pi.rows || 2;
+    var col = Math.floor((t.clientX - c0.left) / c0.width);
+    var row = Math.floor((t.clientY - c0.top) / c0.height);
+    if (col < 0 || col >= cols || row < 0 || row >= rows) return; // 划出板外不标记
+    this.paintCell(row * cols + col, this._paintValue);
   },
 
   onInitPaintEnd: function () {
+    if (!this._paintActive) return;
     this._paintActive = false;
-    this._initRects = null;
+    this._cell0 = null;
+    this.updateInitData(); // 抬手后全量校准一次（此时无活跃 touch，重建安全）
   },
 
   paintCell: function (idx, value) {
@@ -634,23 +639,28 @@ Page({
     var states = this._initBoardStates;
     if (!states[b]) states[b] = {};
     var set = states[b];
-    if (value) {
-      if (set[idx]) return;
-      set[idx] = true;
-    } else {
-      if (!set[idx]) return;
-      delete set[idx];
-    }
+    if (value ? !!set[idx] : !set[idx]) return; // 状态无变化
+    if (value) set[idx] = true; else delete set[idx];
+    // 定向路径更新：只改叶子属性，节点树保持稳定，touch 事件流不断
+    var pi = this.pi || {};
+    var cols = pi.cols || 5;
+    var r = Math.floor(idx / cols), c = idx % cols;
+    var patch = {};
+    patch['initCellRows[' + r + '][' + c + '].taken'] = !!value;
+    patch['initCellRows[' + r + '][' + c + '].showPill'] = !value;
+    var tab = this.data.initTabs[b - 1];
+    if (tab) patch['initTabs[' + (b - 1) + '].taken'] = tab.taken + (value ? 1 : -1);
+    patch.initTotalTaken = this.data.initTotalTaken + (value ? 1 : -1);
+    this.setData(patch);
     var now = Date.now();
     if (now - (this._lastVib || 0) > 80) { this._lastVib = now; wx.vibrateShort({ type: 'light' }); }
-    this.updateInitData();
   },
 
   // 退出初始化模式
   onInitCancel: function () {
     this._initBoardStates = null;
     this._paintActive = false;
-    this._initRects = null;
+    this._cell0 = null;
     this.setData({ initializing: false, initTabs: [], initCellRows: [], initTotalTaken: 0 });
   },
 
@@ -688,7 +698,10 @@ Page({
       return;
     }
     var item = list[i];
-    var taken = Object.keys(item.set).map(function (k) { return parseInt(k, 10); });
+    // 服务端 initializeMedBoard 契约：takenPositions = [{boardNo, pillIndex}] 对象数组
+    var taken = Object.keys(item.set).map(function (k) {
+      return { boardNo: item.boardNo, pillIndex: parseInt(k, 10) };
+    });
     api.resetMedBoard(this.pkgId, item.boardNo, taken, function () {
       that.submitInitBoards(list, i + 1);
     }, function () {
