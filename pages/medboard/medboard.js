@@ -264,6 +264,17 @@ Page({
     // 月度依从热力图
     var month = buildMonthCells(pkg.schedule || null, this.allLogs, times);
 
+    // 视图版号：首次加载跟随服务端当前版；打满自动推进/撤销回退（服务端版号变化）时跟随；
+    // 其余情况保留用户正在查看的版，避免打卡后视图被强行跳回当前版
+    var serverBoard = pi.boardNo || 1;
+    var viewBoard;
+    if (!this._prevServerBoard || serverBoard !== this._prevServerBoard) {
+      viewBoard = serverBoard;
+    } else {
+      viewBoard = clamp(this.data.boardNo, 1, pi.boards, serverBoard);
+    }
+    this._prevServerBoard = serverBoard;
+
     this.setData({
       pkg: pkg,
       colorHex: COLOR_HEX[pi.color],
@@ -275,7 +286,7 @@ Page({
       holeStyleMini: holeStyleMini,
       boards: boards,
       slots: slots,
-      boardNo: pi.boardNo || this.data.boardNo,
+      boardNo: viewBoard,
       weekDays: weekDays,
       weekRate: weekRate,
       streak: streak,
