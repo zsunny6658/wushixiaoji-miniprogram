@@ -130,6 +130,9 @@
           <text class="ibt-count">{{item.taken}}/{{item.cap}}</text>
         </view>
       </view>
+      <view class="init-photo-row" wx:if="{{initializing}}">
+        <view class="init-photo-btn" bindtap="onInitPhoto" hover-class="hover-press">📷 拍照识别本版已吃位置</view>
+      </view>
       <view class="init-overlay-hint">点击或按住划过药丸标记已吃 · 逐版设置好后点「完成」</view>
     </view>
 

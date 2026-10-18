@@ -625,6 +625,66 @@ Page({
     this.updateInitData();
   },
 
+  // 拍照识别当前版已吃位置：AI 视觉识别空泡罩 → 预填标记 → 人工核对微调（仍走原「完成」保存链路）
+  onInitPhoto: function () {
+    if (!this.data.initializing || this._photoBusy) return;
+    var that = this;
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['camera', 'album'],
+      sizeType: ['compressed'],
+      success: function (res) {
+        var f = res.tempFiles && res.tempFiles[0];
+        if (!f || !f.tempFilePath) return;
+        wx.getFileSystemManager().readFile({
+          filePath: f.tempFilePath,
+          encoding: 'base64',
+          success: function (r) {
+            that._photoBusy = true;
+            wx.showLoading({ title: '识别中…', mask: true });
+            api.recognizeMedBoard(that.pkgId, 'data:image/jpeg;base64,' + r.data, function (data) {
+              that._photoBusy = false;
+              wx.hideLoading();
+              var taken = (data && data.taken) || [];
+              var b = that._initBoardNo;
+              if (!taken.length) {
+                wx.showModal({
+                  title: '未识别到已吃位置',
+                  content: '可能是新板未拆、照片不清晰或拍摄角度倾斜。可重拍或直接手工划选标记。',
+                  showCancel: false,
+                  confirmText: '好的'
+                });
+                return;
+              }
+              if (!that._initBoardStates[b]) that._initBoardStates[b] = {};
+              taken.forEach(function (idx) { that._initBoardStates[b][idx] = true; });
+              that.updateInitData(); // 非滑动期间，全量刷新安全
+              wx.vibrateShort({ type: 'light' });
+              wx.showToast({
+                title: '识别 ' + taken.length + ' 颗已吃（置信度 ' + ((data && data.confidence) || 0) + '%）已预填，请核对微调',
+                icon: 'none',
+                duration: 3000
+              });
+            }, function (msg) {
+              that._photoBusy = false;
+              wx.hideLoading();
+              wx.showModal({
+                title: '识别失败',
+                content: (msg || '请检查 AI 视觉模型配置') + '。仍可手工划选标记。',
+                showCancel: false,
+                confirmText: '好的'
+              });
+            });
+          },
+          fail: function () {
+            wx.showToast({ title: '读取照片失败', icon: 'none' });
+          }
+        });
+      }
+    });
+  },
+
   // 初始化模式：点击/按住划过药丸标记已吃（paint：起始格取反决定涂「标记」还是「取消」，划过即应用）
   // 注意：滑动期间只用定向路径 setData（不重建节点树），否则触点节点被替换会切断 touch 事件流
   onInitPaintStart: function (e) {

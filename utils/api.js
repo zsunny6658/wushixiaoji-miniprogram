@@ -226,6 +226,10 @@ var API = {
   resetMedBoard: function (id, boardNo, takenPositions, cb, errCb) {
     this.request('POST', '/api/packages/' + id + '/medlogs/reset', { boardNo: boardNo, takenPositions: takenPositions || [] }, cb, errCb);
   },
+  // 药板照片识别（初始化预填辅助）：image 为 dataURL
+  recognizeMedBoard: function (id, image, cb, errCb) {
+    this.request('POST', '/api/packages/' + id + '/medboard/recognize', { image: image }, cb, errCb);
+  },
   // 药名输入联想
   suggestDrugs: function (q, cb, errCb) {
     this.request('GET', '/api/drugs/suggest', { q: q, limit: 6 }, cb, errCb);
