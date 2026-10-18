@@ -40,6 +40,9 @@
         <view class="field">
           <text class="field-label">取件驿站 <text class="req">*</text></text>
           <input class="field-input" placeholder="如：菜鸟驿站" value="{{form.station}}" bindinput="onField" data-field="station" />
+          <view class="quick-chips" wx:if="{{stationChips.length}}">
+            <view class="quick-chip" wx:for="{{stationChips}}" wx:key="*this" bindtap="onChipField" data-field="station" data-val="{{item}}">{{item}}</view>
+          </view>
         </view>
         <view class="field">
           <text class="field-label">取件码 <text class="req">*</text></text>
@@ -191,6 +194,9 @@
         <view class="field">
           <text class="field-label">快递公司</text>
           <input class="field-input" placeholder="如：中通快递" value="{{form.company}}" bindinput="onField" data-field="company" />
+          <view class="quick-chips" wx:if="{{courierChips.length}}">
+            <view class="quick-chip {{form.company === item ? 'qc-active' : ''}}" wx:for="{{courierChips}}" wx:key="*this" bindtap="onChipField" data-field="company" data-val="{{item}}">{{item}}</view>
+          </view>
         </view>
         <view class="field">
           <text class="field-label">快递单号</text>
@@ -258,6 +264,9 @@
       <view class="field">
         <text class="field-label">备注</text>
         <input class="field-input" placeholder="补充说明" value="{{form.note}}" bindinput="onField" data-field="note" />
+        <view class="quick-chips" wx:if="{{noteChips.length}}">
+          <view class="quick-chip" wx:for="{{noteChips}}" wx:key="*this" bindtap="onChipField" data-field="note" data-val="{{item}}">{{item}}</view>
+        </view>
       </view>
 
       <view class="field">

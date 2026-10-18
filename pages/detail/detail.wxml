@@ -86,6 +86,10 @@
           <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="clock" size="26" color="#718096" /> 时间</view>
           <text class="info-value {{pkg.overdue ? 'warn' : ''}}">{{pkg.arrivedLabel}}</text>
         </view>
+        <view class="info-row" wx:if="{{pkg.ageText}}">
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="clock" size="26" color="#F59E0B" /> 存放</view>
+          <text class="info-value {{pkg.overdue ? 'warn' : ''}}">{{pkg.ageText}}</text>
+        </view>
         <view class="info-row" wx:if="{{pkg.type === 'pickup'}}">
           <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="box" size="26" color="#4A90D9" /> 驿站</view>
           <text class="info-value">{{pkg.station || '—'}}</text>

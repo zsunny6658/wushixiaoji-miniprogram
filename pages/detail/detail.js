@@ -10,6 +10,12 @@ Page({
 
   onLoad: function (opts) {
     api.setToken(app.globalData.token);
+    // 分享链接落地：未登录时先去登录（登录后默认进首页，可重新点开）
+    if (!app.globalData.token) {
+      wx.showToast({ title: '请先登录后查看', icon: 'none' });
+      setTimeout(function () { wx.reLaunch({ url: '/pages/login/login' }); }, 800);
+      return;
+    }
     if (!opts || !opts.id) {
       wx.showToast({ title: '记录不存在', icon: 'none' });
       setTimeout(function () { wx.navigateBack(); }, 1000);
@@ -58,7 +64,19 @@ Page({
 
   applyDetail: function (raw) {
     var gd = app.globalData;
-    var decorated = helpers.decorate(raw, gd.members);
+    // 浅拷贝：decorate 有缓存，ageText 是随时间变化的渲染值，不能写回缓存对象
+    var decorated = Object.assign({}, helpers.decorate(raw, gd.members));
+    // 取件存放时效：待取件时展示已存放多久（从本次 raw 计算，避免 decorate 缓存导致时效停滞）
+    decorated.ageText = '';
+    if (raw.type === 'pickup' && raw.status === 'pending' && raw.arrivedAt) {
+      var arr = new Date(raw.arrivedAt);
+      if (!isNaN(arr)) {
+        var hrs = Math.floor((Date.now() - arr.getTime()) / 3600000);
+        if (hrs < 1) decorated.ageText = '刚到驿站';
+        else if (hrs < 24) decorated.ageText = '已存放 ' + hrs + ' 小时';
+        else decorated.ageText = '已存放 ' + Math.floor(hrs / 24) + ' 天' + (hrs % 24 ? ' ' + (hrs % 24) + ' 小时' : '');
+      }
+    }
     this.setData({ pkg: decorated });
     var titleMap = { pickup: '取件详情', todo: '备忘详情', debt: '待还详情', medication: '用药详情' };
     wx.setNavigationBarTitle({ title: titleMap[decorated.type] || '详情' });
@@ -266,7 +284,15 @@ Page({
       wx.showToast({ title: '已完成', icon: 'success' });
     }
   },
+  // 单条分享：取件分享带驿站+取件码，其他类型带标题；落地直达本条详情
   onShareAppMessage: function () {
+    var p = this.data.pkg;
+    if (p && p.id) {
+      var label = p.type === 'pickup'
+        ? '「' + (p.station || '快递') + '」取件码 ' + (p.code || '')
+        : '「' + (p.title || p.code || '') + '」待办提醒';
+      return { title: label, path: '/pages/detail/detail?id=' + p.id };
+    }
     return { title: '屋事小记 - 家庭快递取件码共享', path: '/pages/overview/overview' };
   },
   onShareTimeline: function () {

@@ -65,8 +65,17 @@
     <text class="batch-exit" bindtap="onExitBatch">退出</text>
   </view>
 
+  <!-- 首屏骨架（首次加载未就绪时占位，避免白屏） -->
+  <view class="skeleton" wx:if="{{loading}}">
+    <view class="sk-card" wx:for="{{skeletonRows}}" wx:key="*this">
+      <view class="sk-line sk-tag"></view>
+      <view class="sk-line sk-main"></view>
+      <view class="sk-line sk-sub"></view>
+    </view>
+  </view>
+
   <!-- 空状态 -->
-  <view class="empty-state" wx:if="{{!list.length}}">
+  <view class="empty-state" wx:elif="{{!list.length}}">
     <text class="empty-icon">{{emptyEmoji}}</text>
     <text class="empty-text">{{emptyTitle}}</text>
     <text class="empty-desc">{{emptyDesc}}</text>

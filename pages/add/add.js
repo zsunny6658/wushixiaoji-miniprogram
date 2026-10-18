@@ -14,6 +14,13 @@ var FREQ_MAP = [
 function today() { var d = new Date(); return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2); }
 function nowTime() { var d = new Date(); return ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2); }
 
+// 快捷输入历史（本地 storage，最多记 8 条）
+var HIST_KEYS = { station: 'fph_hist_station', company: 'fph_hist_company', note: 'fph_hist_note' };
+// 内置主流快递公司清单（优先级在历史记录之后）
+var BUILTIN_COURIERS = ['顺丰速运', '中通快递', '圆通速递', '申通快递', '韵达快递', '京东物流', '极兔速递', 'EMS', '德邦快递', '菜鸟裹裦'];
+// 内置常用备注模板
+var BUILTIN_NOTES = ['放前台', '放柜子', '放门口', '到柜自取', '联系我'];
+
 Page({
   data: {
     editId: '',
@@ -44,6 +51,9 @@ Page({
     pillPreviewRows: [],
     pillPrevStyle: '',
     form: { station: '', code: '', company: '', trackingNo: '', note: '', institution: '', amount: '' },
+    stationChips: [],
+    courierChips: [],
+    noteChips: [],
     dueDateStr: '',
     isPrivate: false,
     smartText: '',
@@ -68,6 +78,7 @@ Page({
     var members = (app.globalData.members || []).map(function (m) { return m.name; });
     this.setData({ memberOptions: ['不指定'].concat(members) });
     this.refreshPillPreview();
+    this.refreshQuickChips();
     // 恢复草稿：仅新建模式（编辑模式不恢复），草稿 3 天过期
     if (!opts || !opts.id) {
       try {
@@ -287,6 +298,43 @@ Page({
   onField: function (e) {
     var f = e.currentTarget.dataset.field;
     var v = e.detail.value;
+    this.setData({ ['form.' + f]: v });
+  },
+
+  // —— 快捷输入：历史驿站 / 常用快递 / 常用备注（点击 chip 直填）——
+  loadHistory: function (key) {
+    try {
+      var v = wx.getStorageSync(key);
+      var arr = typeof v === 'string' ? JSON.parse(v) : (Array.isArray(v) ? v : []);
+      return Array.isArray(arr) ? arr.slice(0, 8) : [];
+    } catch (e) { return []; }
+  },
+  saveHistory: function (key, arr) {
+    try { wx.setStorageSync(key, JSON.stringify(arr.slice(0, 8))); } catch (e) { /* 存储失败忽略 */ }
+  },
+  // 保存成功后记入历史（最新在前去重），并刷新 chips
+  pushHistory: function (field, val) {
+    var v = (val || '').trim();
+    if (!v) return;
+    var key = HIST_KEYS[field];
+    if (!key) return;
+    var arr = this.loadHistory(key).filter(function (x) { return x !== v; });
+    arr.unshift(v);
+    this.saveHistory(key, arr);
+  },
+  refreshQuickChips: function () {
+    var seen = {};
+    var couriers = this.loadHistory(HIST_KEYS.company).concat(BUILTIN_COURIERS)
+      .filter(function (c) { if (seen[c]) return false; seen[c] = 1; return true; }).slice(0, 10);
+    var seenN = {};
+    var notes = this.loadHistory(HIST_KEYS.note).concat(BUILTIN_NOTES)
+      .filter(function (c) { if (seenN[c]) return false; seenN[c] = 1; return true; }).slice(0, 8);
+    this.setData({ courierChips: couriers, noteChips: notes, stationChips: this.loadHistory(HIST_KEYS.station) });
+  },
+  onChipField: function (e) {
+    var f = e.currentTarget.dataset.field;
+    var v = e.currentTarget.dataset.val;
+    if (!f || !v) return;
     this.setData({ ['form.' + f]: v });
   },
 
@@ -649,10 +697,18 @@ Page({
       data.pillInfo = this.data.pillInfo;
     }
     wx.showLoading({ title: '保存中...' });
+    var selfRef = this;
+    var afterSaved = function () {
+      // 快捷输入历史：驿站/快递公司/备注记入本地，下次一键回填
+      selfRef.pushHistory('station', f.station);
+      selfRef.pushHistory('company', f.company);
+      selfRef.pushHistory('note', f.note);
+    };
     if (this.data.editId) {
       api.updatePackage(this.data.editId, data, function () {
         wx.hideLoading();
         wx.showToast({ title: '已保存', icon: 'success' });
+        afterSaved();
         that.clearDraft();
         // 用药记录保存后顺带请求订阅授权（勾选"总是保持"后静默续配额）
         if (that.data.type === 'medication') subscribe.askSubscribe();
@@ -664,6 +720,7 @@ Page({
       api.addPackages([data], function () {
         wx.hideLoading();
         wx.showToast({ title: '已保存', icon: 'success' });
+        afterSaved();
         that.clearDraft();
         if (that.data.type === 'medication') subscribe.askSubscribe();
         setTimeout(function () { wx.navigateBack(); }, 600);

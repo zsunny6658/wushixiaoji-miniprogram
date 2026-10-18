@@ -446,3 +446,25 @@
   font-size: 24rpx;
   color: var(--text-tertiary, #94A3B8);
 }
+
+/* ── 快捷输入 chips（历史驿站/常用快递/常用备注） ── */
+.quick-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+.quick-chip {
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  background: #F1F5F9;
+  color: #475569;
+  font-size: 24rpx;
+  line-height: 1.4;
+  border: 1rpx solid #E2E8F0;
+}
+.quick-chip.qc-active {
+  background: rgba(74, 144, 217, 0.1);
+  border-color: #4A90D9;
+  color: #4A90D9;
+}

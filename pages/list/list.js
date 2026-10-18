@@ -32,6 +32,8 @@ Page({
     showFilter: false,
     activeFilterCount: 0,
     batchCount: 0,
+    loading: true,
+    skeletonRows: [1, 2, 3, 4, 5],
     swipeTouchX: 0,
     swipeTouchY: 0,
     swipeOffset: 0,
@@ -62,6 +64,7 @@ Page({
   },
   onUnload: function () {
     if (this._unsubRt) { this._unsubRt(); this._unsubRt = null; }
+    if (this._searchTimer) { clearTimeout(this._searchTimer); this._searchTimer = null; }
   },
   onShow: function () {
     if (!app.globalData.token) { wx.reLaunch({ url: '/pages/login/login' }); return; }
@@ -153,7 +156,7 @@ Page({
     var emptyMap = { all: ['📋', '当前没有记录', '点击右下角 + 添加'], pending: ['⏳', '没有待办', '做得不错'], picked: ['✅', '没有已完成', '完成后点击 ✓ 归档'], overdue: ['⚠️', '没有逾期', '没有需要处理的'], ignored: ['🚫', '没有已忽略的记录', '点击卡片进入详情可忽略'], debt: ['💳', '没有待还款项', '点击右下角 + 添加'] };
     var em = emptyMap[this.data.filter] || emptyMap.all;
 
-    this.setData({ list: pkgs, groups: groups, counts: counts, emptyEmoji: em[0], emptyTitle: em[1], emptyDesc: em[2] });
+    this.setData({ list: pkgs, groups: groups, counts: counts, loading: false, emptyEmoji: em[0], emptyTitle: em[1], emptyDesc: em[2] });
   },
 
   switchScope: function (e) {
@@ -250,7 +253,13 @@ Page({
     this.setData({ swipeOffset: 0, swipeId: '' });
   },
 
-  onSearch: function (e) { this.setData({ search: e.detail.value }); this.computeList(); },
+  // 搜索防抖：输入框立即回显，列表重算 250ms 内去抖（避免每 keystroke 全量过滤+setData）
+  onSearch: function (e) {
+    this.setData({ search: e.detail.value });
+    var that = this;
+    if (this._searchTimer) clearTimeout(this._searchTimer);
+    this._searchTimer = setTimeout(function () { that.computeList(); }, 250);
+  },
   onToggleFilter: function () { this.setData({ showFilter: !this.data.showFilter }); },
   // 徽标 = 非默认筛选条件数（范围/重要性/紧迫性/分组）
   updateFilterBadge: function () {
