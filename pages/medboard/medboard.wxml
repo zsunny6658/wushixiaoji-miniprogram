@@ -53,6 +53,7 @@
       <view class="board-tab {{boardNo === item.no ? 'bt-active' : ''}}" wx:for="{{boards}}" wx:key="no" bindtap="onBoardTap" data-no="{{item.no}}">
         <text>第{{item.no}}版</text>
         <text class="bt-count">{{item.taken}}/{{item.cap}}</text>
+        <text class="bt-current" wx:if="{{item.isCurrent}}">吃这版</text>
       </view>
       <view class="board-reset" bindtap="onResetBoard">🔄 初始化</view>
     </view>

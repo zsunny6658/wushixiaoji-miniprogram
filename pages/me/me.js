@@ -12,6 +12,15 @@ function mePickArchiveDays() {
   return v;
 }
 
+// 读取本地缓存的药量预警阈值（0=关闭；异常回退 10）
+function meLowStockThreshold() {
+  var raw = wx.getStorageSync('parcel.medLowStockThreshold');
+  if (raw === '' || raw === undefined || raw === null) return 10;
+  var v = parseInt(raw, 10);
+  if (isNaN(v) || v < 0) return 10;
+  return v;
+}
+
 Page({
   data: {
     meName: '',
@@ -37,6 +46,7 @@ Page({
     notifyCleanupDays: 7,
     ignoreCleanupMode: 'delete',
     pickArchiveDays: 7,
+    medLowStockThreshold: 10,
     showNotifyModal: false,
     mpNotifyConfigured: false,
     mailConfigured: false,
@@ -85,7 +95,8 @@ Page({
       notifyDays: parseInt(wx.getStorageSync('parcel.reminderDays') || '3', 10) || 3,
       notifyCleanupDays: parseInt(wx.getStorageSync('parcel.ignoreCleanupDays') || '7', 10) || 7,
       ignoreCleanupMode: wx.getStorageSync('parcel.ignoreCleanupMode') === 'archive' ? 'archive' : 'delete',
-      pickArchiveDays: mePickArchiveDays()
+      pickArchiveDays: mePickArchiveDays(),
+      medLowStockThreshold: meLowStockThreshold()
     });
   },
 
@@ -191,6 +202,12 @@ Page({
     if (isNaN(v) || v < 0) v = 7;
     this.setData({ pickArchiveDays: v });
   },
+  // 药量预警阈值输入（剩余 ≤ N 颗提醒备药，0=关闭）
+  onLowStockThresholdBlur: function (e) {
+    var v = parseInt(e.detail.value, 10);
+    if (isNaN(v) || v < 0) v = 10;
+    this.setData({ medLowStockThreshold: v });
+  },
   // 忽略超期处理模式：delete=删除 | archive=转归档
   onIgnoreModeTap: function (e) {
     var mode = e.currentTarget.dataset.mode === 'archive' ? 'archive' : 'delete';
@@ -260,15 +277,16 @@ Page({
       if (that.data.notifyTemplateId) {
         api.request('PUT', '/api/config' + (fid ? '?familyId=' + fid : ''), { notify: { templateId: that.data.notifyTemplateId } }, function () {});
       }
-      // 保存清理天数/模式 + 完成自动归档天数（0=关闭）
+      // 保存清理天数/模式 + 完成自动归档天数 + 药量预警阈值（0=关闭）
       var pad = that.data.pickArchiveDays;
       var mode = that.data.ignoreCleanupMode === 'archive' ? 'archive' : 'delete';
-      api.request('PUT', '/api/config' + (fid ? '?familyId=' + fid : ''), { ignoreCleanupDays: that.data.notifyCleanupDays, ignoreCleanupMode: mode, pickArchiveDays: pad }, function () {
+      api.request('PUT', '/api/config' + (fid ? '?familyId=' + fid : ''), { ignoreCleanupDays: that.data.notifyCleanupDays, ignoreCleanupMode: mode, pickArchiveDays: pad, medLowStockThreshold: that.data.medLowStockThreshold }, function () {
         wx.setStorageSync('parcel.ignoreCleanupDays', String(that.data.notifyCleanupDays));
         app.globalData.ignoreCleanupDays = that.data.notifyCleanupDays;
         wx.setStorageSync('parcel.ignoreCleanupMode', mode);
         app.globalData.ignoreCleanupMode = mode;
         wx.setStorageSync('parcel.pickArchiveDays', String(pad));
+        wx.setStorageSync('parcel.medLowStockThreshold', String(that.data.medLowStockThreshold));
         that.setData({ showNotifyModal: false });
         wx.showToast({ title: '已保存', icon: 'success' });
       }, function () {

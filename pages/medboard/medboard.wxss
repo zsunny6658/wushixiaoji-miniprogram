@@ -151,6 +151,16 @@
 .board-tab.bt-active .bt-count {
   color: var(--color-primary, #4A90D9);
 }
+/* 当前正在吃的版徽标 */
+.bt-current {
+  font-size: 18rpx;
+  line-height: 1;
+  padding: 4rpx 10rpx;
+  border-radius: 8rpx;
+  background: rgba(16, 185, 129, 0.14);
+  color: #059669;
+  font-weight: 600;
+}
 .board-reset {
   display: flex;
   align-items: center;

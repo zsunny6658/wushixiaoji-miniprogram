@@ -179,13 +179,14 @@ Page({
     this.times = times;
     this.pi = pi;
 
-    // 版 tab（各版累计消耗）
+    // 版 tab（各版累计消耗；isCurrent = 服务端当前正在吃的版，徽标提示）
     var boards = [];
     for (var b = 1; b <= pi.boards; b++) {
       boards.push({
         no: b,
         taken: this.allLogs.filter(function (l) { return l.boardNo === b; }).length,
-        cap: pi.rows * pi.cols
+        cap: pi.rows * pi.cols,
+        isCurrent: b === (pi.boardNo || 1)
       });
     }
 

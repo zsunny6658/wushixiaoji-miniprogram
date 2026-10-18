@@ -233,6 +233,16 @@
       </view>
       <input class="notify-input" type="number" value="{{pickArchiveDays}}" bindblur="onPickArchiveDaysBlur" />
     </view>
+    <view class="notify-item">
+      <view class="notify-item-left">
+        <ficon class="notify-item-icon" name="pill" size="36" color="#10B981" />
+        <view class="notify-item-text">
+          <text class="notify-item-title">药量预警</text>
+          <text class="notify-item-desc">盒内剩余 ≤ N 颗提醒备药，0=关闭</text>
+        </view>
+      </view>
+      <input class="notify-input" type="number" value="{{medLowStockThreshold}}" bindblur="onLowStockThresholdBlur" />
+    </view>
     <!-- 提醒时间 -->
     <view class="notify-divider"></view>
     <text class="notify-section-title">提醒时间</text>
