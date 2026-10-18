@@ -156,3 +156,28 @@
   font-size: 20rpx;
   color: var(--text-tertiary);
 }
+/* ── 卡片快捷操作 ── */
+.qcard-actions {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+.qact {
+  padding: 6rpx 18rpx;
+  border-radius: 999rpx;
+  font-size: 20rpx;
+  line-height: 1.4;
+  background: #F1F5F9;
+  color: #475569;
+  border: 1rpx solid #E2E8F0;
+}
+.qact-done {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #0F6E56;
+}
+.qact-on {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #854F0B;
+}

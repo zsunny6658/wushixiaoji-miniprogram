@@ -19,6 +19,8 @@ function fmtTime(iso) {
 Page({
   data: {
     items: [],
+    shown: [],
+    search: '',
     loading: true
   },
 
@@ -64,10 +66,63 @@ Page({
         };
       });
       that.setData({ items: items, loading: false });
+      that.applyFilter();
       if (done) done();
     }, function () {
       that.setData({ loading: false });
       if (done) done();
+    });
+  },
+
+  // —— 搜索：标题/驿站/类型本地过滤（数据量小，直接过滤即可）——
+  onSearchInput: function (e) {
+    this.setData({ search: e.detail.value });
+    this.applyFilter();
+  },
+  onClearSearch: function () {
+    this.setData({ search: '' });
+    this.applyFilter();
+  },
+  applyFilter: function () {
+    var q = (this.data.search || '').trim().toLowerCase();
+    var items = this.data.items || [];
+    var shown = !q ? items : items.filter(function (it) {
+      return (it.title || '').toLowerCase().indexOf(q) >= 0 ||
+             (it.sub || '').toLowerCase().indexOf(q) >= 0 ||
+             (it.typeLabel || '').indexOf(q) >= 0;
+    });
+    this.setData({ shown: shown });
+  },
+
+  // —— 批量清理：按归档时间批量删除（仅家庭管理员可用，服务端校验）——
+  onCleanupTap: function () {
+    var that = this;
+    var ranges = ['30 天前', '90 天前', '180 天前', '365 天前'];
+    var days = [30, 90, 180, 365];
+    wx.showActionSheet({
+      itemList: ranges.map(function (r) { return '清理 ' + r + ' 的归档'; }),
+      success: function (res) {
+        var d = days[res.tapIndex];
+        if (!d) return;
+        wx.showModal({
+          title: '确认清理',
+          content: '将永久删除归档超过 ' + d + ' 的记录，删除后不可恢复。确定继续？',
+          confirmText: '删除',
+          confirmColor: '#EF4444',
+          success: function (m) {
+            if (!m.confirm) return;
+            wx.showLoading({ title: '清理中…' });
+            api.request('POST', '/api/packages/archived/cleanup', { olderThanDays: d }, function (data) {
+              wx.hideLoading();
+              wx.showToast({ title: '已清理 ' + ((data && data.removed) || 0) + ' 条', icon: 'none' });
+              that.loadList();
+            }, function () {
+              wx.hideLoading();
+              wx.showToast({ title: '清理失败（需家庭管理员）', icon: 'none' });
+            });
+          }
+        });
+      }
     });
   },
 

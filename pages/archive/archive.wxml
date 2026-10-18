@@ -1,6 +1,14 @@
 <view class="page">
-  <view class="arch-list" wx:if="{{items.length}}">
-    <view class="arch-item" wx:for="{{items}}" wx:key="id">
+  <view class="arch-toolbar">
+    <view class="arch-search">
+      <input class="arch-search-input" placeholder="搜索标题/驿站/类型" value="{{search}}" bindinput="onSearchInput" confirm-type="search" />
+      <view class="arch-search-clear" wx:if="{{search}}" catchtap="onClearSearch">✕</view>
+    </view>
+    <view class="arch-cleanup-btn" catchtap="onCleanupTap" hover-class="hover-press">清理</view>
+  </view>
+
+  <view class="arch-list" wx:if="{{shown.length}}">
+    <view class="arch-item" wx:for="{{shown}}" wx:key="id">
       <view class="arch-main" bindtap="onViewDetail" data-id="{{item.id}}" hover-class="hover-press">
         <view class="arch-icon">{{item.icon}}</view>
         <view class="arch-body">
@@ -21,10 +29,14 @@
     <view class="arch-loading" wx:if="{{loadingMore}}">加载中...</view>
   </view>
 
-  <view class="arch-empty" wx:elif="{{!loading}}">
+  <view class="arch-empty" wx:elif="{{!loading && !items.length}}">
     <view class="arch-empty-icon"><ficon name="archive" size="96" color="#CBD5E1" /></view>
     <text class="arch-empty-text">暂无归档记录</text>
     <text class="arch-empty-hint">在详情页选择「归档」后，记录会收纳到这里</text>
+  </view>
+
+  <view class="arch-empty" wx:elif="{{!loading}}">
+    <text class="arch-empty-text">无匹配记录</text>
   </view>
 
   <view class="arch-bottom-spacer"></view>

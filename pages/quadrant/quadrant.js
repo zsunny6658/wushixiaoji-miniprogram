@@ -1,5 +1,6 @@
 // pages/quadrant/quadrant.js
 var helpers = require('../../utils/helpers');
+var api = require('../../utils/api');
 var app = getApp();
 
 Page({
@@ -47,6 +48,35 @@ Page({
 
   onEdit: function (e) {
     wx.navigateTo({ url: '/pages/detail/detail?id=' + e.currentTarget.dataset.id });
+  },
+
+  // 快捷完成：取件/备忘/待还可直接标记完成；用药需走药板打卡，不提供快捷完成
+  onQuickDone: function (e) {
+    var id = e.currentTarget.dataset.id;
+    if (!id || e.currentTarget.dataset.type === 'medication') return;
+    var that = this;
+    wx.showLoading({ title: '处理中…' });
+    api.updatePackage(id, { status: 'picked' }, function () {
+      wx.hideLoading();
+      wx.showToast({ title: '已完成', icon: 'success' });
+      app.refreshState(function () { that.compute(); });
+    }, function () {
+      wx.hideLoading();
+      wx.showToast({ title: '操作失败', icon: 'none' });
+    });
+  },
+
+  // 快捷切换重要级：高 ↔ 中（即时改象限归属）
+  onQuickFlag: function (e) {
+    var id = e.currentTarget.dataset.id;
+    var important = e.currentTarget.dataset.important === '1';
+    if (!id) return;
+    var that = this;
+    api.updatePackage(id, { importance: important ? 'medium' : 'high' }, function () {
+      app.refreshState(function () { that.compute(); });
+    }, function () {
+      wx.showToast({ title: '操作失败', icon: 'none' });
+    });
   },
 
   onGoAll: function () {

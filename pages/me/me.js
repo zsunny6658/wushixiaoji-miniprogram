@@ -242,6 +242,40 @@ Page({
       wx.showToast({ title: '导出失败', icon: 'none' });
     });
   },
+  // 导出全部记录 CSV（含取件/备忘/待还/用药，全部状态，复制到剪贴板）
+  onExportAll: function () {
+    var fid = this.data.familyId || '';
+    if (!fid) {
+      wx.showToast({ title: '未加入家庭，无法导出', icon: 'none' });
+      return;
+    }
+    wx.showLoading({ title: '生成中…' });
+    api.request('GET', '/api/packages/export?familyId=' + fid, null, function (data) {
+      wx.hideLoading();
+      if (!data || !data.csv) {
+        wx.showToast({ title: '导出失败', icon: 'none' });
+        return;
+      }
+      if (!data.count) {
+        wx.showToast({ title: '暂无记录', icon: 'none' });
+        return;
+      }
+      wx.setClipboardData({
+        data: data.csv,
+        success: function () {
+          wx.showModal({
+            title: '已复制到剪贴板',
+            content: '共 ' + data.count + ' 条记录（CSV 格式，含全部类型与状态），可粘贴到电脑 Excel 存档。',
+            showCancel: false,
+            confirmText: '好的'
+          });
+        }
+      });
+    }, function () {
+      wx.hideLoading();
+      wx.showToast({ title: '导出失败', icon: 'none' });
+    });
+  },
   // 忽略超期处理模式：delete=删除 | archive=转归档
   onIgnoreModeTap: function (e) {
     var mode = e.currentTarget.dataset.mode === 'archive' ? 'archive' : 'delete';
