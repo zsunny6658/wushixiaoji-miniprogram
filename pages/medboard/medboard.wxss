@@ -33,6 +33,21 @@
   opacity: 0.85;
   margin-left: 8rpx;
 }
+.med-sched {
+  font-size: 22rpx;
+  color: #64748B;
+  margin-top: 6rpx;
+  margin-left: 40rpx;
+}
+/* 打卡成功弹跳动效 */
+.hole-pop {
+  animation: holepop 0.55s ease;
+}
+@keyframes holepop {
+  0% { transform: scale(0.6); }
+  55% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
 .progress-head {
   display: flex;
   justify-content: space-between;

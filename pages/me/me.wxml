@@ -243,6 +243,17 @@
       </view>
       <input class="notify-input" type="number" value="{{medLowStockThreshold}}" bindblur="onLowStockThresholdBlur" />
     </view>
+    <!-- 导出打卡记录 -->
+    <view class="notify-item" bindtap="onExportMedLogs">
+      <view class="notify-item-left">
+        <ficon class="notify-item-icon" name="pill" size="36" color="#10B981" />
+        <view class="notify-item-text">
+          <text class="notify-item-title">导出打卡记录</text>
+          <text class="notify-item-desc">全部服药记录导出 CSV（复制到剪贴板）</text>
+        </view>
+      </view>
+      <text class="notify-arrow">›</text>
+    </view>
     <!-- 提醒时间 -->
     <view class="notify-divider"></view>
     <text class="notify-section-title">提醒时间</text>

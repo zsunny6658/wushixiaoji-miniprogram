@@ -212,7 +212,7 @@ Page({
         taken: d.taken,
         total: d.total,
         due: !!d.due,
-        catchable: i === 1 && !!d.due && d.taken < d.total, // 昨天+服药日+没吃满 → 可补记
+        catchable: i > 0 && !!d.due && d.taken < d.total, // 过去 6 天内服药日+没吃满 → 可补记
         percent: d.total ? Math.round(d.taken * 100 / d.total) : 0,
         full: d.total > 0 && d.taken >= d.total,
         none: d.taken === 0
@@ -278,6 +278,8 @@ Page({
 
     this.setData({
       pkg: pkg,
+      schedTimes: times.join(' / '),
+      schedCount: times.length,
       colorHex: COLOR_HEX[pi.color],
       shapeLabel: SHAPE_LABEL[pi.shape],
       pillShape: pi.shape,
@@ -423,6 +425,7 @@ Page({
           pinfo.boardNo = res.log.boardNo + 1;
         }
         that.applyData(that._lastRes); // 本地重算全部统计 + 药板（乐观更新）
+        that.playPopAnim(res.log.pillIndex); // 打卡成功弹跳动效
         wx.showToast({ title: '已记录 ✓', icon: 'success' });
       }
     }, function () {
@@ -480,6 +483,18 @@ Page({
     }
   },
 
+  // 打卡成功弹跳动效：定向标记该格 pop，700ms 后清除（不清 rows 节点树）
+  playPopAnim: function (pillIndex) {
+    var that = this;
+    var cols = (this.pi && this.pi.cols) || 5;
+    var r = Math.floor(pillIndex / cols), c = pillIndex % cols;
+    this.setData({ ['rows[' + r + '][' + c + '].pop']: true });
+    if (this._popTimer) clearTimeout(this._popTimer);
+    this._popTimer = setTimeout(function () {
+      that.setData({ ['rows[' + r + '][' + c + '].pop']: false });
+    }, 700);
+  },
+
   untake: function (logId) {
     var that = this;
     api.untakeMed(this.pkgId, logId, function () {
@@ -490,11 +505,13 @@ Page({
     }, function () {});
   },
 
-  // 补记昨天：ActionSheet 选昨天漏掉的时段，药位取当前版第一个未吃位置
+  // 补记：近 7 天内任意未满的服药日，ActionSheet 选漏掉的时段，药位取当前版第一个未吃位置
   onWeekCatchup: function (e) {
     var date = e.currentTarget.dataset.date;
     if (!date) return;
-    if (!this.data.dueToday && !this.pkg) { /* 非服药日但昨天可补，继续 */ }
+    var dayLabel = date.slice(5).replace('-', '/');
+    var wd = (this.data.weekDays || []).find(function (d) { return d.date === date; });
+    if (wd && wd.label) dayLabel = wd.label;
     var sched = (this.pkg && this.pkg.schedule) || {};
     var times = this.times || (sched.times || []);
     var yLogs = this.allLogs.filter(function (l) { return l.date === date; });
@@ -503,10 +520,10 @@ Page({
       if (!yLogs.some(function (l) { return l.slotIndex === i; })) untaken.push({ index: i, time: t });
     });
     if (!untaken.length) {
-      wx.showToast({ title: '昨天已全部记录 ✓', icon: 'none' });
+      wx.showToast({ title: dayLabel + '已全部记录 ✓', icon: 'none' });
       return;
     }
-    // 药位：当前版第一个未吃的位置（补记 = 那颗药昨天实际已吃掉）
+    // 药位：当前版第一个未吃的位置（补记 = 那颗药该日实际已吃掉）
     var boardNo = this.data.boardNo;
     var cap = this.pi.rows * this.pi.cols;
     var pillIndex = -1;
@@ -530,14 +547,14 @@ Page({
           that.allLogs.push(res.log);
           wx.vibrateShort({ type: 'light' });
           that.load();
-          wx.showToast({ title: '已补记昨天 ✓', icon: 'success' });
+          wx.showToast({ title: '已补记 ✓', icon: 'success' });
         }
       }, function () {});
     };
     if (untaken.length === 1) {
       wx.showModal({
-        title: '补记昨天',
-        content: '将这颗药记为昨天 ' + untaken[0].time + ' 那次服药？',
+        title: '补记 ' + dayLabel,
+        content: '将这颗药记为 ' + dayLabel + ' ' + untaken[0].time + ' 那次服药？',
         success: function (r) { if (r.confirm) pick(untaken[0].index); }
       });
       return;

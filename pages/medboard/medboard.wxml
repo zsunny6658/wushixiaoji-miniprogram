@@ -17,6 +17,7 @@
         <text class="med-name">{{pkg.code}}</text>
         <text class="med-note" wx:if="{{pkg.note}}">{{pkg.note}}</text>
       </view>
+      <view class="med-sched" wx:if="{{schedCount}}">📅 每日 {{schedCount}} 次 · {{schedTimes}}</view>
       <view class="med-progress">
         <view class="rest-banner" wx:if="{{!dueToday}}">🌙 今日非服药日 · 好好休息</view>
         <view class="progress-head">
@@ -92,7 +93,7 @@
             </view>
             <view
               wx:else
-              class="pill-hole {{cell.isToday ? 'hole-today' : ''}}"
+              class="pill-hole {{cell.isToday ? 'hole-today' : ''}} {{cell.pop ? 'hole-pop' : ''}}"
               style="{{holeStyleMini}}"
               bindtap="onTodayHoleTap"
               data-board="{{cell.boardNo}}"

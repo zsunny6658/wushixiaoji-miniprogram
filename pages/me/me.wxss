@@ -407,6 +407,11 @@
   border-bottom: 1rpx solid var(--border);
 }
 .notify-item:last-child { border-bottom: none; }
+.notify-arrow {
+  font-size: 40rpx;
+  color: var(--text-tertiary, #94A3B8);
+  padding-left: 12rpx;
+}
 .notify-item-left {
   display: flex;
   align-items: center;
