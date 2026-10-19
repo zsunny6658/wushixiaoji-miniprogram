@@ -91,6 +91,8 @@ Page({
     boxRemaining: 0,
     compare: 'current',
     compareRows: [],
+    compareBefore: 0,
+    compareLastDate: '',
     weekDays: [],
     weekRate: 0,
     streak: 0,
@@ -327,6 +329,9 @@ Page({
     var cap = pi.rows * pi.cols;
     var cells = [];
     var beforeCells = [];
+    // 对比板健康度：当前盒当前版"今天之前"的真实缺口数（开新盒首日/未开吃的新版 = 0 → 双板降级为单板）
+    var beforeCount = 0;
+    var lastBeforeDate = '';
     for (var i = 0; i < cap; i++) {
       (function (idx) {
         var that2 = this;
@@ -334,6 +339,11 @@ Page({
         var log = logs[logs.length - 1];
         var todayLog = logs.find(function (l) { return l.date === today; });
         var beforeLog = logs.find(function (l) { return l.date < today; }); // 今天之前已吃
+        if (beforeLog) {
+          beforeCount++;
+          // 初始化占位（2000-01-01）计入缺口但不参与"最近服用日期"展示
+          if (beforeLog.date !== '2000-01-01' && beforeLog.date > lastBeforeDate) lastBeforeDate = beforeLog.date;
+        }
         // 主板（现在）：已吃 → 缺口；今日刚吃的缺口高亮
         cells.push({
           index: idx,
@@ -363,7 +373,7 @@ Page({
     for (var r2 = 0; r2 < pi.rows; r2++) {
       compareRows.push(beforeCells.slice(r2 * pi.cols, (r2 + 1) * pi.cols));
     }
-    this.setData({ rows: rows, compareRows: compareRows });
+    this.setData({ rows: rows, compareRows: compareRows, compareBefore: beforeCount, compareLastDate: lastBeforeDate ? lastBeforeDate.slice(5).replace('-', '/') : '' });
   },
 
   onCompareToggle: function (e) {

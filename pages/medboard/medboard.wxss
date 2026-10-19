@@ -436,6 +436,11 @@
   color: #10B981;
   font-weight: 600;
 }
+/* 对比板无历史缺口（新盒首日）提示文案 */
+.ch-empty {
+  color: var(--text-tertiary, #94A3B8);
+  font-weight: 500;
+}
 .cmp-gap {
   margin-top: 16rpx;
 }

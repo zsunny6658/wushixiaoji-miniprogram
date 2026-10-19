@@ -64,13 +64,14 @@
       <view class="board-reset" bindtap="onResetBoard">🔄 初始化</view>
     </view>
 
-    <!-- 今日前后对比（双板，紧凑头） -->
+    <!-- 今日前后对比（双板，紧凑头；新盒首日/新版未开吃时无历史缺口，降级为单板避免两张满板） -->
     <view class="compare-card" wx:if="{{compare === 'today' && !initializing}}">
       <view class="compare-head">
-        <text class="ch-before">上 · 今天之前</text>
-        <text class="ch-after">下 · 现在，绿「今」= 今日已服</text>
+        <text class="ch-before" wx:if="{{compareBefore > 0}}">上 · 今天之前{{compareLastDate ? '（最近 ' + compareLastDate + ' 已服）' : ''}}</text>
+        <text class="ch-before ch-empty" wx:else>📦 新板还没有历史缺口，暂无可对比</text>
+        <text class="ch-after">{{compareBefore > 0 ? '下 · 现在，绿「今」= 今日已服' : '现在 · 绿「今」= 今日已服'}}</text>
       </view>
-      <view class="blister blister-mini">
+      <view class="blister blister-mini" wx:if="{{compareBefore > 0}}">
         <view class="blister-row" wx:for="{{compareRows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
           <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
             <view wx:if="{{cell.showPill}}" class="pill shape-{{pillShape}}" style="{{pillStyleMini}}background:{{colorHex}}">
@@ -82,7 +83,7 @@
           </view>
         </view>
       </view>
-      <view class="blister blister-mini blister-after {{!dueToday ? 'blister-rest' : ''}} cmp-gap">
+      <view class="blister blister-mini blister-after {{!dueToday ? 'blister-rest' : ''}} {{compareBefore > 0 ? 'cmp-gap' : ''}}">
         <view class="blister-row" wx:for="{{rows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
           <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
             <view
