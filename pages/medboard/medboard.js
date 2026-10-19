@@ -171,20 +171,25 @@ Page({
     pi.cols = clamp(pi.cols, 1, 8, 5);
     pi.boards = clamp(pi.boards, 1, 6, 2);
     pi.boardNo = clamp(pi.boardNo, 1, pi.boards, 1);
+    pi.boxNo = clamp(pi.boxNo, 1, 999, 1);
 
     var today = todayStr();
     this.todayLogs = this.allLogs.filter(function (l) { return l.date === today; });
+    // 当前盒流水（开新盒后旧盒历史保留，不参与当前盒统计/药板渲染）
+    var box = pi.boxNo || 1;
+    this.boxLogs = this.allLogs.filter(function (l) { return (l.boxNo || 1) === box; });
     var times = (pkg.schedule && pkg.schedule.times) || ['08:00', '20:00'];
 
     this.times = times;
     this.pi = pi;
 
-    // 版 tab（各版累计消耗；isCurrent = 服务端当前正在吃的版，徽标提示）
+    // 版 tab（当前盒各版累计消耗；isCurrent = 服务端当前正在吃的版，徽标提示）
+    var boxLogsRef = this.boxLogs;
     var boards = [];
     for (var b = 1; b <= pi.boards; b++) {
       boards.push({
         no: b,
-        taken: this.allLogs.filter(function (l) { return l.boardNo === b; }).length,
+        taken: boxLogsRef.filter(function (l) { return l.boardNo === b; }).length,
         cap: pi.rows * pi.cols,
         isCurrent: b === (pi.boardNo || 1)
       });
@@ -302,7 +307,9 @@ Page({
       todayTotal: todayTotal,
       dueToday: dueToday,
       todayPercent: todayTotal ? Math.round(todayTaken * 100 / todayTotal) : 0,
-      boxRemaining: pi.boards * pi.rows * pi.cols - this.allLogs.length
+      boxNo: box,
+      boxRemaining: pi.boards * pi.rows * pi.cols - this.boxLogs.length,
+      boxFinished: this.boxLogs.length >= pi.boards * pi.rows * pi.cols
     });
     this.buildBoard();
     // 详情页「初始化药板」入口直达：加载完成后自动进入初始化模式（默认停在当前版）
@@ -315,6 +322,7 @@ Page({
   buildBoard: function () {
     var pi = this.pi;
     var boardNo = this.data.boardNo;
+    var box = pi.boxNo || 1;
     var today = todayStr();
     var cap = pi.rows * pi.cols;
     var cells = [];
@@ -322,7 +330,7 @@ Page({
     for (var i = 0; i < cap; i++) {
       (function (idx) {
         var that2 = this;
-        var logs = that2.allLogs.filter(function (l) { return l.boardNo === boardNo && l.pillIndex === idx; });
+        var logs = that2.boxLogs.filter(function (l) { return l.boardNo === boardNo && (l.boxNo || 1) === box && l.pillIndex === idx; });
         var log = logs[logs.length - 1];
         var todayLog = logs.find(function (l) { return l.date === today; });
         var beforeLog = logs.find(function (l) { return l.date < today; }); // 今天之前已吃
@@ -370,6 +378,35 @@ Page({
     if (no === this.data.boardNo) return;
     this.setData({ boardNo: no });
     this.buildBoard();
+  },
+
+  // 开新盒：盒号 +1、版号重置 1；完成后自动进入初始化模式（新盒已吃几颗可预填/拍照识别）
+  onNewBox: function () {
+    var that = this;
+    if (this._newBoxBusy) return;
+    wx.showModal({
+      title: '开新盒',
+      content: '将开始第 ' + ((this.pi.boxNo || 1) + 1) + ' 盒：版号重置为第 1 版，历史打卡流水全部保留。新盒已吃过的位置可在初始化时标记。',
+      confirmText: '开新盒',
+      success: function (r) {
+        if (!r.confirm) return;
+        that._newBoxBusy = true;
+        wx.showLoading({ title: '开启中…', mask: true });
+        api.openMedBox(that.pkgId, function () {
+          that._newBoxBusy = false;
+          wx.hideLoading();
+          wx.vibrateShort({ type: 'light' });
+          that._selfAction = Date.now();
+          that._autoInit = true; // load 完成后自动进入初始化模式
+          that.load();
+          wx.showToast({ title: '已开新盒，请标记新盒已吃位置', icon: 'none', duration: 2500 });
+        }, function () {
+          that._newBoxBusy = false;
+          wx.hideLoading();
+          wx.showToast({ title: '操作失败，请重试', icon: 'none' });
+        });
+      }
+    });
   },
 
   // 点击药丸：记录为今日某次服药（任意位置乱序点击均可，无需按顺序）
@@ -424,9 +461,22 @@ Page({
         if (bt && bt.taken >= cap && res.log.boardNo < that.pi.boards && pinfo && (pinfo.boardNo || 1) === res.log.boardNo) {
           pinfo.boardNo = res.log.boardNo + 1;
         }
+        var wasFinished = that.data.boxFinished;
         that.applyData(that._lastRes); // 本地重算全部统计 + 药板（乐观更新）
         that.playPopAnim(res.log.pillIndex); // 打卡成功弹跳动效
         wx.showToast({ title: '已记录 ✓', icon: 'success' });
+        // 整盒吃完：弹窗引导开新盒（历史流水保留，新盒可初始化预填/拍照识别）
+        if (!wasFinished && that.data.boxFinished) {
+          setTimeout(function () {
+            wx.showModal({
+              title: '整盒已服完 🎉',
+              content: '「' + (that.pkg && that.pkg.code || '本药') + '」第 ' + (that.pi.boxNo || 1) + ' 盒已全部服完。要开新盒吗？开新盒后可初始化预填已吃位置。',
+              confirmText: '开新盒',
+              cancelText: '稍后',
+              success: function (r) { if (r.confirm) that.onNewBox(); }
+            });
+          }, 800);
+        }
       }
     }, function () {
       // 失败提示已由 api 层统一 toast
@@ -440,7 +490,8 @@ Page({
     var pillIndex = parseInt(ds.pill, 10);
     var boardNo = parseInt(ds.board, 10);
     var that = this;
-    var logs = this.allLogs.filter(function (l) { return l.boardNo === boardNo && l.pillIndex === pillIndex; });
+    var box = this.pi.boxNo || 1;
+    var logs = this.allLogs.filter(function (l) { return l.boardNo === boardNo && l.pillIndex === pillIndex && (l.boxNo || 1) === box; });
     if (!logs.length) return;
     var todayLog = logs.find(function (l) { return l.date === todayStr(); });
     if (todayLog) {
@@ -466,9 +517,10 @@ Page({
     var taken = ds.taken === 'true' || ds.taken === true;
     if (!taken) return;
     var that = this;
+    var boxCur = this.pi.boxNo || 1;
     // 找到这颗药的所有服用记录
-    var logs = this.allLogs.filter(function (l) { return l.boardNo === boardNo && l.pillIndex === pillIndex; });
-    var todayLog = logs.find(function (l) { return l.date === todayStr(); });
+    var logs = this.allLogs.filter(function (l) { return l.boardNo === boardNo && l.pillIndex === pillIndex && (l.boxNo || 1) === boxCur; });
+    var todayLog = logs.find(function (l) { return l.date === todayStr() && (l.boxNo || 1) === boxCur; });
     if (todayLog) {
       wx.showModal({
         title: '撤销打卡',
@@ -575,9 +627,10 @@ Page({
   // 进入初始化模式：一次会话设置所有版；预填各版已有的初始化占位标记
   startInitMode: function (curBoard) {
     var pi = this.pi || {};
+    var box = pi.boxNo || 1;
     var states = {};
     (this.allLogs || []).forEach(function (l) {
-      if (l.date === '2000-01-01') {
+      if (l.date === '2000-01-01' && (l.boxNo || 1) === box) {
         var b = l.boardNo || 1;
         if (!states[b]) states[b] = {};
         states[b][l.pillIndex] = true;

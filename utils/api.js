@@ -230,6 +230,10 @@ var API = {
   recognizeMedBoard: function (id, image, cb, errCb) {
     this.request('POST', '/api/packages/' + id + '/medboard/recognize', { image: image }, cb, errCb);
   },
+  // 开新盒：盒号 +1、版号重置 1，历史流水保留
+  openMedBox: function (id, cb, errCb) {
+    this.request('POST', '/api/packages/' + id + '/medbox/new', {}, cb, errCb);
+  },
   // 药名输入联想
   suggestDrugs: function (q, cb, errCb) {
     this.request('GET', '/api/drugs/suggest', { q: q, limit: 6 }, cb, errCb);

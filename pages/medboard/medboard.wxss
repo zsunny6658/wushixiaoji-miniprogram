@@ -724,3 +724,27 @@
   color: #4A90D9;
   border: 1rpx solid rgba(74, 144, 217, 0.35);
 }
+
+/* ── 整盒已服完横幅 ── */
+.box-done-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12rpx;
+  padding: 16rpx 24rpx;
+  border-radius: 16rpx;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1rpx solid rgba(16, 185, 129, 0.3);
+}
+.bdb-text {
+  font-size: 26rpx;
+  color: #0F6E56;
+  font-weight: 500;
+}
+.bdb-btn {
+  padding: 8rpx 28rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  background: #10B981;
+  color: #fff;
+}

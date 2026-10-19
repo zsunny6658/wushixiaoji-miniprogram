@@ -17,7 +17,12 @@
         <text class="med-name">{{pkg.code}}</text>
         <text class="med-note" wx:if="{{pkg.note}}">{{pkg.note}}</text>
       </view>
-      <view class="med-sched" wx:if="{{schedCount}}">📅 每日 {{schedCount}} 次 · {{schedTimes}}</view>
+      <view class="med-sched" wx:if="{{schedCount}}">📅 每日 {{schedCount}} 次 · {{schedTimes}} · 第 {{boxNo}} 盒</view>
+      <!-- 整盒已服完横幅 + 开新盒入口 -->
+      <view class="box-done-banner" wx:if="{{boxFinished}}">
+        <text class="bdb-text">📦 第 {{boxNo}} 盒已全部服完</text>
+        <view class="bdb-btn" bindtap="onNewBox">开新盒</view>
+      </view>
       <view class="med-progress">
         <view class="rest-banner" wx:if="{{!dueToday}}">🌙 今日非服药日 · 好好休息</view>
         <view class="progress-head">
