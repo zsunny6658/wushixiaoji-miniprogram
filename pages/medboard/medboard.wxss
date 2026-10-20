@@ -359,7 +359,7 @@
 }
 .shape-oval {
   width: 108rpx;
-  height: 68rpx;
+  height: 58rpx;
   border-radius: 50%;
 }
 .shape-capsule {
@@ -458,8 +458,8 @@
 }
 .blister-mini .shape-oval {
   width: 72rpx;
-  height: 46rpx;
-  border-radius: 23rpx;
+  height: 38rpx;
+  border-radius: 50%;
 }
 .blister-mini .shape-capsule {
   width: 80rpx;

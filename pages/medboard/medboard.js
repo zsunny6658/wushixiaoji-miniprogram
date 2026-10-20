@@ -245,7 +245,7 @@ Page({
     // 按列数自适应药丸/缺口尺寸（防止 6-8 列时固定 88rpx 药丸互相重叠）
     // 宽高按形状固有比例同步缩放（不各自独立 clamp，窄列时椭圆不会被压扁趋圆）；
     // 圆/椭圆用 50%（真圆/真椭圆，贴近真实药片），胶囊保持 stadium（高/2 圆角）
-    var SH = { round: [88, 88], oval: [108, 68], capsule: [120, 54], square: [88, 88] }[pi.shape] || [88, 88];
+    var SH = { round: [88, 88], oval: [108, 58], capsule: [120, 54], square: [88, 88] }[pi.shape] || [88, 88];
     var cellW = Math.floor((750 - 48 - 44) / pi.cols);
     var maxW = Math.floor(cellW * 0.8);
     var minH = Math.max(Math.floor(cellW * 0.55), 34);
@@ -260,7 +260,7 @@ Page({
     var rad = radOf(ph);
     var pillStyle = 'width:' + pw + 'rpx;height:' + ph + 'rpx;border-radius:' + rad + ';';
     var holeStyle = 'width:' + pw + 'rpx;height:' + ph + 'rpx;border-radius:' + rad + ';'; // 缺口 = 药丸占地，形状一致
-    var pwM = Math.floor(pw * 0.66), phM = Math.floor(ph * 0.66);
+    var pwM = Math.round(pw * 0.66), phM = Math.round(ph * 0.66);
     var radM = radOf(phM);
     var pillStyleMini = 'width:' + pwM + 'rpx;height:' + phM + 'rpx;border-radius:' + radM + ';';
     var holeStyleMini = 'width:' + pwM + 'rpx;height:' + phM + 'rpx;border-radius:' + radM + ';';

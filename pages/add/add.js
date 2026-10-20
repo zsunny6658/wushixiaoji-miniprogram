@@ -243,7 +243,7 @@ Page({
   refreshPillPreview: function () {
     var pi = this.data.pillInfo;
     var hex = this.data.pillColorHex[pi.color] || '#F1F5F9';
-    var dims = { round: [88, 88], oval: [108, 68], capsule: [120, 54], square: [88, 88] }[pi.shape] || [88, 88];
+    var dims = { round: [88, 88], oval: [108, 58], capsule: [120, 54], square: [88, 88] }[pi.shape] || [88, 88];
     var cellW = Math.floor(620 / Math.max(pi.cols, 1));
     var maxW = Math.floor(cellW * 0.8);
     var w = Math.min(dims[0], maxW);
