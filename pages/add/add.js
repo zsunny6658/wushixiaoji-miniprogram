@@ -239,6 +239,7 @@ Page({
     this.setData({ medTimes: times });
   },
   // 药板实时预览：根据 pillInfo 计算预览网格与药丸内联样式（列数多时自动缩小防重叠）
+  // 与 medboard 渲染同口径：宽高按形状固有比例同步缩放；圆/椭圆 50%，胶囊 stadium
   refreshPillPreview: function () {
     var pi = this.data.pillInfo;
     var hex = this.data.pillColorHex[pi.color] || '#F1F5F9';
@@ -246,8 +247,9 @@ Page({
     var cellW = Math.floor(620 / Math.max(pi.cols, 1));
     var maxW = Math.floor(cellW * 0.8);
     var w = Math.min(dims[0], maxW);
-    var h = Math.min(dims[1], Math.max(Math.floor(cellW * 0.55), 34));
-    var r = pi.shape === 'square' ? Math.round(h * 0.16) : (pi.shape === 'round' ? 999 : Math.round(h / 2));
+    var h = Math.min(Math.round(w * dims[1] / dims[0]), Math.max(Math.floor(cellW * 0.55), 34));
+    w = Math.min(w, Math.round(h * dims[0] / dims[1]));
+    var r = pi.shape === 'square' ? Math.round(h * 0.16) + 'rpx' : (pi.shape === 'capsule' ? Math.round(h / 2) + 'rpx' : '50%');
     var rows = [];
     for (var i = 0; i < pi.rows; i++) {
       var row = [];
@@ -256,7 +258,7 @@ Page({
     }
     this.setData({
       pillPreviewRows: rows,
-      pillPrevStyle: 'width:' + w + 'rpx;height:' + h + 'rpx;border-radius:' + r + 'rpx;background:' + hex + ';'
+      pillPrevStyle: 'width:' + w + 'rpx;height:' + h + 'rpx;border-radius:' + r + ';background:' + hex + ';'
     });
   },
 

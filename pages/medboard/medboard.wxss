@@ -360,7 +360,7 @@
 .shape-oval {
   width: 108rpx;
   height: 68rpx;
-  border-radius: 34rpx;
+  border-radius: 50%;
 }
 .shape-capsule {
   width: 120rpx;

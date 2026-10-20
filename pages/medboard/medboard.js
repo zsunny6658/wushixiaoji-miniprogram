@@ -243,18 +243,27 @@ Page({
     var weekRate = sumN ? Math.round(sumT * 100 / sumN) : 0;
 
     // 按列数自适应药丸/缺口尺寸（防止 6-8 列时固定 88rpx 药丸互相重叠）
-    // 主板可用宽 ≈ 750 - 页面 padding48 - 药板 padding44；对比小板再缩 0.66
+    // 宽高按形状固有比例同步缩放（不各自独立 clamp，窄列时椭圆不会被压扁趋圆）；
+    // 圆/椭圆用 50%（真圆/真椭圆，贴近真实药片），胶囊保持 stadium（高/2 圆角）
     var SH = { round: [88, 88], oval: [108, 68], capsule: [120, 54], square: [88, 88] }[pi.shape] || [88, 88];
     var cellW = Math.floor((750 - 48 - 44) / pi.cols);
     var maxW = Math.floor(cellW * 0.8);
     var minH = Math.max(Math.floor(cellW * 0.55), 34);
-    var pw = Math.min(SH[0], maxW), ph = Math.min(SH[1], minH);
+    var pw = Math.min(SH[0], maxW);
+    var ph = Math.min(Math.round(pw * SH[1] / SH[0]), minH);
+    pw = Math.min(pw, Math.round(ph * SH[0] / SH[1]));
+    var radOf = function (h) {
+      if (pi.shape === 'square') return Math.round(h * 0.16) + 'rpx';
+      if (pi.shape === 'capsule') return Math.round(h / 2) + 'rpx';
+      return '50%'; // round / oval
+    };
+    var rad = radOf(ph);
+    var pillStyle = 'width:' + pw + 'rpx;height:' + ph + 'rpx;border-radius:' + rad + ';';
+    var holeStyle = 'width:' + pw + 'rpx;height:' + ph + 'rpx;border-radius:' + rad + ';'; // 缺口 = 药丸占地，形状一致
     var pwM = Math.floor(pw * 0.66), phM = Math.floor(ph * 0.66);
-    var radOf = function (h) { return pi.shape === 'square' ? Math.round(h * 0.16) : (pi.shape === 'round' ? 999 : Math.round(h / 2)); };
-    var pillStyle = 'width:' + pw + 'rpx;height:' + ph + 'rpx;border-radius:' + radOf(ph) + 'rpx;';
-    var holeStyle = 'width:' + Math.min(88, maxW) + 'rpx;height:' + Math.min(88, minH) + 'rpx;border-radius:' + radOf(minH) + 'rpx;';
-    var pillStyleMini = 'width:' + pwM + 'rpx;height:' + phM + 'rpx;border-radius:' + radOf(phM) + 'rpx;';
-    var holeStyleMini = 'width:' + Math.floor(Math.min(88, maxW) * 0.66) + 'rpx;height:' + Math.floor(Math.min(88, minH) * 0.66) + 'rpx;border-radius:' + radOf(Math.floor(minH * 0.66)) + 'rpx;';
+    var radM = radOf(phM);
+    var pillStyleMini = 'width:' + pwM + 'rpx;height:' + phM + 'rpx;border-radius:' + radM + ';';
+    var holeStyleMini = 'width:' + pwM + 'rpx;height:' + phM + 'rpx;border-radius:' + radM + ';';
 
     // 今日打卡时间线（几点 · 谁 · 第几版第几行第几颗）
     var cols = pi.cols;
@@ -344,7 +353,7 @@ Page({
           // 初始化占位（2000-01-01）计入缺口但不参与"最近服用日期"展示
           if (beforeLog.date !== '2000-01-01' && beforeLog.date > lastBeforeDate) lastBeforeDate = beforeLog.date;
         }
-        // 主板（现在）：已吃 → 缺口；今日刚吃的缺口高亮
+        // 主板（现在）：已吃 → 缺口；今日刚吃的缺口高亮（满版模式已移除，与当前信息重复）
         cells.push({
           index: idx,
           boardNo: boardNo,
@@ -352,7 +361,7 @@ Page({
           takenAt: log ? (log.takenAt || '').slice(0, 10) : '',
           isToday: !!todayLog,
           todayLogId: todayLog ? todayLog.id : '',
-          showPill: that2.data.compare === 'full' || !log,
+          showPill: !log,
           holeText: log ? '✓' : ''
         });
         // 对比板（今天之前）：仅历史缺口，今日吃的位置药丸仍在

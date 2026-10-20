@@ -50,7 +50,6 @@
       <view class="compare-switch">
         <view class="cs-item {{compare === 'current' ? 'cs-active' : ''}}" bindtap="onCompareToggle" data-mode="current">当前</view>
         <view class="cs-item {{compare === 'today' ? 'cs-active' : ''}}" bindtap="onCompareToggle" data-mode="today">今日对比</view>
-        <view class="cs-item {{compare === 'full' ? 'cs-active' : ''}}" bindtap="onCompareToggle" data-mode="full">满版</view>
       </view>
     </view>
 
@@ -158,7 +157,7 @@
     </view>
     <view class="init-overlay-hint init-overlay-hint-page" wx:if="{{initializing}}">起始位置决定动作：从药丸起划 = 标记已吃，从已吃缺口起划 = 取消标记</view>
 
-    <!-- 单板（当前 / 满版） -->
+    <!-- 单板（当前） -->
     <view class="blister {{!dueToday ? 'blister-rest' : ''}}" wx:elif="{{compare !== 'today'}}">
       <view class="blister-row" wx:for="{{rows}}" wx:for-item="row" wx:for-index="ri" wx:key="ri">
         <view class="cell" wx:for="{{row}}" wx:for-item="cell" wx:key="index">
