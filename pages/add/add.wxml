@@ -247,7 +247,7 @@
           <view class="imp-ai-btn {{aiImpBusy ? 'imp-ai-busy' : ''}}" bindtap="onAiImportance" hover-class="hover-press">🤖 {{aiImpBusy ? 'AI 判断中…' : 'AI 判重要度'}}</view>
         </view>
         <view class="ai-imp-tip" wx:if="{{aiSuggestion}}">
-          <text class="ai-imp-reason">AI 建议判为「{{ {high:'高',medium:'中',low:'低'}[aiSuggestion.importance] }}」{{aiSuggestion.reason ? ' · ' + aiSuggestion.reason : ''}}</text>
+          <text class="ai-imp-reason">AI 建议判为「{{aiSuggestion.impLabel}}」{{aiSuggestion.reason ? ' · ' + aiSuggestion.reason : ''}}</text>
           <view class="ai-imp-actions">
             <text class="ai-imp-adopt" bindtap="onAdoptAiImportance">采纳</text>
             <text class="ai-imp-dismiss" bindtap="onDismissAiImportance">忽略</text>

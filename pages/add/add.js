@@ -443,9 +443,15 @@ Page({
     api.aiImportance(text, this.data.type, function (r) {
       that._aiImpBusy = false;
       var impIdx = ['high', 'medium', 'low'].indexOf(r.importance);
+      var imp = r.importance || 'medium';
       that.setData({
         aiImpBusy: false,
-        aiSuggestion: { importance: r.importance || 'medium', reason: r.reason || '', impIndex: impIdx >= 0 ? impIdx : 1 }
+        aiSuggestion: {
+          importance: imp,
+          impLabel: { high: '高', medium: '中', low: '低' }[imp] || '中',
+          reason: r.reason || '',
+          impIndex: impIdx >= 0 ? impIdx : 1
+        }
       });
     }, function () {
       // 错误提示已由 api 层统一 toast
