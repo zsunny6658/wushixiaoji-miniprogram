@@ -449,9 +449,10 @@
   100% { background-position: -100% 0; }
 }
 
-/* ── 块状卡片（v0.16.1：一块一事，主值大字 + 上下小字环绕 + 底部操作行） ── */
+/* ── 块状卡片（v0.16.1：一块一事；v0.16.2 质感升级：克制用色 + 大留白 + 轻操作行） ── */
 .card {
-  padding: 28rpx 28rpx 24rpx;
+  padding: 32rpx 32rpx 28rpx;
+  border-radius: 20rpx;
 }
 .bk-top {
   display: flex;
@@ -461,10 +462,11 @@
 }
 .bk-main {
   display: block;
-  margin-top: 18rpx;
+  margin-top: 20rpx;
   font-size: 40rpx;
   line-height: 1.35;
   font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--text-primary, #26302A);
   word-break: break-all;
 }
@@ -492,9 +494,9 @@
 }
 .bk-sub {
   display: block;
-  margin-top: 8rpx;
+  margin-top: 10rpx;
   font-size: 24rpx;
-  color: var(--text-secondary, #64705F);
+  color: var(--text-tertiary, #9AA396);
   line-height: 1.5;
   word-break: break-all;
 }
@@ -503,30 +505,42 @@
   align-items: center;
   justify-content: space-between;
   gap: 12rpx;
-  margin-top: 20rpx;
-  padding-top: 16rpx;
-  border-top: 1rpx dashed var(--border, #E6DECC);
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid rgba(38, 48, 42, 0.07);
 }
 .bk-meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8rpx;
+  gap: 12rpx;
   min-width: 0;
 }
+/* meta 降噪（v0.16.2）：普通信息一律小灰字，仅异常态保留颜色（字色，不用彩底） */
+.bk-meta .meta-item {
+  background: transparent;
+  color: var(--text-tertiary, #9AA396);
+  font-weight: 500;
+  padding: 0;
+  font-size: 22rpx;
+}
+.bk-meta .meta-item.imp-high { color: #B4491B; font-weight: 600; }
+.bk-meta .meta-item.urg-urgent { color: var(--color-error, #EF5350); font-weight: 600; }
+.bk-meta .meta-item.time-warn { color: #B45309; font-weight: 600; }
+.bk-meta .meta-item.bk-assignee { color: var(--text-tertiary, #9AA396); font-weight: 500; }
 .bk-act {
   flex-shrink: 0;
   padding: 10rpx 30rpx;
   border-radius: 999rpx;
   font-size: 26rpx;
   font-weight: 600;
-  color: #FFFDF7;
-  background: var(--color-primary, #1E5B3C);
-  box-shadow: 0 4rpx 10rpx rgba(20, 61, 40, 0.22);
+  color: var(--color-primary, #1E5B3C);
+  background: var(--color-primary-light, #E9F1EA);
+  border: 1rpx solid rgba(30, 91, 60, 0.18);
 }
 .bk-act-done {
   color: var(--text-tertiary, #9AA396);
-  background: var(--bg-hover, #F1ECE0);
-  box-shadow: none;
+  background: transparent;
+  border-color: transparent;
   font-weight: 500;
 }
