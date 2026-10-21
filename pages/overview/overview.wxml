@@ -131,12 +131,10 @@
       <view class="section-title"><ficon style="vertical-align:-6rpx;margin-right:8rpx" name="bell" size="30" color="#718096" /> 今日动态</view>
     </view>
     <view class="pending-list">
-      <view class="pending-item act-item {{item.cls}}" wx:for="{{todayActs}}" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}">
-        <ficon class="pending-icon" name="{{item.iconName}}" size="30" color="{{item.iconColor || '#718096'}}" />
-        <view class="pending-body">
-          <text class="pending-text">{{item.text}}</text>
-        </view>
-        <text class="pending-time act-time">{{item._time}}</text>
+      <view class="act-row" wx:for="{{todayActs}}" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}" hover-class="hover-press">
+        <view class="act-dot {{item.cls === 'act-done' ? 'done' : 'new'}}"></view>
+        <text class="act-text">{{item.text}}</text>
+        <text class="act-time">{{item._time}}</text>
       </view>
     </view>
   </view>

@@ -269,6 +269,45 @@
   color: var(--text-tertiary);
 }
 
+/* ── 今日动态 · 极简时间线（v0.16.4：刻意弱化，与块状待办形成主次层级） ── */
+.act-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid var(--bg-hover);
+  transition: background 0.15s;
+}
+.act-row:last-child { border-bottom: none; }
+.act-row:active { background: var(--bg-hover); }
+.act-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.act-dot.new { background: var(--color-primary, #1E5B3C); }
+.act-dot.done {
+  background: transparent;
+  border: 3rpx solid var(--color-success, #66BB6A);
+}
+.act-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.act-time {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── 最新待办 · 块状行（v0.16.3：与列表页同语言，紧凑版） ── */
 .ov-item {
   display: flex;
