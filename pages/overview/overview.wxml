@@ -96,11 +96,25 @@
       <text class="section-more" bindtap="onGoPending">全部 ›</text>
     </view>
     <view class="pending-list">
-      <view class="pending-item {{item._flagged ? 'flagged' : ''}}" wx:for="{{latestPending}}" wx:for-item="item" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}">
-        <ficon class="pending-icon" name="{{item._iconName}}" size="30" color="{{item._iconColor}}" />
+      <view class="ov-item {{item.importance === 'high' ? 'flagged' : ''}}" wx:for="{{latestPending}}" wx:for-item="item" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}" hover-class="hover-press">
         <view class="pending-body">
-          <text class="pending-text">{{item._text}}</text>
-          <text class="pending-time" wx:if="{{item._time}}">{{item._time}}</text>
+          <view class="ov-top">
+            <view class="card-type-group">
+              <text class="tag tag-primary" wx:if="{{item.type === 'pickup'}}">取件</text>
+              <text class="tag tag-warning" wx:if="{{item.type === 'todo'}}">备忘</text>
+              <text class="tag tag-debt" wx:if="{{item.type === 'debt'}}">待还</text>
+              <text class="tag tag-med" wx:if="{{item.type === 'medication'}}">用药</text>
+            </view>
+            <text class="ov-time" wx:if="{{item.arrivedLabel}}">{{item.arrivedLabel}}</text>
+          </view>
+          <text class="ov-main{{item.blockMainType === 'code' ? ' ov-main-code' : ''}}{{item.blockMainType === 'amount' ? ' ov-main-amount' : ''}}">{{item.blockMain}}</text>
+          <text class="ov-sub" wx:if="{{item.blockSub}}">{{item.blockSub}}</text>
+          <view class="ov-meta" wx:if="{{item.dueLabel || item.assignee || item.importance === 'high' || item.urgency === 'urgent'}}">
+            <text class="ov-meta-hot" wx:if="{{item.importance === 'high'}}">高优先</text>
+            <text class="ov-meta-hot urg" wx:if="{{item.urgency === 'urgent'}}">紧急</text>
+            <text class="ov-meta-dim" wx:if="{{item.dueLabel}}">{{item.dueLabel}}</text>
+            <text class="ov-meta-dim" wx:if="{{item.assignee}}">@{{item.assignee}}</text>
+          </view>
         </view>
         <text class="pending-arrow">›</text>
       </view>

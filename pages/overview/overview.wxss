@@ -268,3 +268,74 @@
   font-size: var(--font-body-sm);
   color: var(--text-tertiary);
 }
+
+/* ── 最新待办 · 块状行（v0.16.3：与列表页同语言，紧凑版） ── */
+.ov-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--bg-hover);
+  transition: background 0.15s;
+}
+.ov-item:last-child { border-bottom: none; }
+.ov-item:active { background: var(--bg-hover); }
+.ov-item.flagged { border-left: 6rpx solid var(--color-accent, #E8622C); padding-left: 12rpx; }
+.ov-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+.ov-time {
+  font-size: 20rpx;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+.ov-main {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 34rpx;
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+.ov-main-code {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 44rpx;
+  letter-spacing: 6rpx;
+  color: var(--color-primary-dark, #143D28);
+}
+.ov-main-amount {
+  font-size: 44rpx;
+  color: var(--color-accent, #E8622C);
+  font-variant-numeric: tabular-nums;
+}
+.ov-sub {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  word-break: break-all;
+}
+.ov-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 12rpx;
+}
+.ov-meta-hot {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #B4491B;
+}
+.ov-meta-hot.urg { color: var(--color-error, #EF5350); }
+.ov-meta-dim {
+  font-size: 22rpx;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
