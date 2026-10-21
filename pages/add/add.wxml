@@ -19,7 +19,7 @@
       <view class="image-actions">
         <button class="btn btn-outline btn-sm" bindtap="onChooseImage">📷 选择图片</button>
         <button class="btn btn-primary btn-sm" bindtap="onParseImage" disabled="{{imageParsing || !imageTempPaths.length}}">
-          {{imageParsing ? '识别中...' : '图片识别'}}<ficon wx:if="{{!imageParsing}}" name="search" size="28" color="#4A90D9" />
+          {{imageParsing ? '识别中...' : '图片识别'}}<ficon wx:if="{{!imageParsing}}" name="search" size="28" color="#1E5B3C" />
         </button>
       </view>
     </view>
@@ -29,10 +29,10 @@
   <view class="form-section">
     <!-- 类型分段切换 -->
     <view class="type-segmented">
-      <view class="seg-item {{type === 'pickup' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="pickup"><ficon name="box" size="30" color="{{type === 'pickup' ? '#4A90D9' : '#718096'}}" /> 取件</view>
-      <view class="seg-item {{type === 'todo' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="todo"><ficon name="clipboard" size="30" color="{{type === 'todo' ? '#4A90D9' : '#718096'}}" /> 备忘</view>
-      <view class="seg-item {{type === 'debt' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="debt"><ficon name="creditcard" size="30" color="{{type === 'debt' ? '#4A90D9' : '#718096'}}" /> 还款</view>
-      <view class="seg-item {{type === 'medication' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="medication"><ficon name="pill" size="30" color="{{type === 'medication' ? '#4A90D9' : '#718096'}}" /> 用药</view>
+      <view class="seg-item {{type === 'pickup' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="pickup"><ficon name="box" size="30" color="{{type === 'pickup' ? '#1E5B3C' : '#718096'}}" /> 取件</view>
+      <view class="seg-item {{type === 'todo' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="todo"><ficon name="clipboard" size="30" color="{{type === 'todo' ? '#1E5B3C' : '#718096'}}" /> 备忘</view>
+      <view class="seg-item {{type === 'debt' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="debt"><ficon name="creditcard" size="30" color="{{type === 'debt' ? '#1E5B3C' : '#718096'}}" /> 还款</view>
+      <view class="seg-item {{type === 'medication' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="medication"><ficon name="pill" size="30" color="{{type === 'medication' ? '#1E5B3C' : '#718096'}}" /> 用药</view>
     </view>
 
     <view class="form-grid">
@@ -242,7 +242,17 @@
       </view>
 
       <view class="field">
-        <text class="field-label">重要性</text>
+        <view class="imp-head-row">
+          <text class="field-label">重要性</text>
+          <view class="imp-ai-btn {{aiImpBusy ? 'imp-ai-busy' : ''}}" bindtap="onAiImportance" hover-class="hover-press">🤖 {{aiImpBusy ? 'AI 判断中…' : 'AI 判重要度'}}</view>
+        </view>
+        <view class="ai-imp-tip" wx:if="{{aiSuggestion}}">
+          <text class="ai-imp-reason">AI 建议判为「{{ {high:'高',medium:'中',low:'低'}[aiSuggestion.importance] }}」{{aiSuggestion.reason ? ' · ' + aiSuggestion.reason : ''}}</text>
+          <view class="ai-imp-actions">
+            <text class="ai-imp-adopt" bindtap="onAdoptAiImportance">采纳</text>
+            <text class="ai-imp-dismiss" bindtap="onDismissAiImportance">忽略</text>
+          </view>
+        </view>
         <picker range="{{impOptions}}" value="{{impIndex}}" bindchange="onImpChange">
           <view class="field-picker">
             <text class="field-picker-value">{{impOptions[impIndex]}}</text>
@@ -272,8 +282,8 @@
       <view class="field">
         <text class="field-label">可见范围</text>
         <view class="private-toggle">
-          <switch checked="{{isPrivate}}" bindchange="onPrivateChange" color="#4A90D9" />
-          <view class="private-label"><ficon style="vertical-align:-4rpx;margin-right:6rpx" name="{{isPrivate ? 'lock' : 'users'}}" size="26" color="{{isPrivate ? '#64748B' : '#4A90D9'}}" /> {{isPrivate ? '仅本人可见' : '家庭成员可见'}}</view>
+          <switch checked="{{isPrivate}}" bindchange="onPrivateChange" color="#1E5B3C" />
+          <view class="private-label"><ficon style="vertical-align:-4rpx;margin-right:6rpx" name="{{isPrivate ? 'lock' : 'users'}}" size="26" color="{{isPrivate ? '#64748B' : '#1E5B3C'}}" /> {{isPrivate ? '仅本人可见' : '家庭成员可见'}}</view>
         </view>
       </view>
     </view>

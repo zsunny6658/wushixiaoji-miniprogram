@@ -44,6 +44,31 @@ Page({
       quadrants: quads,
       totalCount: pending.length
     });
+    this.loadSmart(quads);
+  },
+
+  // 个人重要度建议（v0.16.0）：按当前成员行为画像，给建议重要 ≠ 当前设置的卡片打 AI 徽标
+  loadSmart: function (quads) {
+    var that = this;
+    var fid = app.globalData.familyId || '';
+    if (!fid) return;
+    api.getSmartImportance(fid, function (data) {
+      var sug = (data && data.suggestions) || {};
+      var patch = {};
+      ['q1', 'q2', 'q3', 'q4'].forEach(function (k) {
+        (quads[k] || []).forEach(function (p, i) {
+          var s = sug[p.id];
+          if (!s) return;
+          if (s.suggested === 'high' && p.importance !== 'high') {
+            patch['quadrants.' + k + '[' + i + '].aiUp'] = true;
+            patch['quadrants.' + k + '[' + i + '].aiReason'] = (s.reasons && s.reasons[0]) || 'AI 建议标重要';
+          } else if (s.suggested === 'low' && p.importance !== 'low') {
+            patch['quadrants.' + k + '[' + i + '].aiLow'] = true;
+          }
+        });
+      });
+      if (Object.keys(patch).length) that.setData(patch);
+    }, function () {});
   },
 
   onEdit: function (e) {

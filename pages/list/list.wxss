@@ -163,8 +163,8 @@
 .card.picked .card-inner { opacity: 0.6; }
 .card.picked .code-value { text-decoration: line-through; color: var(--text-tertiary); }
 .card.urgent { border-left: 6rpx solid var(--color-warning); }
-.card.flagged { border-left: 6rpx solid var(--color-error); }
-.card.flagged.urgent { border-left: 6rpx solid var(--color-error); }
+.card.flagged { border-left: 6rpx solid var(--color-accent, #E8622C); }
+.card.flagged.urgent { border-left: 6rpx solid var(--color-accent, #E8622C); }
 .card.selected { border: 2rpx solid var(--color-primary); background: var(--color-primary-light); }
 
 .card-inner {
@@ -234,7 +234,7 @@
 }
 .meta-item.time-warn { background: var(--color-warning-light); color: var(--color-warning); }
 .meta-item.note { background: rgba(109, 84, 196, 0.14); color: #8B6FE8; }
-.meta-item.imp-high { background: var(--color-error-light); color: var(--color-error); font-weight: 600; }
+.meta-item.imp-high { background: var(--color-accent-light, #FCEADD); color: #B4491B; font-weight: 600; }
 .meta-item.imp-medium { background: var(--color-warning-light); color: var(--color-warning); font-weight: 600; }
 .meta-item.imp-low { background: var(--bg-hover); color: var(--text-tertiary); font-weight: 600; }
 .meta-item.urg-urgent { background: var(--color-error-light); color: var(--color-error); font-weight: 600; }
@@ -400,7 +400,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8rpx 24rpx rgba(74, 144, 217, 0.4);
+  box-shadow: 0 8rpx 24rpx rgba(30, 91, 60, 0.4);
   z-index: 50;
   cursor: pointer;
   transition: all 0.15s;

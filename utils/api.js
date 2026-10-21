@@ -87,6 +87,17 @@ var API = {
     this.request('POST', '/api/packages/clear-picked', {}, cb, errCb);
   },
 
+  // 智能重要度（v0.16.0）
+  aiImportance: function (text, pkgType, cb, errCb) {
+    this.request('POST', '/api/ai/importance', { text: text, pkgType: pkgType || 'todo' }, cb, errCb);
+  },
+  getSmartImportance: function (familyId, cb, errCb) {
+    this.request('GET', '/api/packages/smart-importance' + (familyId ? '?familyId=' + familyId : ''), null, cb, errCb);
+  },
+  getBehaviorSummary: function (familyId, cb, errCb) {
+    this.request('GET', '/api/behavior/summary' + (familyId ? '?familyId=' + familyId : ''), null, cb, errCb);
+  },
+
   // 解析
   parse: function (text, type, cb, errCb) {
     this.request('POST', '/api/parse', { text: text, type: type || 'auto' }, cb, errCb);

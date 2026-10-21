@@ -23,6 +23,18 @@
     </view>
   </view>
 
+  <!-- 我的待办习惯（v0.16.0 行为画像） -->
+  <view class="section-card habit-card" wx:if="{{habitTotal}}">
+    <text class="section-label">我的待办习惯</text>
+    <text class="habit-sub">智能重要度正在学习这些行为</text>
+    <view class="habit-grid">
+      <view class="habit-item"><text class="habit-num habit-green">{{habitTotal.completes}}</text><text class="habit-label">完成</text></view>
+      <view class="habit-item"><text class="habit-num">{{habitTotal.views}}</text><text class="habit-label">查看</text></view>
+      <view class="habit-item"><text class="habit-num habit-orange">{{habitTotal.flags}}</text><text class="habit-label">红旗</text></view>
+      <view class="habit-item"><text class="habit-num habit-gray">{{habitTotal.ignores}}</text><text class="habit-label">忽略</text></view>
+    </view>
+  </view>
+
   <!-- 家庭切换 -->
   <view class="section-card" wx:if="{{families.length > 1}}">
     <text class="section-label">当前家庭</text>
@@ -180,7 +192,7 @@
           <text class="notify-item-desc">快递逾期前提醒</text>
         </view>
       </view>
-      <switch checked="{{notifyEnabled}}" bindchange="onNotifyToggle" color="#4A90D9" />
+      <switch checked="{{notifyEnabled}}" bindchange="onNotifyToggle" color="#1E5B3C" />
     </view>
     <view class="notify-item" wx:if="{{notifyEnabled}}">
       <view class="notify-item-left">
@@ -257,7 +269,7 @@
     <!-- 导出全部记录 -->
     <view class="notify-item" bindtap="onExportAll">
       <view class="notify-item-left">
-        <ficon class="notify-item-icon" name="box" size="36" color="#4A90D9" />
+        <ficon class="notify-item-icon" name="box" size="36" color="#1E5B3C" />
         <view class="notify-item-text">
           <text class="notify-item-title">导出全部记录</text>
           <text class="notify-item-desc">取件/备忘/待还/用药全量 CSV（复制到剪贴板）</text>
@@ -270,7 +282,7 @@
     <text class="notify-section-title">提醒时间</text>
     <view class="notify-item">
       <view class="notify-item-left">
-        <ficon class="notify-item-icon" name="box" size="36" color="#4A90D9" />
+        <ficon class="notify-item-icon" name="box" size="36" color="#1E5B3C" />
         <view class="notify-item-text">
           <text class="notify-item-title">待取件提醒</text>
           <text class="notify-item-desc">超过24小时未取时提醒</text>
@@ -321,7 +333,7 @@
       </view>
     </view>
     <view class="notify-item notify-subscribe-row">
-      <button class="modal-btn modal-btn-sm modal-btn-outline" bindtap="onSubscribeNotify"><ficon name="bell" size="26" color="#4A90D9" /> 授权订阅消息</button>
+      <button class="modal-btn modal-btn-sm modal-btn-outline" bindtap="onSubscribeNotify"><ficon name="bell" size="26" color="#1E5B3C" /> 授权订阅消息</button>
       <text class="notify-status {{subscribeAuthorized ? 'notify-status-enabled' : 'notify-status-disabled'}}">{{subscribeAuthorized ? '已授权' : '未授权'}}</text>
     </view>
     <view class="notify-item">

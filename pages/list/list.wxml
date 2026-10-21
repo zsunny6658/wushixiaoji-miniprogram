@@ -35,8 +35,8 @@
   <view class="filter-drawer" wx:if="{{showFilter}}">
     <view class="segmented segmented-fill">
       <view class="seg-item {{scope === 'all' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="all">全部</view>
-      <view class="seg-item {{scope === 'family' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="family"><ficon name="users" size="26" color="{{scope === 'family' ? '#4A90D9' : '#718096'}}" /> 家庭</view>
-      <view class="seg-item {{scope === 'personal' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="personal"><ficon name="lock" size="26" color="{{scope === 'personal' ? '#4A90D9' : '#718096'}}" /> 个人</view>
+      <view class="seg-item {{scope === 'family' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="family"><ficon name="users" size="26" color="{{scope === 'family' ? '#1E5B3C' : '#718096'}}" /> 家庭</view>
+      <view class="seg-item {{scope === 'personal' ? 'seg-active' : ''}}" bindtap="switchScope" data-scope="personal"><ficon name="lock" size="26" color="{{scope === 'personal' ? '#1E5B3C' : '#718096'}}" /> 个人</view>
     </view>
     <view class="toolbar filters">
       <picker class="mini-select" range="{{impOptions}}" value="{{impIndex}}" bindchange="onImpChange">

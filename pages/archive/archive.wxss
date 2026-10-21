@@ -111,8 +111,8 @@
 }
 
 .arch-btn-med {
-  color: #4A90D9;
-  background: rgba(74, 144, 217, 0.1);
+  color: #1E5B3C;
+  background: rgba(30, 91, 60, 0.1);
 }
 
 /* ── 顶部工具条：搜索 + 清理 ── */

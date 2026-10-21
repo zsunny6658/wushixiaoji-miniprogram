@@ -19,6 +19,8 @@
               <view class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}"><ficon style="vertical-align:-3rpx;margin-right:4rpx" name="clock" size="22" color="#9CA3AF" />{{pkg.arrivedLabel}}</view>
               <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
               <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
+              <text class="qcard-ai" wx:if="{{pkg.aiUp}}">AI↑ {{pkg.aiReason}}</text>
+              <text class="qcard-ai-low" wx:elif="{{pkg.aiLow}}">AI·可缓</text>
             </view>
             <view class="qcard-actions">
               <view class="qact qact-done" wx:if="{{pkg.type !== 'medication'}}" catchtap="onQuickDone" data-id="{{pkg.id}}" data-type="{{pkg.type}}">✓ 完成</view>
@@ -43,6 +45,8 @@
               <view class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}"><ficon style="vertical-align:-3rpx;margin-right:4rpx" name="clock" size="22" color="#9CA3AF" />{{pkg.arrivedLabel}}</view>
               <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
               <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
+              <text class="qcard-ai" wx:if="{{pkg.aiUp}}">AI↑ {{pkg.aiReason}}</text>
+              <text class="qcard-ai-low" wx:elif="{{pkg.aiLow}}">AI·可缓</text>
             </view>
             <view class="qcard-actions">
               <view class="qact qact-done" wx:if="{{pkg.type !== 'medication'}}" catchtap="onQuickDone" data-id="{{pkg.id}}" data-type="{{pkg.type}}">✓ 完成</view>
@@ -67,6 +71,8 @@
               <view class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}"><ficon style="vertical-align:-3rpx;margin-right:4rpx" name="clock" size="22" color="#9CA3AF" />{{pkg.arrivedLabel}}</view>
               <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
               <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
+              <text class="qcard-ai" wx:if="{{pkg.aiUp}}">AI↑ {{pkg.aiReason}}</text>
+              <text class="qcard-ai-low" wx:elif="{{pkg.aiLow}}">AI·可缓</text>
             </view>
             <view class="qcard-actions">
               <view class="qact qact-done" wx:if="{{pkg.type !== 'medication'}}" catchtap="onQuickDone" data-id="{{pkg.id}}" data-type="{{pkg.type}}">✓ 完成</view>
@@ -91,6 +97,8 @@
               <view class="qcard-meta-item" wx:if="{{pkg.arrivedLabel}}"><ficon style="vertical-align:-3rpx;margin-right:4rpx" name="clock" size="22" color="#9CA3AF" />{{pkg.arrivedLabel}}</view>
               <text class="qcard-meta-item" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
               <text class="qcard-meta-item assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
+              <text class="qcard-ai" wx:if="{{pkg.aiUp}}">AI↑ {{pkg.aiReason}}</text>
+              <text class="qcard-ai-low" wx:elif="{{pkg.aiLow}}">AI·可缓</text>
             </view>
             <view class="qcard-actions">
               <view class="qact qact-done" wx:if="{{pkg.type !== 'medication'}}" catchtap="onQuickDone" data-id="{{pkg.id}}" data-type="{{pkg.type}}">✓ 完成</view>

@@ -272,7 +272,7 @@
     <view class="section">
       <text class="section-title">关于</text>
       <view class="about-card">
-        <view class="about-logo"><ficon name="box" size="72" color="#4A90D9" /></view>
+        <view class="about-logo"><ficon name="box" size="72" color="#1E5B3C" /></view>
         <text class="about-name">屋事小记</text>
         <text class="about-desc">家庭快递取件码共享平台</text>
         <view class="about-divider"></view>

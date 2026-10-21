@@ -61,7 +61,9 @@ Page({
     showAboutModal: false,
     // 忽略规则管理
     showRulesModal: false,
-    ignoreRules: []
+    ignoreRules: [],
+    // 我的待办习惯（v0.16.0 行为画像）
+    habitTotal: null
   },
 
   onLoad: function () {
@@ -97,6 +99,33 @@ Page({
       ignoreCleanupMode: wx.getStorageSync('parcel.ignoreCleanupMode') === 'archive' ? 'archive' : 'delete',
       pickArchiveDays: mePickArchiveDays(),
       medLowStockThreshold: meLowStockThreshold()
+    });
+    this.loadHabit();
+  },
+
+  // 我的待办习惯（v0.16.0）：行为画像汇总 —— 智能重要度模型的数据来源展示
+  loadHabit: function () {
+    var that = this;
+    var gd = app.globalData;
+    var fid = gd.familyId || '';
+    if (!fid) { this.setData({ habitTotal: null }); return; }
+    api.getBehaviorSummary(fid, function (data) {
+      var members = (data && data.members) || [];
+      var mine = null;
+      for (var i = 0; i < members.length; i++) {
+        if ((gd.meId && members[i].memberId === gd.meId) || members[i].name === gd.me) { mine = members[i]; break; }
+      }
+      if (!mine || !mine.samples) { that.setData({ habitTotal: null }); return; }
+      that.setData({
+        habitTotal: {
+          completes: mine.total.completes || 0,
+          views: mine.total.views || 0,
+          flags: mine.total.flags || 0,
+          ignores: mine.total.ignores || 0
+        }
+      });
+    }, function () {
+      that.setData({ habitTotal: null });
     });
   },
 

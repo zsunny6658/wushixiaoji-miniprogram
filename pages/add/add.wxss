@@ -152,11 +152,11 @@
 .med-times { display: flex; flex-wrap: wrap; gap: 16rpx; }
 .med-time-chip {
   padding: 12rpx 28rpx;
-  background: rgba(74, 144, 217, 0.08);
-  border: 1rpx solid rgba(74, 144, 217, 0.35);
+  background: rgba(30, 91, 60, 0.08);
+  border: 1rpx solid rgba(30, 91, 60, 0.35);
   border-radius: 32rpx;
   font-size: var(--font-body-sm, 28rpx);
-  color: var(--color-primary, #4A90D9);
+  color: var(--color-primary, #1E5B3C);
   font-weight: 600;
 }
 .field-hint {
@@ -255,7 +255,7 @@
 .pill-color-dot.pc-active {
   border-color: var(--color-primary);
   transform: scale(1.15);
-  box-shadow: 0 0 0 4rpx rgba(74, 144, 217, 0.18);
+  box-shadow: 0 0 0 4rpx rgba(30, 91, 60, 0.18);
 }
 .pill-shapes {
   display: flex;
@@ -272,7 +272,7 @@
   border: 2rpx solid var(--border);
 }
 .pill-shape-chip.ps-active {
-  background: rgba(74, 144, 217, 0.12);
+  background: rgba(30, 91, 60, 0.12);
   color: var(--color-primary);
   border-color: var(--color-primary);
   font-weight: 600;
@@ -342,9 +342,9 @@
 }
 .pill-photo-btn {
   font-size: 24rpx;
-  color: var(--color-primary, #4A90D9);
-  background: rgba(74, 144, 217, 0.1);
-  border: 2rpx solid rgba(74, 144, 217, 0.3);
+  color: var(--color-primary, #1E5B3C);
+  background: rgba(30, 91, 60, 0.1);
+  border: 2rpx solid rgba(30, 91, 60, 0.3);
   border-radius: 999rpx;
   padding: 6rpx 20rpx;
 }
@@ -377,7 +377,7 @@
   border-bottom: none;
 }
 .drug-suggest-item:active {
-  background: rgba(74, 144, 217, 0.08);
+  background: rgba(30, 91, 60, 0.08);
 }
 .ds-name {
   font-size: 27rpx;
@@ -409,9 +409,9 @@
   border: 2rpx solid var(--border, #E2E8F0);
 }
 .week-chip.wc-active {
-  background: rgba(74, 144, 217, 0.14);
-  color: var(--color-primary, #4A90D9);
-  border-color: var(--color-primary, #4A90D9);
+  background: rgba(30, 91, 60, 0.14);
+  color: var(--color-primary, #1E5B3C);
+  border-color: var(--color-primary, #1E5B3C);
   font-weight: 600;
 }
 
@@ -464,7 +464,59 @@
   border: 1rpx solid #E2E8F0;
 }
 .quick-chip.qc-active {
-  background: rgba(74, 144, 217, 0.1);
-  border-color: #4A90D9;
-  color: #4A90D9;
+  background: rgba(30, 91, 60, 0.1);
+  border-color: #1E5B3C;
+  color: #1E5B3C;
+}
+
+/* ── AI 判重要度（v0.16.0） ── */
+.imp-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+}
+.imp-ai-btn {
+  padding: 8rpx 22rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  border: 1rpx solid rgba(30, 91, 60, 0.25);
+}
+.imp-ai-busy {
+  opacity: 0.6;
+}
+.ai-imp-tip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 14rpx 20rpx;
+  margin-bottom: 12rpx;
+  border-radius: 14rpx;
+  background: #FCEADD;
+  border: 1rpx solid rgba(232, 98, 44, 0.3);
+}
+.ai-imp-reason {
+  flex: 1;
+  min-width: 0;
+  font-size: 24rpx;
+  color: #B4491B;
+}
+.ai-imp-actions {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  flex-shrink: 0;
+}
+.ai-imp-adopt {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #E8622C;
+}
+.ai-imp-dismiss {
+  font-size: 24rpx;
+  color: #A4AC9F;
 }

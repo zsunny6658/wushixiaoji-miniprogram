@@ -162,7 +162,7 @@
   border: 0;
   margin-top: var(--spacing-xs);
   transition: all 0.15s;
-  box-shadow: 0 8rpx 24rpx rgba(74, 144, 217, 0.25);
+  box-shadow: 0 8rpx 24rpx rgba(30, 91, 60, 0.25);
 }
 .login-btn:active { transform: scale(0.97); opacity: 0.9; }
 .login-btn::after { border: none; }

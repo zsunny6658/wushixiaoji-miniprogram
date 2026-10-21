@@ -23,7 +23,7 @@
     <!-- 标题卡片 -->
     <view class="title-card">
       <view class="title-row">
-        <view class="type-badge {{pkg.type}}"><ficon wx:if="{{pkg.type === 'pickup'}}" style="vertical-align:-5rpx;margin-right:6rpx" name="box" size="24" color="#4A90D9" /><ficon wx:elif="{{pkg.type === 'debt'}}" style="vertical-align:-5rpx;margin-right:6rpx" name="creditcard" size="24" color="#EF4444" /><ficon wx:elif="{{pkg.type === 'medication'}}" style="vertical-align:-5rpx;margin-right:6rpx" name="pill" size="24" color="#10B981" /><ficon wx:else style="vertical-align:-5rpx;margin-right:6rpx" name="clipboard" size="24" color="#F59E0B" /> {{pkg.type === 'pickup' ? '取件' : (pkg.type === 'debt' ? '待还' : (pkg.type === 'medication' ? '用药' : '备忘'))}}</view>
+        <view class="type-badge {{pkg.type}}"><ficon wx:if="{{pkg.type === 'pickup'}}" style="vertical-align:-5rpx;margin-right:6rpx" name="box" size="24" color="#1E5B3C" /><ficon wx:elif="{{pkg.type === 'debt'}}" style="vertical-align:-5rpx;margin-right:6rpx" name="creditcard" size="24" color="#EF4444" /><ficon wx:elif="{{pkg.type === 'medication'}}" style="vertical-align:-5rpx;margin-right:6rpx" name="pill" size="24" color="#10B981" /><ficon wx:else style="vertical-align:-5rpx;margin-right:6rpx" name="clipboard" size="24" color="#F59E0B" /> {{pkg.type === 'pickup' ? '取件' : (pkg.type === 'debt' ? '待还' : (pkg.type === 'medication' ? '用药' : '备忘'))}}</view>
         <view class="private-badge" wx:if="{{pkg.isPrivate}}"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="lock" size="24" color="#64748B" /> 个人</view>
         <text class="occ-badge" wx:if="{{pkg.occCount > 1}}">×{{pkg.occCount}}</text>
         <text class="tag-badge" wx:if="{{pkg.tagLabel}}">{{pkg.tagLabel}}</text>
@@ -91,7 +91,7 @@
           <text class="info-value {{pkg.overdue ? 'warn' : ''}}">{{pkg.ageText}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.type === 'pickup'}}">
-          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="box" size="26" color="#4A90D9" /> 驿站</view>
+          <view class="info-label"><ficon style="vertical-align:-5rpx;margin-right:6rpx" name="box" size="26" color="#1E5B3C" /> 驿站</view>
           <text class="info-value">{{pkg.station || '—'}}</text>
         </view>
         <view class="info-row" wx:if="{{pkg.scheduleLabel}}">

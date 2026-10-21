@@ -8,10 +8,10 @@
 /* 问候语 */
 .greeting {
   margin-bottom: var(--spacing-md);
-  background: linear-gradient(135deg, #4A90D9 0%, #5B8DEF 65%, #6FA6F0 100%);
+  background: linear-gradient(135deg, #1E5B3C 0%, #2E7D52 65%, #6FA6F0 100%);
   border-radius: var(--radius-lg);
   padding: 32rpx 32rpx;
-  box-shadow: 0 8rpx 24rpx rgba(74, 144, 217, 0.28);
+  box-shadow: 0 8rpx 24rpx rgba(30, 91, 60, 0.28);
 }
 .greeting-text {
   font-size: var(--font-title);
@@ -61,7 +61,7 @@
   font-size: 40rpx;
   line-height: 1;
 }
-.s-pickup .stat-icon { background: rgba(74, 144, 217, 0.12); }
+.s-pickup .stat-icon { background: rgba(30, 91, 60, 0.12); }
 .s-todo .stat-icon { background: rgba(255, 167, 38, 0.15); }
 .s-debt .stat-icon { background: rgba(239, 83, 80, 0.10); }
 .s-private .stat-icon { background: rgba(100, 116, 139, 0.14); }
@@ -80,7 +80,7 @@
   margin-top: 4rpx;
 }
 .s-pickup { border-top-color: var(--color-primary); }
-.s-pickup .stat-num { color: var(--color-primary); }
+.s-pickup .stat-num { color: var(--color-accent, #E8622C); }
 .s-todo { border-top-color: var(--color-warning); }
 .s-todo .stat-num { color: var(--color-warning); }
 .s-overdue { border-top-color: var(--color-error); }

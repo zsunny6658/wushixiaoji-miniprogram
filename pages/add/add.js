@@ -428,6 +428,42 @@ Page({
   onUrgChange: function (e) { this.setData({ urgIndex: parseInt(e.detail.value, 10) }); },
   onDueDateChange: function (e) { this.setData({ dueDateStr: e.detail.value }); },
 
+  // AI 判重要度（v0.16.0）：把已填的事项内容交给服务端 AI 判断，一键采纳或仅作参考
+  onAiImportance: function () {
+    if (this._aiImpBusy) return;
+    var f = this.data.form || {};
+    var text = ((f.code || f.item || f.title || '') + ' ' + (f.note || '')).trim();
+    if (!text) {
+      wx.showToast({ title: '先填写事项内容', icon: 'none' });
+      return;
+    }
+    var that = this;
+    this._aiImpBusy = true;
+    this.setData({ aiImpBusy: true, aiSuggestion: null });
+    api.aiImportance(text, this.data.type, function (r) {
+      that._aiImpBusy = false;
+      var impIdx = ['high', 'medium', 'low'].indexOf(r.importance);
+      that.setData({
+        aiImpBusy: false,
+        aiSuggestion: { importance: r.importance || 'medium', reason: r.reason || '', impIndex: impIdx >= 0 ? impIdx : 1 }
+      });
+    }, function () {
+      // 错误提示已由 api 层统一 toast
+      that._aiImpBusy = false;
+      that.setData({ aiImpBusy: false });
+    });
+  },
+  // 采纳 AI 建议：应用重要度并清掉建议条
+  onAdoptAiImportance: function () {
+    var s = this.data.aiSuggestion;
+    if (!s) return;
+    this.setData({ impIndex: s.impIndex, aiSuggestion: null });
+    wx.showToast({ title: '已采纳 AI 建议', icon: 'success' });
+  },
+  onDismissAiImportance: function () {
+    this.setData({ aiSuggestion: null });
+  },
+
   // 应用用药解析结果（文本/药板照片共用）：类型、药名、服药人、计划时间、药板
   applyMedicationRecord: function (r) {
     var patch = {

@@ -18,7 +18,7 @@
   <view class="stats">
     <view class="stats-row">
       <view class="stat-card s-pickup" bindtap="onGoPickup" hover-class="hover-press">
-        <view class="stat-icon"><ficon name="box" size="44" color="#4A90D9" /></view>
+        <view class="stat-icon"><ficon name="box" size="44" color="#1E5B3C" /></view>
         <view class="stat-num">{{stats.pickup || 0}}</view>
         <view class="stat-label">待取快递</view>
       </view>

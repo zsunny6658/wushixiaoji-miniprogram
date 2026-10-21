@@ -39,7 +39,8 @@
 .summary-count {
   font-size: var(--font-title);
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--color-accent, #E8622C);
+  font-variant-numeric: tabular-nums;
 }
 
 /* 2x2 网格 */
@@ -180,4 +181,26 @@
   background: rgba(245, 158, 11, 0.14);
   border-color: rgba(245, 158, 11, 0.4);
   color: #854F0B;
+}
+
+/* ── 个人重要度 AI 建议徽标（v0.16.0） ── */
+.qcard-ai {
+  font-size: 20rpx;
+  color: #B4491B;
+  background: #FCEADD;
+  border: 1rpx solid rgba(232, 98, 44, 0.35);
+  border-radius: 8rpx;
+  padding: 2rpx 10rpx;
+  font-weight: 600;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.qcard-ai-low {
+  font-size: 20rpx;
+  color: var(--text-tertiary, #A4AC9F);
+  background: var(--bg-hover, #F1F5F9);
+  border-radius: 8rpx;
+  padding: 2rpx 10rpx;
 }

@@ -12,7 +12,7 @@
 
 /* 药品信息头 */
 .med-header {
-  background: linear-gradient(135deg, #4A90D9, #5B8DEF);
+  background: linear-gradient(135deg, #1E5B3C, #2E7D52);
   border-radius: 24rpx;
   padding: 28rpx 32rpx;
   color: #fff;
@@ -130,7 +130,7 @@
 }
 .cs-item.cs-active {
   background: var(--bg-card, #fff);
-  color: var(--color-primary, #4A90D9);
+  color: var(--color-primary, #1E5B3C);
   font-weight: 600;
   box-shadow: 0 2rpx 8rpx rgba(15, 42, 86, 0.08);
 }
@@ -154,9 +154,9 @@
   color: var(--text-secondary, #475569);
 }
 .board-tab.bt-active {
-  border-color: var(--color-primary, #4A90D9);
-  color: var(--color-primary, #4A90D9);
-  background: rgba(74, 144, 217, 0.08);
+  border-color: var(--color-primary, #1E5B3C);
+  color: var(--color-primary, #1E5B3C);
+  background: rgba(30, 91, 60, 0.08);
   font-weight: 600;
 }
 .bt-count {
@@ -164,7 +164,7 @@
   color: var(--text-tertiary, #94A3B8);
 }
 .board-tab.bt-active .bt-count {
-  color: var(--color-primary, #4A90D9);
+  color: var(--color-primary, #1E5B3C);
 }
 /* 当前正在吃的版徽标 */
 .bt-current {
@@ -538,7 +538,7 @@
 .week-bar-fill {
   height: 100%;
   border-radius: 999rpx;
-  background: var(--color-primary, #4A90D9);
+  background: var(--color-primary, #1E5B3C);
   transition: width 0.3s ease;
 }
 .week-bar-fill.wbf-full {
@@ -624,8 +624,8 @@
 /* 非服药日横幅 */
 .rest-banner {
   margin-top: 12rpx;
-  background: rgba(74, 144, 217, 0.16);
-  border: 2rpx dashed rgba(74, 144, 217, 0.45);
+  background: rgba(30, 91, 60, 0.16);
+  border: 2rpx dashed rgba(30, 91, 60, 0.45);
   border-radius: 16rpx;
   padding: 12rpx 20rpx;
   font-size: 24rpx;
@@ -647,8 +647,8 @@
 .week-catchup {
   flex-shrink: 0;
   font-size: 22rpx;
-  color: #4A90D9;
-  border: 2rpx solid #4A90D9;
+  color: #1E5B3C;
+  border: 2rpx solid #1E5B3C;
   border-radius: 999rpx;
   padding: 2rpx 16rpx;
 }
@@ -725,9 +725,9 @@
   padding: 12rpx 30rpx;
   border-radius: 999rpx;
   font-size: 26rpx;
-  background: rgba(74, 144, 217, 0.1);
-  color: #4A90D9;
-  border: 1rpx solid rgba(74, 144, 217, 0.35);
+  background: rgba(30, 91, 60, 0.1);
+  color: #1E5B3C;
+  border: 1rpx solid rgba(30, 91, 60, 0.35);
 }
 
 /* ── 整盒已服完横幅 ── */
