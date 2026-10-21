@@ -98,7 +98,7 @@
                 <text class="checkbox {{item.batchSelected ? 'checked' : ''}}">{{item.batchSelected ? '✓' : ''}}</text>
               </view>
               <view class="card-body">
-                <view class="card-meta-row">
+                <view class="bk-top">
                   <view class="card-type-group">
                     <text class="tag tag-primary" wx:if="{{item.type === 'pickup'}}">取件</text>
                     <text class="tag tag-warning" wx:if="{{item.type === 'todo'}}">备忘</text>
@@ -108,12 +108,19 @@
                   </view>
                   <view class="card-info-group">
                     <view class="meta-item {{item.overdue ? 'time-warn' : ''}}" wx:if="{{item.arrivedAt}}"><ficon wx:if="{{item.type === 'debt'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="creditcard" size="24" color="#9CA3AF" /><ficon wx:elif="{{item.type === 'medication'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="pill" size="24" color="#9CA3AF" /><ficon wx:else name="clock" size="24" color="#9CA3AF" /> {{item.arrivedLabel}}</view>
-                    <text class="meta-item imp-{{item.importance}}">{{item.impLabel}}</text>
-                    <text class="meta-item urg-{{item.urgency}}">{{item.urgLabel}}</text>
-                    <text class="tag tag-success" wx:if="{{item.assignee}}">@{{item.assignee}}</text>
                   </view>
                 </view>
-                <text class="code-value">{{item.summaryText}}</text>
+                <text class="bk-main {{item.blockMainType === 'code' ? 'bk-main-code' : ''}} {{item.blockMainType === 'amount' ? 'bk-main-amount' : ''}} {{item.status === 'picked' ? 'bk-main-done' : ''}}">{{item.blockMain}}</text>
+                <text class="bk-sub" wx:if="{{item.blockSub}}">{{item.blockSub}}</text>
+                <view class="bk-bottom">
+                  <view class="bk-meta">
+                    <text class="meta-item imp-{{item.importance}}">{{item.impLabel}}</text>
+                    <text class="meta-item urg-{{item.urgency}}">{{item.urgLabel}}</text>
+                    <text class="meta-item time-warn" wx:if="{{item.dueLabel}}">{{item.dueLabel}}</text>
+                    <text class="tag tag-success" wx:if="{{item.assignee}}">@{{item.assignee}}</text>
+                  </view>
+                  <view class="bk-act {{item.status === 'picked' ? 'bk-act-done' : ''}}" catchtap="onSwipePick" data-id="{{item.id}}">{{item.status === 'picked' ? '已完成 ✓' : (item.type === 'medication' ? '💊 打卡' : '✓ 完成')}}</view>
+                </view>
               </view>
             </view>
           </view>
@@ -142,7 +149,7 @@
                 <text class="checkbox {{pkg.batchSelected ? 'checked' : ''}}">{{pkg.batchSelected ? '✓' : ''}}</text>
               </view>
               <view class="card-body">
-                <view class="card-meta-row">
+                <view class="bk-top">
                   <view class="card-type-group">
                     <text class="tag tag-primary" wx:if="{{pkg.type === 'pickup'}}">取件</text>
                     <text class="tag tag-warning" wx:if="{{pkg.type === 'todo'}}">备忘</text>
@@ -152,12 +159,19 @@
                   </view>
                   <view class="card-info-group">
                     <view class="meta-item {{pkg.overdue ? 'time-warn' : ''}}" wx:if="{{pkg.arrivedAt}}"><ficon wx:if="{{pkg.type === 'debt'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="creditcard" size="24" color="#9CA3AF" /><ficon wx:elif="{{pkg.type === 'medication'}}" style="vertical-align:-4rpx;margin-right:6rpx" name="pill" size="24" color="#9CA3AF" /><ficon wx:else name="clock" size="24" color="#9CA3AF" /> {{pkg.arrivedLabel}}</view>
-                    <text class="meta-item imp-{{pkg.importance}}">{{pkg.impLabel}}</text>
-                    <text class="meta-item urg-{{pkg.urgency}}">{{pkg.urgLabel}}</text>
-                    <text class="tag tag-success" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
                   </view>
                 </view>
-                <text class="code-value">{{pkg.summaryText}}</text>
+                <text class="bk-main {{pkg.blockMainType === 'code' ? 'bk-main-code' : ''}} {{pkg.blockMainType === 'amount' ? 'bk-main-amount' : ''}} {{pkg.status === 'picked' ? 'bk-main-done' : ''}}">{{pkg.blockMain}}</text>
+                <text class="bk-sub" wx:if="{{pkg.blockSub}}">{{pkg.blockSub}}</text>
+                <view class="bk-bottom">
+                  <view class="bk-meta">
+                    <text class="meta-item imp-{{pkg.importance}}">{{pkg.impLabel}}</text>
+                    <text class="meta-item urg-{{pkg.urgency}}">{{pkg.urgLabel}}</text>
+                    <text class="meta-item time-warn" wx:if="{{pkg.dueLabel}}">{{pkg.dueLabel}}</text>
+                    <text class="tag tag-success" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
+                  </view>
+                  <view class="bk-act {{pkg.status === 'picked' ? 'bk-act-done' : ''}}" catchtap="onSwipePick" data-id="{{pkg.id}}">{{pkg.status === 'picked' ? '已完成 ✓' : (pkg.type === 'medication' ? '💊 打卡' : '✓ 完成')}}</view>
+                </view>
               </view>
             </view>
           </view>

@@ -448,3 +448,85 @@
   0% { background-position: 100% 0; }
   100% { background-position: -100% 0; }
 }
+
+/* ── 块状卡片（v0.16.1：一块一事，主值大字 + 上下小字环绕 + 底部操作行） ── */
+.card {
+  padding: 28rpx 28rpx 24rpx;
+}
+.bk-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+.bk-main {
+  display: block;
+  margin-top: 18rpx;
+  font-size: 40rpx;
+  line-height: 1.35;
+  font-weight: 700;
+  color: var(--text-primary, #26302A);
+  word-break: break-all;
+}
+/* 取件码：等宽 + 宽字距，像实体码一样醒目 */
+.bk-main-code {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 52rpx;
+  letter-spacing: 6rpx;
+  color: var(--color-primary-dark, #143D28);
+}
+/* 金额：橙色大字 */
+.bk-main-amount {
+  font-size: 52rpx;
+  color: var(--color-accent, #E8622C);
+  font-variant-numeric: tabular-nums;
+}
+.bk-main-done {
+  text-decoration: line-through;
+  color: var(--text-tertiary, #9AA396);
+  font-weight: 600;
+}
+.card.picked .bk-main-code,
+.card.picked .bk-main-amount {
+  color: var(--text-tertiary, #9AA396);
+}
+.bk-sub {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary, #64705F);
+  line-height: 1.5;
+  word-break: break-all;
+}
+.bk-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  margin-top: 20rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx dashed var(--border, #E6DECC);
+}
+.bk-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  min-width: 0;
+}
+.bk-act {
+  flex-shrink: 0;
+  padding: 10rpx 30rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #FFFDF7;
+  background: var(--color-primary, #1E5B3C);
+  box-shadow: 0 4rpx 10rpx rgba(20, 61, 40, 0.22);
+}
+.bk-act-done {
+  color: var(--text-tertiary, #9AA396);
+  background: var(--bg-hover, #F1ECE0);
+  box-shadow: none;
+  font-weight: 500;
+}

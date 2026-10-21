@@ -137,10 +137,6 @@ function decorate(p, members) {
   d.tagLabel = tagLabel(p.tag);
   d.sourceLabel = p.source || '';
   d.summaryText = summaryText(p);
-  d.isPrivate = !!p.isPrivate;
-  d.amount = p.amount || 0;
-  d.amountLabel = p.amount ? formatAmount(p.amount) : '';
-  d.institution = p.institution || '';
   d.scheduleLabel = '';
   if (p.schedule && Array.isArray(p.schedule.times) && p.schedule.times.length) {
     var st = p.schedule.times.join(' / ');
@@ -153,6 +149,39 @@ function decorate(p, members) {
       d.scheduleLabel = st;
     }
   }
+  // 块状卡片主值/副行（v0.16.1）："一块一事"排版——主值大字突出、上下小字环绕
+  // pickup→取件码大字(code)；debt→金额大字(无金额则事项)；todo→事项标题；medication→药名
+  var _type = p.type || 'todo';
+  var bm = '', bs = '', bmType = 'text';
+  if (_type === 'pickup') {
+    bm = p.code || '';
+    bmType = 'code';
+    bs = p.note || '';
+  } else if (_type === 'debt') {
+    if (p.amount) {
+      bm = '¥' + formatAmount(p.amount);
+      bmType = 'amount';
+      bs = [p.institution, p.title || p.code].filter(Boolean).join(' · ');
+    } else {
+      bm = p.title || p.code || '';
+      bs = [p.institution, p.note].filter(Boolean).join(' · ');
+    }
+  } else if (_type === 'medication') {
+    bm = p.title || p.code || '';
+    bs = d.scheduleLabel || p.note || '';
+  } else {
+    bm = p.title || p.code || '';
+    bs = p.note || '';
+  }
+  if (bm.length > 30) bm = bm.slice(0, 30) + '…';
+  if (bs.length > 40) bs = bs.slice(0, 40) + '…';
+  d.blockMain = bm;
+  d.blockSub = bs;
+  d.blockMainType = bmType;
+  d.isPrivate = !!p.isPrivate;
+  d.amount = p.amount || 0;
+  d.amountLabel = p.amount ? formatAmount(p.amount) : '';
+  d.institution = p.institution || '';
   d.dueDate = p.dueDate || '';
   d.dueLabel = dueLabel(p.dueDate);
   d.dueDays = dueDays(p.dueDate);
