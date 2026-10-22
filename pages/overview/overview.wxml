@@ -95,7 +95,7 @@
       <view class="section-title"><ficon style="vertical-align:-6rpx;margin-right:8rpx" name="bell" size="30" color="#718096" /> 今日动态</view>
     </view>
     <view class="pending-list">
-      <view class="act-row" wx:for="{{todayActs}}" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}" hover-class="hover-press">
+      <view class="act-row" wx:for="{{todayActs}}" wx:key="id" bindtap="onGoDetail" data-id="{{item.pkgId}}" hover-class="hover-press">
         <view class="act-dot {{item.cls === 'act-done' ? 'done' : 'new'}}"></view>
         <text class="act-text">{{item.text}}</text>
         <text class="act-time">{{item._time}}</text>

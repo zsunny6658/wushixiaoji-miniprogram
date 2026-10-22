@@ -396,7 +396,9 @@ Page({
 
   // 关于弹窗
   onOpenAboutModal: function () {
-    this.setData({ showAboutModal: true });
+    var version = '1.0.0';
+    try { version = require('../../package.json').version || version; } catch (e) { }
+    this.setData({ showAboutModal: true, aboutVersion: version });
   },
   onCloseAboutModal: function () {
     this.setData({ showAboutModal: false });

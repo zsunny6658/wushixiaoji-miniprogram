@@ -58,11 +58,11 @@ Page({
     var acts = [];
     pkgs.forEach(function (p) {
       if (p.createdAt && p.createdAt.indexOf(todayPrefix) === 0) {
-        acts.push({ id: p.id + ':new', time: p.createdAt, iconName: p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : (p.type === 'medication' ? 'pill' : 'clipboard')),
+        acts.push({ id: p.id + ':new', pkgId: p.id, time: p.createdAt, iconName: p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : (p.type === 'medication' ? 'pill' : 'clipboard')),
           text: '新增「' + (p.summaryText || p.title || p.code || '') + '」', cls: 'act-new' });
       }
       if (p.status === 'picked' && p.pickedAt && p.pickedAt.indexOf(todayPrefix) === 0) {
-        acts.push({ id: p.id + ':done', time: p.pickedAt, iconName: 'check-circle', iconColor: '#10B981',
+        acts.push({ id: p.id + ':done', pkgId: p.id, time: p.pickedAt, iconName: 'check-circle', iconColor: '#10B981',
           text: '完成「' + (p.summaryText || p.title || p.code || '') + '」', cls: 'act-done' });
       }
     });

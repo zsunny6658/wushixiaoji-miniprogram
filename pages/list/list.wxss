@@ -31,19 +31,27 @@
 .search-input:focus { border-color: var(--color-primary); }
 .mini-select {
   flex: 1;
-  border: 2rpx solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--bg-card);
   min-width: 0;
+  border: none;
+  border-radius: var(--radius-full, 999rpx);
+  background: var(--bg-hover, #F3F4F6);
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: opacity 0.15s;
 }
-.mini-select:active { border-color: var(--color-primary); }
+.mini-select:active { opacity: 0.65; }
 .mini-select-inner {
-  padding: 12rpx 16rpx;
-  font-size: var(--font-body-sm);
-  color: var(--text-primary);
+  padding: 12rpx 6rpx;
+  font-size: 23rpx;
+  color: var(--text-secondary);
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mini-select-inner::after {
+  content: ' ▾';
+  font-size: 18rpx;
+  color: var(--text-tertiary);
 }
 
 /* 搜索行 + 筛选入口 */
