@@ -680,7 +680,7 @@ Page({
       var d = new Date(r.arrivedAt || Date.now());
       that.setData({
         type: r.type || 'pickup',
-        typeIndex: this.typeIndexOf(r.type || 'pickup'),
+        typeIndex: that.typeIndexOf(r.type || 'pickup'),
         form: { station: r.station || '', code: r.code || '', company: r.company || '', trackingNo: r.trackingNo || '', note: r.note || '', institution: r.institution || '', amount: r.amount ? String(r.amount) : '' },
       dueDateStr: r.dueDate || '',
         isPrivate: r.type === 'debt' || r.type === 'medication' ? true : false,
