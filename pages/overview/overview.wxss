@@ -261,3 +261,9 @@
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
 }
+.act-empty {
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: var(--font-body-sm);
+  color: var(--text-tertiary);
+}

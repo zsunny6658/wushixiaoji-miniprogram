@@ -89,17 +89,20 @@
     </view>
   </view>
 
-  <!-- 今日动态 -->
-  <view class="section" wx:if="{{todayActs.length}}">
+  <!-- 最近动态 -->
+  <view class="section">
     <view class="section-head">
-      <view class="section-title"><ficon style="vertical-align:-6rpx;margin-right:8rpx" name="bell" size="30" color="#718096" /> 今日动态</view>
+      <view class="section-title"><ficon style="vertical-align:-6rpx;margin-right:8rpx" name="bell" size="30" color="#718096" /> 最近动态</view>
     </view>
-    <view class="pending-list">
+    <view class="pending-list" wx:if="{{todayActs.length}}">
       <view class="act-row" wx:for="{{todayActs}}" wx:key="id" bindtap="onGoDetail" data-id="{{item.pkgId}}" hover-class="hover-press">
         <view class="act-dot {{item.cls === 'act-done' ? 'done' : 'new'}}"></view>
         <text class="act-text">{{item.text}}</text>
         <text class="act-time">{{item._time}}</text>
       </view>
+    </view>
+    <view class="act-empty" wx:else>
+      <text>近 3 天暂无新增或完成动态</text>
     </view>
   </view>
 </view>

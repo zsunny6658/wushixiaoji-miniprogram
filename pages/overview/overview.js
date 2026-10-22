@@ -52,24 +52,35 @@ Page({
       else counts.q4++;
     });
 
-    // 今日动态（今日新增 / 今日完成，按时间倒序取前 5）
-    var nd = new Date();
-    var todayPrefix = nd.getFullYear() + '-' + ('0' + (nd.getMonth() + 1)).slice(-2) + '-' + ('0' + nd.getDate()).slice(-2);
+    // 最近动态（近 72h 新增/完成，按时间倒序取前 8；带"今天/昨天/日期"标签）
+    var now = new Date();
+    var dayMs = 24 * 3600 * 1000;
+    var cutoff = new Date(now.getTime() - 3 * dayMs);
+    var todayPrefix = now.getFullYear() + '-' + ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
+    var yest = new Date(now.getTime() - dayMs);
+    var yestPrefix = yest.getFullYear() + '-' + ('0' + (yest.getMonth() + 1)).slice(-2) + '-' + ('0' + yest.getDate()).slice(-2);
+    function dayLabelOf(iso) {
+      if (!iso) return '';
+      if (iso.indexOf(todayPrefix) === 0) return '今天';
+      if (iso.indexOf(yestPrefix) === 0) return '昨天';
+      var t = new Date(iso);
+      return (t.getMonth() + 1) + '月' + t.getDate() + '日';
+    }
     var acts = [];
     pkgs.forEach(function (p) {
-      if (p.createdAt && p.createdAt.indexOf(todayPrefix) === 0) {
-        acts.push({ id: p.id + ':new', pkgId: p.id, time: p.createdAt, iconName: p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : (p.type === 'medication' ? 'pill' : 'clipboard')),
+      if (p.createdAt && new Date(p.createdAt).getTime() >= cutoff.getTime()) {
+        acts.push({ id: p.id + ':new', pkgId: p.id, time: p.createdAt, dayLabel: dayLabelOf(p.createdAt), iconName: p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : (p.type === 'medication' ? 'pill' : 'clipboard')),
           text: '新增「' + (p.summaryText || p.title || p.code || '') + '」', cls: 'act-new' });
       }
-      if (p.status === 'picked' && p.pickedAt && p.pickedAt.indexOf(todayPrefix) === 0) {
-        acts.push({ id: p.id + ':done', pkgId: p.id, time: p.pickedAt, iconName: 'check-circle', iconColor: '#10B981',
+      if (p.status === 'picked' && p.pickedAt && new Date(p.pickedAt).getTime() >= cutoff.getTime()) {
+        acts.push({ id: p.id + ':done', pkgId: p.id, time: p.pickedAt, dayLabel: dayLabelOf(p.pickedAt), iconName: 'check-circle', iconColor: '#10B981',
           text: '完成「' + (p.summaryText || p.title || p.code || '') + '」', cls: 'act-done' });
       }
     });
     acts.sort(function (a, b) { return b.time.localeCompare(a.time); });
-    var todayActs = acts.slice(0, 5).map(function (a) {
+    var todayActs = acts.slice(0, 8).map(function (a) {
       var t = new Date(a.time);
-      a._time = ('0' + t.getHours()).slice(-2) + ':' + ('0' + t.getMinutes()).slice(-2);
+      a._time = a.dayLabel + ' ' + ('0' + t.getHours()).slice(-2) + ':' + ('0' + t.getMinutes()).slice(-2);
       return a;
     });
 
