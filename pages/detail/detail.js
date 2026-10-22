@@ -26,9 +26,12 @@ Page({
   },
 
   onShow: function () {
-    // 从编辑页返回时刷新
+    // 从编辑页返回时强制刷新（绕过 10s TTL 缓存），确保编辑保存后的时间/内容立即回显
     if (this.data.pkg) {
-      this.loadDetail(this.data.pkg.id);
+      var that = this;
+      app.refreshState(function () {
+        that.loadDetail(that.data.pkg.id);
+      }, { force: true });
     }
   },
 
