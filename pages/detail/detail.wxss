@@ -331,3 +331,22 @@
   color: var(--text-tertiary);
   line-height: 1;
 }
+
+/* ── 附件图墙（v0.17.0） ── */
+.gallery-section {
+  background: var(--bg-card, #fff);
+  border-radius: 20rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 20rpx;
+}
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.gallery-thumb {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 12rpx;
+  background: rgba(38, 48, 42, 0.04);
+}

@@ -16,6 +16,14 @@ var API = {
     this.token = token;
   },
 
+  // 相对 API 路径 → 绝对 URL（图片 src 等场景）
+  absUrl: function (path) {
+    if (!this.baseUrl) {
+      this.setBaseUrl(getApp_().globalData.baseUrl);
+    }
+    return this.baseUrl + path;
+  },
+
   request: function (method, path, data, cb, errCb) {
     if (!this.baseUrl) {
       this.setBaseUrl(getApp_().globalData.baseUrl);
@@ -252,6 +260,16 @@ var API = {
   // 药品形态搜索（本地库 + AI 兜底）
   searchDrugs: function (name, cb, errCb) {
     this.request('GET', '/api/drugs/search', { name: name }, cb, errCb);
+  },
+
+  // 附件（v0.17.0）
+  // 批量签发图片预览 URL（带过期签名，<image> 标签可直接引用）
+  signFileUrls: function (ids, cb, errCb) {
+    this.request('POST', '/api/files/sign', { ids: ids }, cb, errCb);
+  },
+  // 单独上传图片附件（dataURL 数组），返回 { ids }
+  uploadImages: function (images, cb, errCb) {
+    this.request('POST', '/api/files', { images: images }, cb, errCb);
   }
 };
 

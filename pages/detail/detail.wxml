@@ -50,6 +50,14 @@
       </view>
     </view>
 
+    <!-- 附件图片 -->
+    <view class="gallery-section" wx:if="{{imageUrls.length}}">
+      <view class="section-title">附件</view>
+      <view class="gallery-grid">
+        <image wx:for="{{imageUrls}}" wx:key="*this" class="gallery-thumb" src="{{item}}" mode="aspectFill" data-idx="{{index}}" bindtap="onPreviewImage" lazy-load />
+      </view>
+    </view>
+
     <!-- 仿真药板入口（用药；已完成/已归档仍可查看，仅打卡由药板页按状态拦截） -->
     <view class="medboard-entry" wx:if="{{pkg.type === 'medication'}}" bindtap="onOpenMedboard">
       <view class="mb-entry-icon"><ficon name="pill" size="36" color="#10B981" /></view>

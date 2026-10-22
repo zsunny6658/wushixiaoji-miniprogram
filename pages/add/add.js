@@ -740,6 +740,11 @@ Page({
       data.schedule = sched;
       data.pillInfo = this.data.pillInfo;
     }
+    // 附件：所选图片随记录保存（压缩后 base64 直传，服务端落盘）。
+    // 编辑模式仅在有选图时传 images（空数组会被服务端理解为"清空附件"）
+    if (this.data.imageBase64List && this.data.imageBase64List.length && this.data.imageTempPaths.length) {
+      data.images = this.data.imageBase64List.slice(0, 9);
+    }
     wx.showLoading({ title: '保存中...' });
     var selfRef = this;
     var afterSaved = function () {

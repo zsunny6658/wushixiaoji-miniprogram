@@ -5,7 +5,8 @@ var app = getApp();
 
 Page({
   data: {
-    pkg: null
+    pkg: null,
+    imageUrls: []
   },
 
   onLoad: function (opts) {
@@ -63,6 +64,7 @@ Page({
   },
 
   applyDetail: function (raw) {
+    var that = this;
     var gd = app.globalData;
     // 浅拷贝：decorate 有缓存，ageText 是随时间变化的渲染值，不能写回缓存对象
     var decorated = Object.assign({}, helpers.decorate(raw, gd.members));
@@ -78,6 +80,17 @@ Page({
       }
     }
     this.setData({ pkg: decorated });
+    // 附件图墙（v0.17.0）：为图片 id 签发带过期的预览 URL（<image> 标签无法带 header）
+    if (Array.isArray(raw.images) && raw.images.length) {
+      api.signFileUrls(raw.images, function (d) {
+        var urls = raw.images
+          .map(function (id) { return (d.urls && d.urls[id]) ? api.absUrl(d.urls[id]) : ''; })
+          .filter(function (u) { return !!u; });
+        that.setData({ imageUrls: urls });
+      }, function () { /* 签发失败静默：不影响详情展示 */ });
+    } else if (this.data.imageUrls.length) {
+      this.setData({ imageUrls: [] });
+    }
     var titleMap = { pickup: '取件详情', todo: '备忘详情', debt: '待还详情', medication: '用药详情' };
     wx.setNavigationBarTitle({ title: titleMap[decorated.type] || '详情' });
   },
@@ -89,6 +102,14 @@ Page({
       data: code,
       success: function () { wx.showToast({ title: '已复制', icon: 'success' }); }
     });
+  },
+
+  // 附件预览：点击缩略图全屏查看
+  onPreviewImage: function (e) {
+    var idx = e.currentTarget.dataset.idx || 0;
+    var urls = this.data.imageUrls || [];
+    if (!urls.length) return;
+    wx.previewImage({ current: urls[idx], urls: urls });
   },
 
   // 「更多」收纳低频操作：编辑 / 复制 / 归档 / 删除（忽略为高频操作，提到底栏）

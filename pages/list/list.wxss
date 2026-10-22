@@ -544,3 +544,8 @@
   border-color: transparent;
   font-weight: 500;
 }
+
+/* ── 附件角标（v0.17.0） ── */
+.bk-img-badge {
+  color: var(--text-tertiary, #94A3B8);
+}

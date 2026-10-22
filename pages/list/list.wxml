@@ -118,6 +118,7 @@
                     <text class="meta-item urg-{{item.urgency}}">{{item.urgLabel}}</text>
                     <text class="meta-item time-warn" wx:if="{{item.dueLabel}}">{{item.dueLabel}}</text>
                     <text class="meta-item bk-assignee" wx:if="{{item.assignee}}">@{{item.assignee}}</text>
+                    <text class="meta-item bk-img-badge" wx:if="{{item.images.length}}">📷{{item.images.length}}</text>
                   </view>
                   <view class="bk-act {{item.status === 'picked' ? 'bk-act-done' : ''}}" catchtap="onSwipePick" data-id="{{item.id}}">{{item.status === 'picked' ? '已完成 ✓' : (item.type === 'medication' ? '💊 打卡' : '✓ 完成')}}</view>
                 </view>
@@ -169,6 +170,7 @@
                     <text class="meta-item urg-{{pkg.urgency}}">{{pkg.urgLabel}}</text>
                     <text class="meta-item time-warn" wx:if="{{pkg.dueLabel}}">{{pkg.dueLabel}}</text>
                     <text class="meta-item bk-assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
+                    <text class="meta-item bk-img-badge" wx:if="{{pkg.images.length}}">📷{{pkg.images.length}}</text>
                   </view>
                   <view class="bk-act {{pkg.status === 'picked' ? 'bk-act-done' : ''}}" catchtap="onSwipePick" data-id="{{pkg.id}}">{{pkg.status === 'picked' ? '已完成 ✓' : (pkg.type === 'medication' ? '💊 打卡' : '✓ 完成')}}</view>
                 </view>
