@@ -89,40 +89,6 @@
     </view>
   </view>
 
-  <!-- 最新待办 -->
-  <view class="section">
-    <view class="section-head">
-      <view class="section-title"><ficon style="vertical-align:-6rpx;margin-right:8rpx" name="clipboard" size="30" color="#718096" /> 最新待办</view>
-      <text class="section-more" bindtap="onGoPending">全部 ›</text>
-    </view>
-    <view class="pending-list">
-      <view class="ov-item" wx:for="{{latestPending}}" wx:for-item="item" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}" hover-class="hover-press">
-        <view class="pending-body">
-          <view class="ov-top">
-            <view class="card-type-group">
-              <text class="tag tag-primary" wx:if="{{item.type === 'pickup'}}">取件</text>
-              <text class="tag tag-warning" wx:if="{{item.type === 'todo'}}">备忘</text>
-              <text class="tag tag-debt" wx:if="{{item.type === 'debt'}}">待还</text>
-              <text class="tag tag-med" wx:if="{{item.type === 'medication'}}">用药</text>
-            </view>
-            <text class="ov-time" wx:if="{{item.arrivedLabel}}">{{item.arrivedLabel}}</text>
-          </view>
-          <text class="ov-main{{item.blockMainType === 'code' ? ' ov-main-code' : ''}}{{item.blockMainType === 'amount' ? ' ov-main-amount' : ''}}">{{item.blockMain}}</text>
-          <text class="ov-sub" wx:if="{{item.blockSub}}">{{item.blockSub}}</text>
-          <view class="ov-meta" wx:if="{{item.dueLabel || item.assignee}}">
-            <text class="ov-meta-dim" wx:if="{{item.dueLabel}}">{{item.dueLabel}}</text>
-            <text class="ov-meta-dim" wx:if="{{item.assignee}}">@{{item.assignee}}</text>
-          </view>
-        </view>
-        <text class="pending-arrow">›</text>
-      </view>
-      <view class="pending-empty" wx:if="{{latestPending.length === 0}}">
-        <text>全部处理完毕</text>
-        <ficon name="check-circle" size="30" color="#10B981" />
-      </view>
-    </view>
-  </view>
-
   <!-- 今日动态 -->
   <view class="section" wx:if="{{todayActs.length}}">
     <view class="section-head">

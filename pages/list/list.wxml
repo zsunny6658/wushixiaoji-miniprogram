@@ -48,6 +48,9 @@
       <picker class="mini-select" range="{{groupOptions}}" value="{{groupIndex}}" bindchange="onGroupChange">
         <view class="mini-select-inner">{{groupOptions[groupIndex]}}</view>
       </picker>
+      <picker class="mini-select" range="{{sortOptions}}" value="{{sortIndex}}" bindchange="onSortChange">
+        <view class="mini-select-inner">{{sortOptions[sortIndex]}}</view>
+      </picker>
       <view class="filter-reset" wx:if="{{activeFilterCount}}" bindtap="onResetFilter">重置</view>
     </view>
   </view>

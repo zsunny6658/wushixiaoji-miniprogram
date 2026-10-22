@@ -211,56 +211,10 @@
 .q4 .quad-num { color: var(--quad-q4-num); }
 .q4 .quad-label { color: var(--quad-q4-label); }
 
-/* 最新待办列表 */
+/* 今日动态 · 时间线 */
 .pending-list {
   display: flex;
   flex-direction: column;
-}
-.pending-item {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-  padding: 14rpx 0;
-  border-bottom: 1rpx solid var(--bg-hover);
-  transition: background 0.15s;
-}
-.pending-item:last-child { border-bottom: none; }
-.pending-item:active { background: var(--bg-hover); }
-.pending-item.flagged { border-left: 4rpx solid #ef4444; padding-left: 8rpx; }
-
-/* 今日动态 */
-.act-item .pending-time { flex-shrink: 0; }
-.act-item.act-done { border-left: 4rpx solid var(--color-success); padding-left: 8rpx; }
-.act-item.act-new { border-left: 4rpx solid var(--color-info); padding-left: 8rpx; }
-.pending-icon {
-  font-size: 28rpx;
-  flex-shrink: 0;
-  width: 36rpx;
-  text-align: center;
-}
-.pending-body {
-  flex: 1;
-  min-width: 0;
-}
-.pending-text {
-  display: block;
-  font-size: 26rpx;
-  color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.3;
-}
-.pending-time {
-  display: block;
-  font-size: 20rpx;
-  color: var(--text-tertiary);
-  margin-top: 2rpx;
-}
-.pending-arrow {
-  font-size: 28rpx;
-  color: var(--text-tertiary);
-  flex-shrink: 0;
 }
 .pending-empty {
   text-align: center;
@@ -306,68 +260,4 @@
   color: var(--text-tertiary);
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
-}
-
-/* ── 最新待办 · 弱化列表行（v0.16.5：概览页整体降噪，主值降为中字重） ── */
-.ov-item {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid var(--bg-hover);
-  transition: background 0.15s;
-}
-.ov-item:last-child { border-bottom: none; }
-.ov-item:active { background: var(--bg-hover); }
-.ov-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12rpx;
-}
-.ov-time {
-  font-size: 20rpx;
-  color: var(--text-tertiary);
-  flex-shrink: 0;
-}
-.ov-main {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 30rpx;
-  line-height: 1.4;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--text-primary);
-  word-break: break-all;
-}
-.ov-main-code {
-  font-family: "SF Mono", Menlo, Consolas, monospace;
-  font-size: 36rpx;
-  letter-spacing: 5rpx;
-  color: var(--color-primary-dark, #143D28);
-}
-.ov-main-amount {
-  font-size: 36rpx;
-  color: var(--color-accent, #E8622C);
-  font-variant-numeric: tabular-nums;
-}
-.ov-sub {
-  display: block;
-  margin-top: 6rpx;
-  font-size: 24rpx;
-  color: var(--text-tertiary);
-  line-height: 1.5;
-  word-break: break-all;
-}
-.ov-meta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16rpx;
-  margin-top: 8rpx;
-}
-.ov-meta-dim {
-  font-size: 22rpx;
-  font-weight: 400;
-  color: var(--text-tertiary);
 }

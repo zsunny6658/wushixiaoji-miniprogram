@@ -13,6 +13,9 @@ Page({
     urgencyFilter: 'all',
     group: 'type',
     search: '',
+    sortOptions: ['排序：最近添加', '排序：到期时间', '排序：重要优先'],
+    sortIndex: 0,
+    sortMode: 'newest',
     list: [],
     groups: [],
     impOptions: ['重要性：全部', '🔴 高', '🟡 中', '⚪ 低'],
@@ -56,6 +59,10 @@ Page({
       groupIndex: ['none', 'owner', 'type'].indexOf(app.globalData.group || 'type'),
       pxToRpx: 750 / sys.windowWidth
     });
+    // 恢复上次选择的排序方式（默认最近添加，红旗始终置顶）
+    var savedSort = wx.getStorageSync('fph_sortMode');
+    var sortIdx = ['newest', 'due', 'importance'].indexOf(savedSort);
+    if (sortIdx > 0) this.setData({ sortMode: savedSort, sortIndex: sortIdx });
     // SSE 连接状态黄条（首页列表最常看，断线要有感知）
     var that = this;
     this._unsubRt = realtime.subscribe(function () {}, function (st) {
@@ -139,7 +146,7 @@ Page({
     else if (this.data.filter === 'picked') pkgs = pkgs.filter(function (p) { return p.status === 'picked'; });
     else if (this.data.filter === 'overdue') pkgs = pkgs.filter(function (p) { return p.overdue && p.status === 'pending'; });
     else if (this.data.filter === 'ignored') pkgs = pkgs.filter(function (p) { return p.status === 'ignored'; });
-    pkgs = helpers.sortPackages(pkgs);
+    pkgs = helpers.sortPackages(pkgs, this.data.sortMode);
 
     var groups = [];
     if (this.data.group !== 'none' && pkgs.length) {
@@ -302,6 +309,14 @@ Page({
     app.globalData.group = vals[idx];
     this.setData({ groupIndex: idx, group: vals[idx] });
     this.updateFilterBadge();
+    this.computeList();
+  },
+  onSortChange: function (e) {
+    var idx = parseInt(e.detail.value, 10);
+    var vals = ['newest', 'due', 'importance'];
+    var mode = vals[idx] || 'newest';
+    this.setData({ sortIndex: idx, sortMode: mode });
+    try { wx.setStorageSync('fph_sortMode', mode); } catch (err) { }
     this.computeList();
   },
   onTogglePick: function (e) {

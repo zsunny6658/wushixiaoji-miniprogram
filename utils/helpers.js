@@ -105,15 +105,32 @@ function urgLabel(urg) {
   return urg === 'urgent' ? '⚡紧急' : '🕐普通';
 }
 
-function sortPackages(pkgs) {
+// 排序模式：
+//   newest     默认，最近添加在前（arrivedAt/createdAt 倒序）
+//   due        有到期时间的在前，按 dueDate 升序
+//   importance 重要 > 紧急 > 时间
+// 所有模式下：待办在前 → 逾期在前 → 红旗（重要）置顶
+function sortPackages(pkgs, mode) {
+  var m = mode || 'newest';
   pkgs.sort(function (a, b) {
     if (a.status !== b.status) return a.status === 'pending' ? -1 : 1;
     if (!!a.overdue !== !!b.overdue) return a.overdue ? -1 : 1;
-    var ai = IMP_RANK[a.importance], bi = IMP_RANK[b.importance];
-    var au = URG_RANK[a.urgency], bu = URG_RANK[b.urgency];
-    if (au !== bu) return au - bu;
-    if (ai !== bi) return ai - bi;
-    return (b.arrivedAt || '').localeCompare(a.arrivedAt || '');
+    var fa = (a.importance || 'medium') === 'high' ? 0 : 1;
+    var fb = (b.importance || 'medium') === 'high' ? 0 : 1;
+    if (fa !== fb) return fa - fb;
+    if (m === 'importance') {
+      var ai = IMP_RANK[a.importance], bi = IMP_RANK[b.importance];
+      var au = URG_RANK[a.urgency], bu = URG_RANK[b.urgency];
+      if (au !== bu) return au - bu;
+      if (ai !== bi) return ai - bi;
+    } else if (m === 'due') {
+      var ad = a.dueDate || '', bd = b.dueDate || '';
+      if (!!ad !== !!bd) return ad ? -1 : 1;
+      if (ad && ad !== bd) return ad.localeCompare(bd);
+    }
+    var at = a.arrivedAt || a.createdAt || '';
+    var bt = b.arrivedAt || b.createdAt || '';
+    return bt.localeCompare(at);
   });
   return pkgs;
 }

@@ -9,7 +9,6 @@ Page({
     greetingText: '',
     todayStr: '',
     quadrantCounts: { q1: 0, q2: 0, q3: 0, q4: 0 },
-    latestPending: [],
     todayActs: [],
     searchKeyword: ''
   },
@@ -51,18 +50,6 @@ Page({
       else if (important && !urgent) counts.q2++;
       else if (!important && urgent) counts.q3++;
       else counts.q4++;
-    });
-
-    // 最新待办（按创建时间倒序，取前 5 条）
-    var pendingPkgs = pkgs.filter(function (p) { return p.status === 'pending'; });
-    helpers.sortPackages(pendingPkgs);
-    var latestPending = pendingPkgs.slice(0, 5);
-    latestPending.forEach(function (p) {
-      p._iconName = p.importance === 'high' ? 'flag' : (p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : (p.type === 'medication' ? 'pill' : 'clipboard')));
-      p._iconColor = p.importance === 'high' ? '#EF4444' : '#718096';
-      p._text = p.summaryText || p.title || p.code;
-      p._time = p.arrivedLabel;
-      p._flagged = p.importance === 'high';
     });
 
     // 今日动态（今日新增 / 今日完成，按时间倒序取前 5）
@@ -114,7 +101,6 @@ Page({
     this.setData({
       stats: { todo: todoC, pickup: pickupC, debt: debtC, medication: medC, debtTotal: debtTotal, debtTotalLabel: helpers.formatAmount(debtTotal), overdue: overdueC, picked: pickedC, ignored: ignoredC, privateCount: privateC },
       quadrantCounts: counts,
-      latestPending: latestPending,
       todayActs: todayActs,
       greetingText: greeting,
       todayStr: todayStr
@@ -154,10 +140,6 @@ Page({
     wx.switchTab({ url: '/pages/list/list' });
   },
   onGoQuadrant: function () { wx.switchTab({ url: '/pages/quadrant/quadrant' }); },
-  onGoPending: function () {
-    app.globalData._deepLinkFilter = { recordType: 'all', filter: 'pending' };
-    wx.switchTab({ url: '/pages/list/list' });
-  },
   onSearchInput: function (e) {
     this.setData({ searchKeyword: e.detail.value });
   },
