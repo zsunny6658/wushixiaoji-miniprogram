@@ -1,6 +1,0 @@
-{
-  "name": "family-parcel-hub-miniprogram",
-  "version": "0.17.8",
-  "private": true,
-  "description": "屋事小记小程序端版本号（由 scripts/upload.js 从根 package.json 自动同步，请勿手动编辑 version）"
-}

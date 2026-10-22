@@ -54,7 +54,7 @@ Page({
   onLoad: function (opts) {
     api.setToken(app.globalData.token);
     var version;
-    try { version = require('../../package.json').version; } catch (e) { version = '1.0.0'; }
+    try { version = require('../../version.js').version; } catch (e) { version = ''; }
     this.setData({ action: (opts && opts.action) || '', version: version });
   },
 

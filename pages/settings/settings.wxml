@@ -276,7 +276,7 @@
         <text class="about-name">屋事小记</text>
         <text class="about-desc">家庭快递取件码共享平台</text>
         <view class="about-divider"></view>
-        <view class="about-row"><text class="about-label">版本</text><text class="about-value">v{{version}}</text></view>
+        <view class="about-row"><text class="about-label">版本</text><text class="about-value">{{version ? 'v' + version : '-'}}</text></view>
         <view class="about-row"><text class="about-label">服务地址</text><text class="about-value">{{baseUrl}}</text></view>
         <view class="about-divider"></view>
         <view class="about-icp">

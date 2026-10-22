@@ -398,7 +398,7 @@
         <image class="about-logo-img" src="/images/logo.png" mode="aspectFit" />
       </view>
       <text class="about-name">屋事小记</text>
-      <text class="about-version">v{{aboutVersion}}</text>
+      <text class="about-version" wx:if="{{aboutVersion}}">v{{aboutVersion}}</text>
       <text class="about-desc">快递取件码归集 · 待办管理 · 家庭事务协作</text>
     </view>
     <view class="about-info">

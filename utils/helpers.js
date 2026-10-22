@@ -106,15 +106,19 @@ function urgLabel(urg) {
 }
 
 // 排序模式：
-//   newest     默认，最近添加在前（arrivedAt/createdAt 倒序）
-//   due        有到期时间的在前，按 dueDate 升序
-//   importance 重要 > 紧急 > 时间
-// 所有模式下：待办在前 → 逾期在前 → 红旗（重要）置顶
+//   newest     默认，最近添加在前（arrivedAt/createdAt 倒序）——纯时间序，逾期不插队
+//   due        有到期时间的在前，按 dueDate 升序（逾期在前）
+//   importance 重要 > 紧急 > 时间（逾期在前）
+// 所有模式下：待办在前 → 红旗（重要）置顶
+// 注意：isOverdue 的口径是 arrivedAt 早于当前时间（到店/事项已发生），
+//       pending 记录几乎全部为 overdue=true，故 newest 模式不能用 overdue 插队（会把最新记录压到列表尾）
 function sortPackages(pkgs, mode) {
   var m = mode || 'newest';
   pkgs.sort(function (a, b) {
     if (a.status !== b.status) return a.status === 'pending' ? -1 : 1;
-    if (!!a.overdue !== !!b.overdue) return a.overdue ? -1 : 1;
+    if (m !== 'newest') {
+      if (!!a.overdue !== !!b.overdue) return a.overdue ? -1 : 1;
+    }
     var fa = (a.importance || 'medium') === 'high' ? 0 : 1;
     var fb = (b.importance || 'medium') === 'high' ? 0 : 1;
     if (fa !== fb) return fa - fb;
