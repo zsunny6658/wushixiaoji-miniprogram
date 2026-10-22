@@ -96,7 +96,7 @@
       <text class="section-more" bindtap="onGoPending">全部 ›</text>
     </view>
     <view class="pending-list">
-      <view class="ov-item {{item.importance === 'high' ? 'flagged' : ''}}" wx:for="{{latestPending}}" wx:for-item="item" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}" hover-class="hover-press">
+      <view class="ov-item" wx:for="{{latestPending}}" wx:for-item="item" wx:key="id" bindtap="onGoDetail" data-id="{{item.id}}" hover-class="hover-press">
         <view class="pending-body">
           <view class="ov-top">
             <view class="card-type-group">
@@ -109,9 +109,7 @@
           </view>
           <text class="ov-main{{item.blockMainType === 'code' ? ' ov-main-code' : ''}}{{item.blockMainType === 'amount' ? ' ov-main-amount' : ''}}">{{item.blockMain}}</text>
           <text class="ov-sub" wx:if="{{item.blockSub}}">{{item.blockSub}}</text>
-          <view class="ov-meta" wx:if="{{item.dueLabel || item.assignee || item.importance === 'high' || item.urgency === 'urgent'}}">
-            <text class="ov-meta-hot" wx:if="{{item.importance === 'high'}}">高优先</text>
-            <text class="ov-meta-hot urg" wx:if="{{item.urgency === 'urgent'}}">紧急</text>
+          <view class="ov-meta" wx:if="{{item.dueLabel || item.assignee}}">
             <text class="ov-meta-dim" wx:if="{{item.dueLabel}}">{{item.dueLabel}}</text>
             <text class="ov-meta-dim" wx:if="{{item.assignee}}">@{{item.assignee}}</text>
           </view>
