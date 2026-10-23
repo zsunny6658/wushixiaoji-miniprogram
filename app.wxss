@@ -128,11 +128,13 @@ page {
 
 /* ---------- 基础组件 ---------- */
 
-/* 页面容器 */
+/* 页面容器
+   padding-bottom 需容纳自定义 tabBar（100rpx + safe-area，中键凸起再高 40rpx）
+   取 160rpx + safe-area，留 60rpx 呼吸空间；非 tab 页（settings 等）本地 .page 会覆盖此值 */
 .page {
   min-height: 100vh;
   padding: var(--spacing-md);
-  padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 

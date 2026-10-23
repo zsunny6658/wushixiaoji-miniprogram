@@ -4,7 +4,7 @@
   min-height: 100vh;
   background: var(--bg-page);
   padding: var(--spacing-md);
-  padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
 }
 
 /* 用户信息卡片 */
