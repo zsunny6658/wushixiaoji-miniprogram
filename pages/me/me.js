@@ -166,6 +166,24 @@ Page({
     return '未指定';
   },
 
+  // 点击「角色 · 家庭名」行：家庭名超长被省略时，弹窗查看完整名称并可复制
+  onShowFamilyName: function () {
+    var name = this.data.familyName || '';
+    if (!name) return;
+    wx.showModal({
+      title: '家庭名称',
+      content: name,
+      showCancel: true,
+      cancelText: '关闭',
+      confirmText: '复制',
+      success: function (res) {
+        if (res.confirm) {
+          wx.setClipboardData({ data: name });
+        }
+      }
+    });
+  },
+
   onViewChange: function (e) {
     var i = parseInt(e.detail.value, 10);
     var v = ['list', 'quadrant'][i];

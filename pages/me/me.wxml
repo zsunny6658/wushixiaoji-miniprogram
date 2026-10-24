@@ -10,7 +10,7 @@
       <view class="user-details">
         <text class="user-name">{{meName}}</text>
         <text class="user-email" wx:if="{{meEmail}}">{{meEmail}}</text>
-        <view class="user-meta">
+        <view class="user-meta" bindtap="onShowFamilyName" hover-class="hover-press">
           <text class="user-role">{{roleLabel}}</text>
           <text class="user-divider">·</text>
           <text class="user-family">{{familyName}}</text>
