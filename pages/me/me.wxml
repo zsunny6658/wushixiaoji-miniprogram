@@ -26,7 +26,7 @@
   <!-- 我的待办习惯（v0.16.0 行为画像） -->
   <view class="section-card habit-card" wx:if="{{habitTotal}}">
     <text class="section-label">我的待办习惯</text>
-    <text class="habit-sub">智能重要度正在学习这些行为</text>
+    <text class="habit-sub">智能引擎学习这些行为，待办预测更准 · 仅本地记录，保护隐私</text>
     <view class="habit-grid">
       <view class="habit-item"><text class="habit-num habit-green">{{habitTotal.completes}}</text><text class="habit-label">完成</text></view>
       <view class="habit-item"><text class="habit-num">{{habitTotal.views}}</text><text class="habit-label">查看</text></view>
@@ -148,7 +148,7 @@
   </view>
 
   <!-- 创建家庭 -->
-  <view class="create-btn" wx:if="{{isAdmin}}" bindtap="onShowCreateFamily" hover-class="hover-press">
+  <view class="create-btn" bindtap="onShowCreateFamily" hover-class="hover-press">
     <text class="create-icon">＋</text>
     <text>创建新家庭</text>
   </view>
@@ -169,6 +169,7 @@
       <text class="modal-close" bindtap="onCancelCreateFamily">✕</text>
     </view>
     <input class="modal-input" placeholder="家庭名称（如：郑家）" placeholder-class="placeholder" value="{{newFamilyName}}" bindinput="onNewFamilyName" />
+    <view class="modal-desc">创建后将自动成为该家庭的管理员，并切换到新家庭</view>
     <view class="modal-foot">
       <button class="modal-btn modal-btn-cancel" bindtap="onCancelCreateFamily">取消</button>
       <button class="modal-btn modal-btn-confirm" bindtap="onCreateFamily">创建</button>

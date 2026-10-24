@@ -144,6 +144,11 @@ Page({
     api.request('POST', '/api/families', { name: name }, function (data) {
       var that = this;
       if (data && data.family) {
+        // 普通成员创建家庭会被迁入新家庭并授家庭管理员，服务端会签发新 token
+        if (data.token) {
+          app.saveToken(data.token, app.globalData.me || '', data.family.id);
+          api.setToken(data.token);
+        }
         app.globalData.familyId = data.family.id;
         wx.setStorageSync('parcel.familyId', data.family.id);
         that.setData({ showCreateFamily: false, newFamilyName: '' });
