@@ -104,6 +104,14 @@
   font-weight: 600;
 }
 
+/* 输入框标签（placeholder 在部分机型颜色过浅，改为可见 label 兜底） */
+.input-label {
+  font-size: var(--font-body-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8rpx;
+}
+
 .login-input {
   width: 100%;
   border: 2rpx solid var(--border);
@@ -118,7 +126,7 @@
   transition: border-color 0.15s;
 }
 .login-input:focus { border-color: var(--color-primary); }
-.login-placeholder { color: var(--text-tertiary); }
+.login-placeholder { color: #9CA3AF; }
 
 .code-row {
   display: flex;
