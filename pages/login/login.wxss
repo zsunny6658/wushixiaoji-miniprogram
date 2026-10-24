@@ -114,14 +114,15 @@
 
 .login-input {
   width: 100%;
+  min-height: 88rpx;
   border: 2rpx solid var(--border);
   border-radius: var(--radius-md);
-  padding: 24rpx 28rpx;
+  padding: 20rpx 28rpx;
   font-size: var(--font-body-lg);
   line-height: 1.5;
   box-sizing: border-box;
   margin-bottom: var(--spacing-sm);
-  background: var(--bg-page);
+  background: var(--bg-card);
   color: var(--text-primary);
   transition: border-color 0.15s;
 }
