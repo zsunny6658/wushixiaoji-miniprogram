@@ -167,8 +167,11 @@ Page({
       if (p.avatarUrl) {
         app.globalData.meAvatar = p.avatarUrl;
       }
-      app.refreshState();
-      wx.showToast({ title: '已保存', icon: 'success' });
+      app.refreshState(function () {
+        wx.showToast({ title: '保存成功', icon: 'success' });
+        // 停留片刻让用户看到提示，再返回「我的」页
+        setTimeout(function () { wx.navigateBack(); }, 800);
+      });
     });
   },
 
