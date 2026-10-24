@@ -73,11 +73,14 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* 角色标签 + 家庭名单行恒定布局：
+   标签固定宽、家庭名 flex 收缩超长省略，与姓名/邮箱的截断策略一致，
+   家庭名再长也不会出现"标签一行、家庭名另一行"的破碎换行 */
 .user-meta {
   display: flex;
   align-items: center;
   gap: 8rpx;
-  flex-wrap: wrap;
+  min-width: 0;
 }
 .user-role {
   font-size: var(--font-body-sm);
@@ -86,14 +89,18 @@
   padding: 4rpx 14rpx;
   border-radius: var(--radius-full);
   font-weight: 500;
+  flex-shrink: 0;
 }
 .user-divider {
   font-size: var(--font-caption);
   color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
 }
 .user-family {
   font-size: var(--font-body-sm);
   color: rgba(255, 255, 255, 0.9);
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
