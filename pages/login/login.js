@@ -92,7 +92,7 @@ Page({
   onEmailLogin: function () {
     var that = this;
     var email = this.data.email.trim();
-    if (!email) { wx.showToast({ title: '请输入账号', icon: 'none' }); return; }
+    if (!email) { wx.showToast({ title: '请输入邮箱', icon: 'none' }); return; }
 
     if (this.data.emailTab === 'password') {
 var pass = this.data.emailPass;

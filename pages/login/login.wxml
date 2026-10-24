@@ -15,8 +15,8 @@
     <!-- 账号登录 -->
     <view wx:if="{{view === 'email'}}">
       <view class="login-header">
-        <view class="login-title">账号登录</view>
-        <view class="login-sub">输入用户名或邮箱和密码登录</view>
+        <view class="login-title">邮箱登录</view>
+        <view class="login-sub">输入邮箱和密码登录</view>
       </view>
 
       <!-- 密码/验证码 Tab -->
@@ -25,8 +25,8 @@
         <view class="auth-tab {{emailTab === 'code' ? 'active' : ''}}" bindtap="onEmailTab" data-tab="code">验证码登录</view>
       </view>
 
-      <view class="input-label">账号</view>
-      <input class="login-input" placeholder="用户名或邮箱" placeholder-class="login-placeholder"
+      <view class="input-label">邮箱</view>
+      <input class="login-input" placeholder="邮箱地址" placeholder-class="login-placeholder"
              type="text" value="{{email}}" bindinput="onEmailInput" />
 
       <!-- 密码登录 -->
