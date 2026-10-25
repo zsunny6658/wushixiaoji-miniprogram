@@ -167,5 +167,67 @@
 
 /* 多轮 / 流式补充 */
 .qa-welcome-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8rpx; }
-.qa-clear { font-size: var(--font-caption); color: var(--text-tertiary); padding: 4rpx 8rpx; }
+.qa-welcome-acts { display: flex; align-items: center; }
+.qa-act { font-size: var(--font-caption); color: var(--color-primary); padding: 4rpx 10rpx; }
+.qa-act + .qa-act { color: var(--text-tertiary); }
 .qa-thinking-inline { display: flex; align-items: center; margin-top: 8rpx; }
+
+/* ---------- 对话记录管理面板 ---------- */
+.qa-mask {
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+.qa-sheet {
+  width: 100%;
+  max-height: 70vh;
+  background: var(--bg-card);
+  border-radius: 24rpx 24rpx 0 0;
+  padding: var(--spacing-md) var(--spacing-md) 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+.qa-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+.qa-sheet-title { font-size: var(--font-body); font-weight: 600; color: var(--text-primary); }
+.qa-sheet-new {
+  font-size: var(--font-caption);
+  color: #FFFFFF;
+  background: var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 10rpx 22rpx;
+}
+.qa-sheet-list { flex: 1; min-height: 200rpx; max-height: 56vh; }
+.qa-sess {
+  display: flex;
+  align-items: center;
+  padding: 22rpx 8rpx;
+  border-bottom: 2rpx solid var(--border);
+}
+.qa-sess.cur .qa-sess-title { color: var(--color-primary); font-weight: 600; }
+.qa-sess-main { flex: 1; min-width: 0; }
+.qa-sess-title {
+  font-size: var(--font-body-sm);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.qa-sess-meta { margin-top: 6rpx; font-size: 20rpx; color: var(--text-tertiary); }
+.qa-sess-del {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  font-size: var(--font-caption);
+  color: #C0392B;
+  padding: 8rpx 14rpx;
+}
+.qa-sess-empty { padding: 60rpx 0; text-align: center; font-size: var(--font-caption); color: var(--text-tertiary); }
+.qa-sheet-pad { height: calc(24rpx + env(safe-area-inset-bottom)); }

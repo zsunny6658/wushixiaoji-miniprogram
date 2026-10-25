@@ -6,7 +6,10 @@
       <view class="qa-welcome">
         <view class="qa-welcome-top">
           <view class="qa-welcome-title">基于你的待读知识库回答</view>
-          <view wx:if="{{messages.length}}" class="qa-clear" bindtap="onClearHistory">清空对话</view>
+          <view class="qa-welcome-acts">
+            <view class="qa-act" bindtap="onOpenSessions">对话记录</view>
+            <view wx:if="{{messages.length}}" class="qa-act" bindtap="onClearHistory">清空</view>
+          </view>
         </view>
         <view class="qa-welcome-sub">只依据已收藏文章的正文内容，据实回答并标注来源；库里没有的会明说。支持多轮追问。</view>
         <view class="qa-suggests">
@@ -27,7 +30,7 @@
             <text>{{item.text}}{{item.streaming ? ' ▌' : ''}}</text>
             <view wx:if="{{item.streaming && !item.text}}" class="qa-thinking-inline">
               <text class="qa-dot"></text><text class="qa-dot qa-dot2"></text><text class="qa-dot qa-dot3"></text>
-              <text class="qa-thinking-text">正在检索知识库…</text>
+              <text class="qa-thinking-text">正在检索知识库…{{elapsed > 0 ? ' ' + elapsed + 's' : ''}}</text>
             </view>
             <view wx:if="{{item.sources.length}}" class="qa-srcs">
               <view class="qa-srcs-label">来源</view>
@@ -70,6 +73,33 @@
     />
     <view class="qa-send {{canSend ? 'on' : ''}}" bindtap="onSend">
       <ficon name="send" size="32" color="#FFFFFF" />
+    </view>
+  </view>
+
+  <!-- 对话记录管理面板（半屏弹层） -->
+  <view wx:if="{{showSessions}}" class="qa-mask" bindtap="onCloseSessions">
+    <view class="qa-sheet" catchtap="onStopPropagation">
+      <view class="qa-sheet-head">
+        <text class="qa-sheet-title">对话记录</text>
+        <view class="qa-sheet-new" bindtap="onNewSession">＋ 新对话</view>
+      </view>
+      <scroll-view scroll-y class="qa-sheet-list">
+        <view
+          wx:for="{{sessions}}"
+          wx:key="id"
+          class="qa-sess {{item.id === currentId ? 'cur' : ''}}"
+          bindtap="onSwitchSession"
+          data-id="{{item.id}}"
+        >
+          <view class="qa-sess-main">
+            <view class="qa-sess-title">{{item.title}}</view>
+            <view class="qa-sess-meta">{{item.count}} 问 · {{item.timeText}}</view>
+          </view>
+          <view class="qa-sess-del" catchtap="onDeleteSession" data-id="{{item.id}}">删除</view>
+        </view>
+        <view wx:if="{{!sessions.length}}" class="qa-sess-empty">暂无历史对话</view>
+        <view class="qa-sheet-pad"></view>
+      </scroll-view>
     </view>
   </view>
 </view>

@@ -344,6 +344,34 @@ var API = {
 
     var sseBuf = '';
     var pend = []; // 尾部残包字节（分块可能切断多字节 UTF-8）
+    var gotEvent = false; // 是否已向调用方派发过任何 SSE 事件
+
+    // 派发一个 SSE 块（event/data 解析），返回是否成功
+    var emitBlock = function (block) {
+      var evName = 'message';
+      var dataLine = '';
+      block.split('\n').forEach(function (line) {
+        if (line.indexOf('event:') === 0) evName = line.slice(6).trim();
+        else if (line.indexOf('data:') === 0) dataLine += line.slice(5).trim();
+      });
+      if (!dataLine) return false;
+      try {
+        onEvent && onEvent(evName, JSON.parse(dataLine));
+        gotEvent = true;
+        return true;
+      } catch (e) { return false; }
+    };
+
+    // 反代缓冲场景兑底：整个响应体一次性到达（onChunkReceived 全程不触发），
+    // success 时把完整 body 当 SSE 解析，别让用户白等到超时
+    var drainBuffered = function (buf) {
+      var text = utf8Decode(buf);
+      var blocks = (sseBuf + text).split('\n\n');
+      sseBuf = blocks.pop() || '';
+      blocks.forEach(function (b) { if (b.trim()) emitBlock(b); });
+      if (sseBuf.trim()) { emitBlock(sseBuf); sseBuf = ''; }
+    };
+
     var task = wx.request({
       url: this.baseUrl + '/api/read/ask/stream',
       method: 'POST',
@@ -352,8 +380,15 @@ var API = {
       timeout: 150000,
       enableChunked: true,
       responseType: 'arraybuffer',
-      success: function () { /* 结束以事件为准 */ },
-      fail: function (e) { onErr && onErr(e && e.errMsg ? e : { fallback: true }); }
+      success: function (res) {
+        if (!gotEvent && res && res.data) {
+          try { drainBuffered(res.data); } catch (e) { /* 走 fallback */ }
+        }
+        if (!gotEvent) onErr && onErr({ fallback: true, buffered: true });
+      },
+      fail: function (e) {
+        if (!gotEvent) onErr && onErr(e && e.errMsg ? e : { fallback: true });
+      }
     });
     if (!(task && typeof task.onChunkReceived === 'function')) {
       onErr && onErr({ fallback: true });
@@ -393,14 +428,7 @@ var API = {
       while ((idx = sseBuf.indexOf('\n\n')) >= 0) {
         var block = sseBuf.slice(0, idx);
         sseBuf = sseBuf.slice(idx + 2);
-        var evName = 'message';
-        var dataLine = '';
-        block.split('\n').forEach(function (line) {
-          if (line.indexOf('event:') === 0) evName = line.slice(6).trim();
-          else if (line.indexOf('data:') === 0) dataLine += line.slice(5).trim();
-        });
-        if (!dataLine) continue;
-        try { onEvent && onEvent(evName, JSON.parse(dataLine)); } catch (e) { /* 忽略坏块 */ }
+        emitBlock(block);
       }
     });
     return task;
