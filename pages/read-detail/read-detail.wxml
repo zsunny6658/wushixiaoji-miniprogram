@@ -174,7 +174,7 @@
 <view wx:if="{{showManual}}" class="dt-manual-mask" bindtap="onCloseManual">
   <view class="dt-manual-sheet" catchtap="noop">
     <view class="dt-manual-title">补正文</view>
-    <view class="dt-manual-hint">把文章全文粘贴到下面（在微信/浏览器里全选复制），保存后自动重建检索索引，之后 AI 问答就能引用它。</view>
+    <view class="dt-manual-hint">把文章全文粘贴到下面（在微信/浏览器里全选复制），保存后自动重建检索索引，之后 智能问答就能引用它。</view>
     <textarea
       class="dt-manual-input"
       value="{{manualText}}"

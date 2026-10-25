@@ -7,7 +7,7 @@
     </view>
     <view class="rd-ask-btn" bindtap="onOpenAsk">
       <ficon name="zap" size="30" color="#1E5B3C" />
-      <text class="rd-ask-btn-text">AI 问答</text>
+      <text class="rd-ask-btn-text">智能问答</text>
     </view>
     <view class="rd-add-btn" bindtap="onOpenAdd">
       <ficon name="plus" size="34" color="#FFFFFF" />

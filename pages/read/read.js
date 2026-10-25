@@ -202,7 +202,7 @@ Page({
     this.setData({ keyword: '', searchResults: null, searching: false, displayItems: this.data.items });
   },
 
-  /* ---------------- AI 问答 ---------------- */
+  /* ---------------- 智能问答 ---------------- */
   onOpenAsk: function () {
     wx.navigateTo({ url: '/pages/read-ask/read-ask' });
   },

@@ -49,7 +49,8 @@ var API = {
     return this.baseUrl + path;
   },
 
-  request: function (method, path, data, cb, errCb) {
+  request: function (method, path, data, cb, errCb, opts) {
+    opts = opts || {};
     if (!this.baseUrl) {
       this.setBaseUrl(getApp_().globalData.baseUrl);
     }
@@ -65,6 +66,8 @@ var API = {
       method: method,
       data: data || {},
       header: header,
+      // AI 生成类接口（问答等）可能超过 wx.request 默认 60s，调用方可用 opts.timeout 放宽
+      timeout: opts.timeout || 60000,
       success: function (res) {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           cb && cb(res.data);
@@ -324,7 +327,8 @@ var API = {
     this.request('POST', '/api/read/ask', { question: question }, cb, errCb);
   },
   readAskMulti: function (question, history, cb, errCb) {
-    this.request('POST', '/api/read/ask', { question: question, history: history || [] }, cb, errCb);
+    // AI 生成可能较慢：放宽到 150s（与服务端 chat 60s×重试2 的最坏情况匹配）
+    this.request('POST', '/api/read/ask', { question: question, history: history || [] }, cb, errCb, { timeout: 150000 });
   },
   // 手动补正文：粘贴全文 → 快照 + 索引 + ready
   readSaveContent: function (id, content, cb, errCb) {

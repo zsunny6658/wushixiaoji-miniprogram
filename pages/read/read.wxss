@@ -262,7 +262,7 @@
 }
 .rd-sheet-actions .btn-sm { flex: 1; }
 
-/* AI 问答入口 */
+/* 智能问答入口 */
 .rd-ask-btn {
   display: flex; align-items: center; gap: 6rpx;
   padding: 14rpx 20rpx;
