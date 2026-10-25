@@ -68,6 +68,37 @@ Page({
     this.loadTags();
   },
 
+  onHide: function () {
+    this.clearPoll();
+  },
+
+  onUnload: function () {
+    this.clearPoll();
+  },
+
+  /** 有「解析中」的条目时自动轮询刷新（最多 8 次，避免常驻定时器） */
+  schedulePoll: function () {
+    var that = this;
+    var busy = (this.data.stats.pending || 0) > 0 ||
+      this.data.items.some(function (i) { return i.busy; });
+    if (!busy) { this.clearPoll(); return; }
+    if (this._pollCount >= 8) { this.clearPoll(); return; }
+    if (this._pollTimer) return;
+    this._pollTimer = setTimeout(function () {
+      that._pollTimer = null;
+      that._pollCount = (that._pollCount || 0) + 1;
+      that.loadList(true);
+    }, 4000);
+  },
+
+  clearPoll: function () {
+    if (this._pollTimer) {
+      clearTimeout(this._pollTimer);
+      this._pollTimer = null;
+    }
+    this._pollCount = 0;
+  },
+
   onPullDownRefresh: function () {
     var that = this;
     this.loadList(true, function () {
@@ -100,6 +131,7 @@ Page({
           loading: false,
           loadingMore: false
         });
+        that.schedulePoll();
         done && done();
       },
       function () {
