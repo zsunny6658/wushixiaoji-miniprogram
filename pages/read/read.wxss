@@ -210,14 +210,16 @@
   position: fixed;
   left: 0; right: 0; top: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.45);
-  z-index: 100;
+  /* 高于 custom-tab-bar(9999)，避免弹层被底部 tab 压住 */
+  z-index: 10000;
   display: flex; align-items: flex-end;
 }
 .rd-sheet {
   width: 100%;
   background: var(--bg-card);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  padding: var(--spacing-md) var(--spacing-md) calc(var(--spacing-md) + env(safe-area-inset-bottom));
+  /* 底部预留 tab 栏高度 + 安全区，按钮不被 tab 遮挡 */
+  padding: var(--spacing-md) var(--spacing-md) calc(140rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 .rd-sheet-title { font-size: var(--font-subtitle); font-weight: 700; color: var(--text-primary); }

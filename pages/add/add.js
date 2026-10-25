@@ -29,7 +29,7 @@ Page({
     typeIndex: 0,
     showMore: false,
     moreFilled: false,
-    typeOptions: ['📦 取件码', '📝 文本备忘', '💳 待还款', '💊 用药提醒'],
+    typeOptions: ['📦 取件码', '📝 文本备忘', '💳 待还款', '💊 用药提醒', '📖 待读'],
     doseOptions: ['每日1次', '每日2次', '每日3次', '每日4次'],
     freqOptions: ['每天', '隔1天', '每3天', '每周固定几日'],
     freqIndex: 0,
@@ -190,16 +190,16 @@ Page({
   },
 
   typeIndexOf: function (type) {
-    return type === 'todo' ? 1 : (type === 'debt' ? 2 : (type === 'medication' ? 3 : 0));
+    return type === 'todo' ? 1 : (type === 'debt' ? 2 : (type === 'medication' ? 3 : (type === 'read' ? 4 : 0)));
   },
   onTypeChange: function (e) {
     var i = parseInt(e.detail.value, 10);
-    var typeMap = { 0: 'pickup', 1: 'todo', 2: 'debt', 3: 'medication' };
+    var typeMap = { 0: 'pickup', 1: 'todo', 2: 'debt', 3: 'medication', 4: 'read' };
     this.setData({ typeIndex: i, type: typeMap[i] || 'pickup' });
   },
   onTypeTap: function (e) {
     var type = e.currentTarget.dataset.type;
-    var typeMap = { pickup: 0, todo: 1, debt: 2, medication: 3 };
+    var typeMap = { pickup: 0, todo: 1, debt: 2, medication: 3, read: 4 };
     if (type === this.data.type) return;
     this.setData({ type: type, typeIndex: typeMap[type] || 0 });
   },
@@ -545,6 +545,13 @@ Page({
     wx.showLoading({ title: '识别中...' });
     api.parse(text, 'auto', function (data) {
       wx.hideLoading();
+      // 服务端命中 URL 自动转待读：已入库，提示后返回
+      if (data.redirect === 'read') {
+        wx.showToast({ title: data.message || '已加入待读', icon: 'none', duration: 1800 });
+        that.clearDraft();
+        setTimeout(function () { wx.navigateBack(); }, 900);
+        return;
+      }
       var records = data.records || [];
       if (records.length > 1) {
         // 多条，批量导入
@@ -710,6 +717,22 @@ Page({
   onSave: function () {
     this.updateMoreFilled();
     var f = this.data.form;
+    // 待读：链接必填，走 /api/read（自动抓取正文并入个人索引）
+    if (this.data.type === 'read') {
+      var urlInput = (f.code || '').trim();
+      if (!urlInput) { wx.showToast({ title: '请粘贴链接或分享文案', icon: 'none' }); return; }
+      var thatRead = this;
+      wx.showLoading({ title: '保存中...' });
+      api.readAdd(urlInput, f.note || '', function () {
+        wx.hideLoading();
+        wx.showToast({ title: '已加入待读', icon: 'success' });
+        thatRead.clearDraft();
+        setTimeout(function () { wx.navigateBack(); }, 600);
+      }, function () {
+        wx.hideLoading();
+      });
+      return;
+    }
     if (this.data.type === 'pickup' && (!f.station || !f.code)) {
       wx.showToast({ title: '驿站和取件码必填', icon: 'none' }); return;
     }

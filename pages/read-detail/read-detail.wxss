@@ -184,3 +184,27 @@
 }
 .dt-foot { text-align: center; padding: var(--spacing-md) 0 var(--spacing-lg); }
 .dt-foot-text { font-size: var(--font-caption); color: var(--text-disabled); }
+
+/* ---------- 相关阅读 ---------- */
+.dt-related { margin-top: var(--spacing-sm); }
+.dt-rel-item {
+  display: flex; align-items: center;
+  padding: 20rpx 4rpx;
+  border-bottom: 2rpx solid var(--border);
+}
+.dt-rel-item:last-child { border-bottom: none; }
+.dt-rel-plat {
+  flex-shrink: 0;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  font-size: 20rpx;
+  margin-right: 16rpx;
+}
+.dt-rel-plat.plat-web { background: #EEF1F6; color: #64748B; }
+.dt-rel-title {
+  flex: 1;
+  font-size: var(--font-body-sm);
+  color: var(--text-primary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dt-rel-sim { flex-shrink: 0; font-size: var(--font-caption); color: var(--text-tertiary); margin-left: 12rpx; }

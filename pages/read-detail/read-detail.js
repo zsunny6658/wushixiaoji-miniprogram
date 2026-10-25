@@ -100,7 +100,8 @@ Page({
     headHitIdx: -1,    // 第一个命中块在 headBlocks 里的下标
     restHitIdx: -1,    // 第一个命中块在 restBlocks 里的下标
     editingTags: false,
-    newTag: ''
+    newTag: '',
+    relatedItems: []
   },
 
   onLoad: function (options) {
@@ -126,6 +127,7 @@ Page({
       });
       wx.setNavigationBarTitle({ title: item.platformLabel || '阅读' });
       that.loadContent();
+      that.loadRelated();
       done && done();
     }, function () {
       that.setData({ loading: false });
@@ -186,6 +188,21 @@ Page({
 
   onToggleAll: function () {
     this.setData({ showAll: !this.data.showAll });
+  },
+
+  // 相关阅读：同一人的待读里向量近邻（服务端排序，空则不展示）
+  loadRelated: function () {
+    var that = this;
+    api.readRelated(this.data.id, function (data) {
+      that.setData({ relatedItems: (data && data.items) || [] });
+    }, function () {});
+  },
+
+  onRelatedTap: function (e) {
+    var id = e.currentTarget.dataset.id;
+    if (!id) return;
+    // 用 redirectTo 避免详情页无限堆栈
+    wx.redirectTo({ url: '/pages/read-detail/read-detail?id=' + id });
   },
 
   /* ---------------- 操作 ---------------- */

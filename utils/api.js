@@ -289,6 +289,9 @@ var API = {
   readRefetch: function (id, cb, errCb) {
     this.request('POST', '/api/read/' + id + '/refetch', {}, cb, errCb);
   },
+  readRelated: function (id, cb, errCb) {
+    this.request('GET', '/api/read/' + id + '/related', null, cb, errCb);
+  },
   readSearch: function (q, cb, errCb) {
     this.request('GET', '/api/read/search?q=' + encodeURIComponent(q), null, cb, errCb);
   },

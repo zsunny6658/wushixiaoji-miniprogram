@@ -133,6 +133,26 @@
     </block>
   </view>
 
+  <!-- 相关阅读 -->
+  <view wx:if="{{relatedItems.length}}" class="dt-section dt-related">
+    <view class="dt-section-head">
+      <text class="dt-section-title">相关阅读</text>
+      <text class="dt-section-hint">基于内容向量相似度</text>
+    </view>
+    <view
+      class="dt-rel-item"
+      wx:for="{{relatedItems}}"
+      wx:key="id"
+      bindtap="onRelatedTap"
+      data-id="{{item.id}}"
+      hover-class="hover-press"
+    >
+      <text class="dt-rel-plat plat-{{item.platform}}">{{item.platformLabel}}</text>
+      <text class="dt-rel-title">{{item.title}}</text>
+      <text wx:if="{{item.sim}}" class="dt-rel-sim">{{item.sim}}</text>
+    </view>
+  </view>
+
   <view class="dt-foot">
     <text class="dt-foot-text">收藏于 {{item.createdLabel}}</text>
   </view>

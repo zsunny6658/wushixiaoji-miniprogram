@@ -33,9 +33,22 @@
       <view class="seg-item {{type === 'todo' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="todo"><ficon name="clipboard" size="30" color="{{type === 'todo' ? '#1E5B3C' : '#718096'}}" /> 备忘</view>
       <view class="seg-item {{type === 'debt' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="debt"><ficon name="creditcard" size="30" color="{{type === 'debt' ? '#1E5B3C' : '#718096'}}" /> 还款</view>
       <view class="seg-item {{type === 'medication' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="medication"><ficon name="pill" size="30" color="{{type === 'medication' ? '#1E5B3C' : '#718096'}}" /> 用药</view>
+      <view class="seg-item {{type === 'read' ? 'seg-active' : ''}}" bindtap="onTypeTap" data-type="read"><ficon name="book" size="30" color="{{type === 'read' ? '#1E5B3C' : '#718096'}}" /> 待读</view>
     </view>
 
     <view class="form-grid">
+      <block wx:if="{{type === 'read'}}">
+        <view class="field">
+          <text class="field-label">链接或分享文案 <text class="req">*</text></text>
+          <input class="field-input" placeholder="粘贴公众号 / 小红书 / B站 / 网页链接" value="{{form.code}}" bindinput="onField" data-field="code" />
+          <text class="field-hint">保存后自动抓取正文、生成摘要并入个人索引，仅本人可见</text>
+        </view>
+        <view class="field">
+          <text class="field-label">备注（可选）</text>
+          <input class="field-input" placeholder="比如为什么想读" value="{{form.note}}" bindinput="onField" data-field="note" />
+        </view>
+      </block>
+
       <block wx:if="{{type === 'pickup'}}">
         <view class="field">
           <text class="field-label">取件驿站 <text class="req">*</text></text>
@@ -165,7 +178,7 @@
         </view>
       </block>
 
-      <view class="field">
+      <view class="field" wx:if="{{type !== 'read'}}">
         <text class="field-label">时间</text>
         <view class="datetime-row">
           <picker mode="date" value="{{dateStr}}" bindchange="onDateChange" end="{{endDate}}">
@@ -184,12 +197,12 @@
       </view>
     </view>
 
-    <!-- 更多选项折叠区 -->
-    <view class="more-toggle" bindtap="onToggleMore">
+    <!-- 更多选项折叠区（待读为个人数据，不需要归属/重要度等选项） -->
+    <view class="more-toggle" wx:if="{{type !== 'read'}}" bindtap="onToggleMore">
       <text>{{showMore ? '收起选项 ▲' : '更多选项 ▼'}}</text>
       <text class="more-badge" wx:if="{{!showMore && moreFilled}}">已填写</text>
     </view>
-    <view class="more-section" wx:if="{{showMore}}">
+    <view class="more-section" wx:if="{{showMore && type !== 'read'}}">
       <block wx:if="{{type === 'pickup'}}">
         <view class="field">
           <text class="field-label">快递公司</text>
