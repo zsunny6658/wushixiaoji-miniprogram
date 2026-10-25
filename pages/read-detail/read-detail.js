@@ -78,7 +78,10 @@ function clean(s) {
 function markBlock(b, terms) {
   if (!terms || !terms.length || !b || !b.text) return b;
   var s = hl.segs(b.text, terms);
-  if (s) b.segs = s;
+  if (s) {
+    b.segs = s;
+    b.hit = true;
+  }
   return b;
 }
 
@@ -94,6 +97,8 @@ Page({
     headBlocks: [],
     restBlocks: [],
     hlTerms: [],       // 检索态进入时的高亮词
+    headHitIdx: -1,    // 第一个命中块在 headBlocks 里的下标
+    restHitIdx: -1,    // 第一个命中块在 restBlocks 里的下标
     editingTags: false,
     newTag: ''
   },
@@ -136,6 +141,9 @@ Page({
       if (terms.length) blocks = blocks.map(function (b) { return markBlock(b, terms); });
       var head = [];
       var rest = blocks;
+      var firstHitId = '';
+      var headHitIdx = -1;
+      var restHitIdx = -1;
       // 首屏只渲染前 12 个块，其余「展开全文」，避免长文一次性渲染卡顿
       if (blocks.length > 14) {
         head = blocks.slice(0, 12);
@@ -144,14 +152,33 @@ Page({
         head = blocks;
         rest = [];
       }
+      if (terms.length) {
+        // 标记第一个命中块作为滚动锚点
+        for (var i = 0; i < blocks.length; i++) {
+          if (blocks[i].hit) {
+            firstHitId = 'first-hit';
+            if (i < head.length) headHitIdx = i;
+            else restHitIdx = i - head.length;
+            break;
+          }
+        }
+      }
       that.setData({
         blocks: blocks,
         headBlocks: head,
         restBlocks: rest,
         contentLoading: false,
         contentEmpty: !blocks.length,
-        showAll: blocks.length <= 14 || !!terms.length
+        showAll: blocks.length <= 14 || !!terms.length,
+        headHitIdx: headHitIdx,
+        restHitIdx: restHitIdx
       });
+      // 渲染完成后滚到第一个命中处
+      if (firstHitId) {
+        setTimeout(function () {
+          wx.pageScrollTo({ selector: '#first-hit', duration: 320, offsetTop: -90 });
+        }, 380);
+      }
     }, function () {
       that.setData({ contentLoading: false, contentEmpty: true });
     });

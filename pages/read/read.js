@@ -289,6 +289,44 @@ Page({
     this.doSearch(tag);
   },
 
+  /* ---------------- 标签归并 ---------------- */
+  onOrganizeTags: function () {
+    var that = this;
+    api.readTagSuggest(function (data) {
+      var sug = data.suggestions || [];
+      if (!sug.length) {
+        wx.showToast({ title: '没发现可归并的重复标签', icon: 'none' });
+        return;
+      }
+      var items = sug.map(function (s) {
+        return '"' + s.from + '"(' + s.fromCount + ')\u2192"' + s.to + '"(' + s.toCount + ')';
+      });
+      wx.showActionSheet({
+        itemList: items.slice(0, 6),
+        success: function (r) {
+          var s = sug[r.tapIndex];
+          wx.showModal({
+            title: '归并标签',
+            content: '将 ' + s.fromCount + ' 篇的 #' + s.from + ' 改为 #' + s.to + '？',
+            confirmText: '归并',
+            success: function (m) {
+              if (!m.confirm) return;
+              api.readTagMerge(s.from, s.to, function (res) {
+                wx.showToast({ title: '已归并 ' + (res.changed || 0) + ' 篇', icon: 'success' });
+                that.loadTags();
+                that.loadList(true);
+              }, function () {
+                wx.showToast({ title: '归并失败', icon: 'none' });
+              });
+            }
+          });
+        }
+      });
+    }, function () {
+      wx.showToast({ title: '获取建议失败', icon: 'none' });
+    });
+  },
+
   /* ---------------- 索引诊断 ---------------- */
   onIndexInfo: function () {
     var that = this;

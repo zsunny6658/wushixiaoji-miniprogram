@@ -60,10 +60,20 @@
 }
 
 /* ---------- 标签 ---------- */
+.rd-tags-row {
+  display: flex; align-items: center; gap: 12rpx;
+  margin-bottom: var(--spacing-sm);
+}
 .rd-tags {
   white-space: nowrap;
-  margin-bottom: var(--spacing-sm);
-  width: 100%;
+  flex: 1;
+  min-width: 0;
+}
+.rd-tags-organize {
+  flex-shrink: 0;
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+  padding: 8rpx 8rpx;
 }
 .rd-tag {
   display: inline-block;

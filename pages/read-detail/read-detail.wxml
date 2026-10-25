@@ -90,7 +90,7 @@
     </block>
 
     <block wx:else>
-      <view wx:for="{{headBlocks}}" wx:key="index" wx:for-item="b">
+      <view wx:for="{{headBlocks}}" wx:key="index" wx:for-item="b" id="{{index === headHitIdx ? 'first-hit' : ''}}">
         <text wx:if="{{b.type === 'h1'}}" class="md-h1"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
         <text wx:elif="{{b.type === 'h2'}}" class="md-h2"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
         <text wx:elif="{{b.type === 'h3'}}" class="md-h3"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
@@ -112,7 +112,7 @@
         <view class="dt-expand" bindtap="onToggleAll">展开全文（还有 {{restBlocks.length}} 段）</view>
       </block>
       <block wx:if="{{showAll && restBlocks.length}}">
-        <view wx:for="{{restBlocks}}" wx:key="index" wx:for-item="b">
+        <view wx:for="{{restBlocks}}" wx:key="index" wx:for-item="b" id="{{index === restHitIdx ? 'first-hit' : ''}}">
           <text wx:if="{{b.type === 'h1'}}" class="md-h1"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
           <text wx:elif="{{b.type === 'h2'}}" class="md-h2"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
           <text wx:elif="{{b.type === 'h3'}}" class="md-h3"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>

@@ -33,9 +33,12 @@
   </view>
 
   <!-- 标签快捷入口 -->
-  <scroll-view wx:if="{{!searchResults && tags.length}}" class="rd-tags" scroll-x enable-flex>
-    <view class="rd-tag" wx:for="{{tags}}" wx:key="name" bindtap="onTagTap" data-tag="{{item.name}}">#{{item.name}}</view>
-  </scroll-view>
+  <view wx:if="{{!searchResults && tags.length}}" class="rd-tags-row">
+    <scroll-view class="rd-tags" scroll-x enable-flex>
+      <view class="rd-tag" wx:for="{{tags}}" wx:key="name" bindtap="onTagTap" data-tag="{{item.name}}">#{{item.name}}</view>
+    </scroll-view>
+    <text class="rd-tags-organize" bindtap="onOrganizeTags">整理</text>
+  </view>
 
   <!-- 搜索结果头部 -->
   <view wx:if="{{searchResults}}" class="rd-result-head">
