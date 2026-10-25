@@ -1,7 +1,7 @@
 <view class="page">
   <!-- 顶部：标题 + 添加 -->
   <view class="rd-head">
-    <view class="rd-head-left">
+    <view class="rd-head-left" bindtap="onIndexInfo">
       <text class="rd-title">待读</text>
       <text class="rd-sub">{{stats.unread}} 篇未读 · 共 {{stats.total}} 篇</text>
     </view>
@@ -62,7 +62,15 @@
 
       <text class="rd-card-title">{{item.title || item.url}}</text>
 
-      <text wx:if="{{item.summary}}" class="rd-card-summary">{{item.summary}}</text>
+      <text wx:if="{{item.summary && !item.snippetSegs}}" class="rd-card-summary">{{item.summary}}</text>
+      <view wx:if="{{item.snippetSegs}}" class="rd-card-summary rd-snippet">
+        <text
+          wx:for="{{item.snippetSegs}}"
+          wx:for-item="sg"
+          wx:key="index"
+          class="{{sg.hit ? 'hl' : ''}}"
+        >{{sg.t}}</text>
+      </view>
 
       <view wx:if="{{item.tagsText.length}}" class="rd-card-tags">
         <text class="rd-mini-tag" wx:for="{{item.tagsText}}" wx:for-item="tg" wx:key="*this">#{{tg}}</text>

@@ -79,13 +79,36 @@
 .dt-hl-text { flex: 1; font-size: var(--font-body-sm); color: var(--text-secondary); line-height: 1.6; }
 
 /* 标签 */
-.dt-tags { display: flex; flex-wrap: wrap; gap: 12rpx; margin-bottom: var(--spacing-sm); }
+.dt-tags { display: flex; flex-wrap: wrap; gap: 12rpx; margin-bottom: var(--spacing-sm); align-items: center; }
 .dt-tag {
+  display: flex; align-items: center; gap: 8rpx;
   font-size: var(--font-caption);
   color: var(--text-secondary);
   background: var(--bg-hover);
   padding: 8rpx 20rpx;
   border-radius: var(--radius-full);
+}
+.dt-tag-x {
+  font-size: 22rpx; color: var(--text-tertiary);
+  padding: 0 4rpx;
+}
+.dt-tag-add-wrap {
+  display: flex; align-items: center; gap: 8rpx;
+  border: 2rpx dashed var(--border);
+  border-radius: var(--radius-full);
+  padding: 4rpx 16rpx;
+}
+.dt-tag-input { width: 140rpx; font-size: var(--font-caption); min-height: 48rpx; height: 48rpx; line-height: 48rpx; }
+.dt-tag-ph { color: var(--text-disabled); }
+.dt-tag-add { font-size: var(--font-caption); color: var(--color-primary); font-weight: 600; }
+.dt-tag-edit { font-size: var(--font-caption); color: var(--text-tertiary); padding: 8rpx 8rpx; }
+
+/* 检索命中高亮（详情正文与标签复用） */
+.hl {
+  background: rgba(30, 91, 60, 0.14);
+  color: var(--color-primary);
+  border-radius: 4rpx;
+  font-weight: 600;
 }
 
 /* 抓取失败提示 */

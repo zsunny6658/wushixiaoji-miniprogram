@@ -46,9 +46,25 @@
     </view>
   </view>
 
-  <!-- 标签 -->
-  <view wx:if="{{item.tags.length}}" class="dt-tags">
-    <text class="dt-tag" wx:for="{{item.tags}}" wx:key="*this">#{{item}}</text>
+  <!-- 标签（可编辑） -->
+  <view class="dt-tags">
+    <view class="dt-tag" wx:for="{{item.tags}}" wx:key="*this">
+      <text>#{{item}}</text>
+      <text wx:if="{{editingTags}}" class="dt-tag-x" catchtap="onRemoveTag" data-tag="{{item}}">✕</text>
+    </view>
+    <view wx:if="{{editingTags}}" class="dt-tag-add-wrap">
+      <input
+        class="dt-tag-input"
+        value="{{newTag}}"
+        placeholder="新标签"
+        placeholder-class="dt-tag-ph"
+        maxlength="16"
+        bindinput="onNewTagInput"
+        bindconfirm="onAddTag"
+      />
+      <text class="dt-tag-add" bindtap="onAddTag">添加</text>
+    </view>
+    <text class="dt-tag-edit" bindtap="onToggleTagEdit">{{editingTags ? '完成' : '编辑'}}</text>
   </view>
 
   <!-- 抓取状态提示 -->
@@ -75,21 +91,21 @@
 
     <block wx:else>
       <view wx:for="{{headBlocks}}" wx:key="index" wx:for-item="b">
-        <text wx:if="{{b.type === 'h1'}}" class="md-h1">{{b.text}}</text>
-        <text wx:elif="{{b.type === 'h2'}}" class="md-h2">{{b.text}}</text>
-        <text wx:elif="{{b.type === 'h3'}}" class="md-h3">{{b.text}}</text>
-        <text wx:elif="{{b.type === 'h4'}}" class="md-h4">{{b.text}}</text>
+        <text wx:if="{{b.type === 'h1'}}" class="md-h1"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
+        <text wx:elif="{{b.type === 'h2'}}" class="md-h2"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
+        <text wx:elif="{{b.type === 'h3'}}" class="md-h3"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
+        <text wx:elif="{{b.type === 'h4'}}" class="md-h4"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
         <view wx:elif="{{b.type === 'li'}}" class="md-li">
           <text class="md-li-dot">•</text>
-          <text class="md-li-text">{{b.text}}</text>
+          <text class="md-li-text"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
         </view>
-        <view wx:elif="{{b.type === 'quote'}}" class="md-quote">{{b.text}}</view>
+        <view wx:elif="{{b.type === 'quote'}}" class="md-quote"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></view>
         <view wx:elif="{{b.type === 'img'}}" class="md-img-wrap">
           <image class="md-img" src="{{b.src}}" mode="widthFix" lazy-load />
         </view>
         <text wx:elif="{{b.type === 'code'}}" class="md-code">{{b.text}}</text>
         <view wx:elif="{{b.type === 'hr'}}" class="md-hr"></view>
-        <text wx:else class="md-p">{{b.text}}</text>
+        <text wx:else class="md-p"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
       </view>
 
       <block wx:if="{{!showAll && restBlocks.length}}">
@@ -97,21 +113,21 @@
       </block>
       <block wx:if="{{showAll && restBlocks.length}}">
         <view wx:for="{{restBlocks}}" wx:key="index" wx:for-item="b">
-          <text wx:if="{{b.type === 'h1'}}" class="md-h1">{{b.text}}</text>
-          <text wx:elif="{{b.type === 'h2'}}" class="md-h2">{{b.text}}</text>
-          <text wx:elif="{{b.type === 'h3'}}" class="md-h3">{{b.text}}</text>
-          <text wx:elif="{{b.type === 'h4'}}" class="md-h4">{{b.text}}</text>
+          <text wx:if="{{b.type === 'h1'}}" class="md-h1"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
+          <text wx:elif="{{b.type === 'h2'}}" class="md-h2"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
+          <text wx:elif="{{b.type === 'h3'}}" class="md-h3"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
+          <text wx:elif="{{b.type === 'h4'}}" class="md-h4"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
           <view wx:elif="{{b.type === 'li'}}" class="md-li">
             <text class="md-li-dot">•</text>
-            <text class="md-li-text">{{b.text}}</text>
+            <text class="md-li-text"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
           </view>
-          <view wx:elif="{{b.type === 'quote'}}" class="md-quote">{{b.text}}</view>
+          <view wx:elif="{{b.type === 'quote'}}" class="md-quote"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></view>
           <view wx:elif="{{b.type === 'img'}}" class="md-img-wrap">
             <image class="md-img" src="{{b.src}}" mode="widthFix" lazy-load />
           </view>
           <text wx:elif="{{b.type === 'code'}}" class="md-code">{{b.text}}</text>
           <view wx:elif="{{b.type === 'hr'}}" class="md-hr"></view>
-          <text wx:else class="md-p">{{b.text}}</text>
+          <text wx:else class="md-p"><block wx:if="{{b.segs}}"><text wx:for="{{b.segs}}" wx:for-item="sg" wx:key="index" class="{{sg.hit ? 'hl' : ''}}">{{sg.t}}</text></block><block wx:else>{{b.text}}</block></text>
         </view>
       </block>
     </block>

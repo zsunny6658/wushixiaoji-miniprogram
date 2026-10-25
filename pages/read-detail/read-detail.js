@@ -1,5 +1,6 @@
 // pages/read-detail/read-detail.js - 待读详情（摘要 + 正文原文）
 var api = require('../../utils/api');
+var hl = require('../../utils/highlight');
 
 /**
  * 极简 Markdown → 块数组（小程序没有成熟的 md 渲染器，正文用块级样式呈现即可）
@@ -62,7 +63,8 @@ function formatTime(iso) {
   return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
 }
 
-/** 去掉行内 md 标记（**加粗**、`code`、[文字](url)） */function clean(s) {
+/** 去掉行内 md 标记（**加粗**、`code`、[文字](url)） */
+function clean(s) {
   return String(s || '')
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
@@ -70,6 +72,14 @@ function formatTime(iso) {
     .replace(/(^|[^*])\*([^*]+)\*/g, '$1$2')
     .replace(/`([^`]+)`/g, '$1')
     .trim();
+}
+
+/** 命中的文本块 → 段数组（用于嵌套 <text> 高亮渲染）；无命中返回原样 */
+function markBlock(b, terms) {
+  if (!terms || !terms.length || !b || !b.text) return b;
+  var s = hl.segs(b.text, terms);
+  if (s) b.segs = s;
+  return b;
 }
 
 Page({
@@ -82,11 +92,15 @@ Page({
     contentEmpty: false,
     showAll: false,
     headBlocks: [],
-    restBlocks: []
+    restBlocks: [],
+    hlTerms: [],       // 检索态进入时的高亮词
+    editingTags: false,
+    newTag: ''
   },
 
   onLoad: function (options) {
-    this.setData({ id: options.id || '' });
+    var terms = hl.splitTerms(decodeURIComponent(options.q || ''));
+    this.setData({ id: options.id || '', hlTerms: terms });
     this.loadDetail();
   },
 
@@ -116,8 +130,10 @@ Page({
 
   loadContent: function () {
     var that = this;
+    var terms = this.data.hlTerms;
     api.readContent(this.data.id, function (data) {
       var blocks = parseMarkdown(data.content || '');
+      if (terms.length) blocks = blocks.map(function (b) { return markBlock(b, terms); });
       var head = [];
       var rest = blocks;
       // 首屏只渲染前 12 个块，其余「展开全文」，避免长文一次性渲染卡顿
@@ -134,7 +150,7 @@ Page({
         restBlocks: rest,
         contentLoading: false,
         contentEmpty: !blocks.length,
-        showAll: blocks.length <= 14
+        showAll: blocks.length <= 14 || !!terms.length
       });
     }, function () {
       that.setData({ contentLoading: false, contentEmpty: true });
@@ -198,6 +214,47 @@ Page({
     wx.setClipboardData({
       data: text,
       success: function () { wx.showToast({ title: '已复制摘要', icon: 'success' }); }
+    });
+  },
+
+  /* ---------------- 标签编辑 ---------------- */
+  onToggleTagEdit: function () {
+    this.setData({ editingTags: !this.data.editingTags });
+  },
+
+  onNewTagInput: function (e) {
+    this.setData({ newTag: e.detail.value });
+  },
+
+  onAddTag: function () {
+    var that = this;
+    var t = (this.data.newTag || '').trim().replace(/^#/, '');
+    if (!t) return;
+    var tags = (this.data.item.tags || []).slice();
+    if (tags.indexOf(t) >= 0) {
+      wx.showToast({ title: '已有这个标签', icon: 'none' });
+      return;
+    }
+    if (tags.length >= 12) {
+      wx.showToast({ title: '标签最多 12 个', icon: 'none' });
+      return;
+    }
+    tags.push(t);
+    api.readPatch(this.data.id, { tags: tags }, function (data) {
+      that.setData({ item: data.item, newTag: '' });
+    }, function () {
+      wx.showToast({ title: '保存失败', icon: 'none' });
+    });
+  },
+
+  onRemoveTag: function (e) {
+    var that = this;
+    var t = e.currentTarget.dataset.tag;
+    var tags = (this.data.item.tags || []).filter(function (x) { return x !== t; });
+    api.readPatch(this.data.id, { tags: tags }, function (data) {
+      that.setData({ item: data.item });
+    }, function () {
+      wx.showToast({ title: '删除失败', icon: 'none' });
     });
   },
 

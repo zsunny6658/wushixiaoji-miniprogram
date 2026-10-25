@@ -131,6 +131,13 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
+.rd-card-summary.rd-snippet { color: var(--text-secondary); }
+.hl {
+  background: rgba(30, 91, 60, 0.14);
+  color: var(--color-primary);
+  border-radius: 4rpx;
+  font-weight: 600;
+}
 .rd-card-tags { margin-top: 12rpx; display: flex; flex-wrap: wrap; gap: 10rpx; }
 .rd-mini-tag { font-size: var(--font-caption); color: var(--text-tertiary); }
 

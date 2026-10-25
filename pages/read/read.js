@@ -1,6 +1,7 @@
 // pages/read/read.js - 待读（个人知识库）
 // 设计要点：个人维度（服务端按 ownerId 隔离）、列表 + 混合检索、粘贴链接即抓取。
 var api = require('../../utils/api');
+var hl = require('../../utils/highlight');
 
 var PAGE_SIZE = 20;
 
@@ -182,7 +183,15 @@ Page({
     var that = this;
     this.setData({ searching: true });
     api.readSearch(kw, function (data) {
-      var results = decorateItems(data.items);
+      var terms = hl.splitTerms(kw);
+      var results = decorateItems(data.items).map(function (it) {
+        if (it.snippet) {
+          var s = hl.segs(it.snippet, terms);
+          if (s) it.snippetSegs = s;
+        }
+        return it;
+      });
+      that._lastTerms = terms;
       that.setData({ searching: false, searchResults: results, displayItems: results });
     }, function () {
       that.setData({ searching: false });
@@ -248,7 +257,12 @@ Page({
   /* ---------------- 打开 / 重试 ---------------- */
   onOpenItem: function (e) {
     var id = e.currentTarget.dataset.id;
-    wx.navigateTo({ url: '/pages/read-detail/read-detail?id=' + id });
+    var url = '/pages/read-detail/read-detail?id=' + id;
+    // 搜索态带上关键词，详情页正文高亮命中片段
+    if (this.data.searchResults && this.data.keyword.trim()) {
+      url += '&q=' + encodeURIComponent(this.data.keyword.trim());
+    }
+    wx.navigateTo({ url: url });
   },
 
   onRetry: function (e) {
@@ -273,6 +287,35 @@ Page({
     var tag = e.currentTarget.dataset.tag;
     this.setData({ keyword: tag });
     this.doSearch(tag);
+  },
+
+  /* ---------------- 索引诊断 ---------------- */
+  onIndexInfo: function () {
+    var that = this;
+    api.readIndexStats(function (data) {
+      var ix = data.index || {};
+      var lines = [
+        '已收录 ' + (ix.docs || 0) + ' 篇，索引就绪 ' + (ix.indexed || 0) + ' 篇',
+        '分块 ' + (ix.chunks || 0) + ' 块，全文索引 ' + (ix.ftsRows || 0) + ' 行',
+        '向量引擎 ' + (ix.engine || '-') + ' · ' + (ix.dim || 0) + ' 维'
+      ].join('\n');
+      wx.showModal({
+        title: '检索索引',
+        content: lines,
+        confirmText: '重建',
+        cancelText: '关闭',
+        success: function (r) {
+          if (!r.confirm) return;
+          api.readIndexRebuild(function (res) {
+            wx.showToast({ title: '已重建 ' + (res.rebuilt || 0) + ' 篇', icon: 'success' });
+          }, function () {
+            wx.showToast({ title: '重建失败', icon: 'none' });
+          });
+        }
+      });
+    }, function () {
+      wx.showToast({ title: '获取索引状态失败', icon: 'none' });
+    });
   },
 
   noop: function () {}

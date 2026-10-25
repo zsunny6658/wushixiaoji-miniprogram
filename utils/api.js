@@ -298,6 +298,12 @@ var API = {
   readTags: function (cb, errCb) {
     this.request('GET', '/api/read/tags', null, cb, errCb);
   },
+  readIndexStats: function (cb, errCb) {
+    this.request('GET', '/api/read/index/stats', null, cb, errCb);
+  },
+  readIndexRebuild: function (cb, errCb) {
+    this.request('POST', '/api/read/index/rebuild', {}, cb, errCb);
+  },
 
   // 附件（v0.17.0）
   // 批量签发图片预览 URL（带过期签名，<image> 标签可直接引用）
