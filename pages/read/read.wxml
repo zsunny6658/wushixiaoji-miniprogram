@@ -1,0 +1,116 @@
+<view class="page">
+  <!-- 顶部：标题 + 添加 -->
+  <view class="rd-head">
+    <view class="rd-head-left">
+      <text class="rd-title">待读</text>
+      <text class="rd-sub">{{stats.unread}} 篇未读 · 共 {{stats.total}} 篇</text>
+    </view>
+    <view class="rd-add-btn" bindtap="onOpenAdd">
+      <ficon name="plus" size="34" color="#FFFFFF" />
+    </view>
+  </view>
+
+  <!-- 搜索 -->
+  <view class="rd-search">
+    <ficon name="search" size="30" color="#9AA396" />
+    <input
+      class="rd-search-input"
+      value="{{keyword}}"
+      placeholder="搜索标题或正文内容"
+      placeholder-class="rd-search-ph"
+      confirm-type="search"
+      bindinput="onSearchInput"
+      bindconfirm="onSearchConfirm"
+    />
+    <view wx:if="{{keyword}}" class="rd-search-clear" catchtap="onClearSearch">✕</view>
+  </view>
+
+  <!-- 筛选（搜索结果模式下隐藏） -->
+  <view wx:if="{{!searchResults}}" class="rd-filters">
+    <view class="rd-filter {{filter === 'all' ? 'on' : ''}}" bindtap="onFilter" data-filter="all">全部</view>
+    <view class="rd-filter {{filter === 'unread' ? 'on' : ''}}" bindtap="onFilter" data-filter="unread">未读 {{stats.unread}}</view>
+    <view class="rd-filter {{filter === 'done' ? 'on' : ''}}" bindtap="onFilter" data-filter="done">已读 {{stats.done}}</view>
+  </view>
+
+  <!-- 标签快捷入口 -->
+  <scroll-view wx:if="{{!searchResults && tags.length}}" class="rd-tags" scroll-x enable-flex>
+    <view class="rd-tag" wx:for="{{tags}}" wx:key="name" bindtap="onTagTap" data-tag="{{item.name}}">#{{item.name}}</view>
+  </scroll-view>
+
+  <!-- 搜索结果头部 -->
+  <view wx:if="{{searchResults}}" class="rd-result-head">
+    <text class="rd-result-text">找到 {{searchResults.length}} 条相关内容</text>
+    <text class="rd-result-clear" catchtap="onClearSearch">清除</text>
+  </view>
+
+  <!-- 列表 -->
+  <view wx:if="{{loading}}" class="rd-loading">加载中…</view>
+
+  <block wx:elif="{{(searchResults || items).length}}">
+    <view
+      class="rd-card {{item.unread ? 'is-unread' : ''}}"
+      wx:for="{{searchResults || items}}"
+      wx:key="id"
+      bindtap="onOpenItem"
+      data-id="{{item.id}}"
+    >
+      <view class="rd-card-top">
+        <text class="rd-plat plat-{{item.platform}}">{{item.platformLabel}}</text>
+        <text class="rd-time">{{item.timeLabel}}</text>
+        <view wx:if="{{item.unread}}" class="rd-dot"></view>
+      </view>
+
+      <text class="rd-card-title">{{item.title || item.url}}</text>
+
+      <text wx:if="{{item.summary}}" class="rd-card-summary">{{item.summary}}</text>
+
+      <view wx:if="{{item.tagsText.length}}" class="rd-card-tags">
+        <text class="rd-mini-tag" wx:for="{{item.tagsText}}" wx:for-item="tg" wx:key="*this">#{{tg}}</text>
+      </view>
+
+      <view wx:if="{{item.statusText}}" class="rd-card-status {{item.failed ? 'is-failed' : ''}}">
+        <text>{{item.statusText}}</text>
+        <text wx:if="{{item.failed}}" class="rd-retry" catchtap="onRetry" data-id="{{item.id}}">重新解析</text>
+      </view>
+    </view>
+
+    <view wx:if="{{!searchResults && loadingMore}}" class="rd-more">加载更多…</view>
+    <view wx:elif="{{!searchResults && !hasMore && items.length >= 6}}" class="rd-more">— 到底啦 —</view>
+  </block>
+
+  <view wx:elif="{{!searching}}" class="rd-empty">
+    <ficon name="book" size="96" color="#C9CFC2" />
+    <text class="rd-empty-title">{{searchResults ? '没找到相关内容' : '还没有待读内容'}}</text>
+    <text class="rd-empty-desc">{{searchResults ? '换个关键词试试，或补充更完整的一句描述' : '粘贴公众号 / 小红书 / B站 / 网页链接，自动抓取正文并生成摘要'}}</text>
+    <view wx:if="{{!searchResults}}" class="rd-empty-btn" bindtap="onOpenAdd">添加第一篇</view>
+  </view>
+
+  <!-- 添加弹窗 -->
+  <view wx:if="{{showAdd}}" class="rd-mask" catchtap="onCloseAdd">
+    <view class="rd-sheet" catchtap="noop">
+      <view class="rd-sheet-title">添加待读</view>
+      <text class="rd-sheet-desc">支持公众号文章、小红书、抖音、B站、知乎与普通网页。粘贴分享文案也可以，会自动识别里面的链接。</text>
+      <textarea
+        class="rd-textarea"
+        value="{{addText}}"
+        placeholder="粘贴链接，例如 https://mp.weixin.qq.com/s/..."
+        placeholder-class="rd-ph"
+        maxlength="2000"
+        auto-height
+        bindinput="onAddTextInput"
+      />
+      <input
+        class="rd-note-input"
+        value="{{addNote}}"
+        placeholder="备注（可选，比如为什么想读）"
+        placeholder-class="rd-ph"
+        maxlength="80"
+        bindinput="onAddNoteInput"
+      />
+      <view class="rd-sheet-actions">
+        <button class="btn-sm btn-outline" bindtap="onCloseAdd">取消</button>
+        <button class="btn-sm btn-primary" loading="{{adding}}" bindtap="onConfirmAdd">开始解析</button>
+      </view>
+    </view>
+  </view>
+</view>

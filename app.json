@@ -2,6 +2,8 @@
   "pages": [
     "pages/overview/overview",
     "pages/list/list",
+    "pages/read/read",
+    "pages/read-detail/read-detail",
     "pages/quadrant/quadrant",
     "pages/me/me",
     "pages/login/login",
@@ -41,10 +43,8 @@
         "selectedIconPath": "images/list-active.png"
       },
       {
-        "pagePath": "pages/quadrant/quadrant",
-        "text": "四象限",
-        "iconPath": "images/quadrant.png",
-        "selectedIconPath": "images/quadrant-active.png"
+        "pagePath": "pages/read/read",
+        "text": "待读"
       },
       {
         "pagePath": "pages/me/me",

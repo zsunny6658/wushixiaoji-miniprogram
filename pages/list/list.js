@@ -107,6 +107,8 @@ Page({
     var gd = app.globalData;
     var pkgs = (gd.packages || []).map(function (p) { return helpers.decorate(p, gd.members); });
 
+    // 待读有自己的 Tab，不混进小记列表
+    pkgs = pkgs.filter(function (p) { return p.type !== 'read'; });
 
     if (this.data.recordType !== 'all') pkgs = pkgs.filter(function (p) { return p.type === this.data.recordType; }.bind(this));
     // 个人可见性过滤（后端已过滤，这里兜底）

@@ -1,0 +1,125 @@
+<view class="page" wx:if="{{item}}">
+  <!-- 标题区 -->
+  <view class="dt-head">
+    <text class="dt-plat plat-{{item.platform}}">{{item.platformLabel}}</text>
+    <text class="dt-title">{{item.title || item.url}}</text>
+    <view class="dt-meta">
+      <text wx:if="{{item.author}}" class="dt-meta-item">{{item.author}}</text>
+      <text wx:if="{{item.publishedAt}}" class="dt-meta-item">{{item.publishedAt}}</text>
+      <text wx:if="{{item.contentChars}}" class="dt-meta-item">{{item.contentChars}} 字</text>
+    </view>
+  </view>
+
+  <!-- 操作条 -->
+  <view class="dt-actions">
+    <view class="dt-act" bindtap="onMark" data-status="done">
+      <ficon name="check-circle" size="30" color="{{item.readStatus === 'done' ? '#1E5B3C' : '#64705F'}}" />
+      <text class="dt-act-text {{item.readStatus === 'done' ? 'on' : ''}}">{{item.readStatus === 'done' ? '已读' : '标为已读'}}</text>
+    </view>
+    <view class="dt-act" bindtap="onCopyLink">
+      <ficon name="external" size="30" color="#64705F" />
+      <text class="dt-act-text">复制链接</text>
+    </view>
+    <view class="dt-act" bindtap="onCopySummary">
+      <ficon name="copy" size="30" color="#64705F" />
+      <text class="dt-act-text">复制摘要</text>
+    </view>
+    <view class="dt-act" bindtap="onDelete">
+      <ficon name="trash" size="30" color="#EF5350" />
+      <text class="dt-act-text danger">删除</text>
+    </view>
+  </view>
+
+  <!-- 摘要 -->
+  <view wx:if="{{item.summary}}" class="dt-section">
+    <view class="dt-section-head">
+      <text class="dt-section-title">摘要</text>
+      <text class="dt-section-hint">{{item.wordCount ? 'AI 提炼' : ''}}</text>
+    </view>
+    <text class="dt-summary">{{item.summary}}</text>
+
+    <view wx:if="{{item.highlights.length}}" class="dt-hl">
+      <view class="dt-hl-item" wx:for="{{item.highlights}}" wx:key="*this">
+        <text class="dt-hl-dot">·</text>
+        <text class="dt-hl-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 标签 -->
+  <view wx:if="{{item.tags.length}}" class="dt-tags">
+    <text class="dt-tag" wx:for="{{item.tags}}" wx:key="*this">#{{item}}</text>
+  </view>
+
+  <!-- 抓取状态提示 -->
+  <view wx:if="{{item.contentStatus === 'failed'}}" class="dt-warn">
+    <text class="dt-warn-text">正文抓取失败：{{item.contentError || '该站点可能反爬或需要登录'}}</text>
+    <text class="dt-warn-btn" bindtap="onRefetch">重新解析</text>
+  </view>
+  <view wx:elif="{{item.contentStatus === 'pending' || item.contentStatus === 'fetching'}}" class="dt-warn is-info">
+    <text class="dt-warn-text">正在抓取正文并建立索引，稍后下拉刷新查看</text>
+  </view>
+
+  <!-- 正文 -->
+  <view class="dt-section">
+    <view class="dt-section-head">
+      <text class="dt-section-title">正文</text>
+      <text class="dt-section-hint">来自原页面快照</text>
+    </view>
+
+    <view wx:if="{{contentLoading}}" class="dt-loading">正文加载中…</view>
+
+    <block wx:elif="{{contentEmpty}}">
+      <text class="dt-empty">{{item.contentStatus === 'failed' ? '正文未抓取到，可点上方「复制链接」在浏览器阅读。' : '暂无正文快照。'}}</text>
+    </block>
+
+    <block wx:else>
+      <view wx:for="{{headBlocks}}" wx:key="index" wx:for-item="b">
+        <text wx:if="{{b.type === 'h1'}}" class="md-h1">{{b.text}}</text>
+        <text wx:elif="{{b.type === 'h2'}}" class="md-h2">{{b.text}}</text>
+        <text wx:elif="{{b.type === 'h3'}}" class="md-h3">{{b.text}}</text>
+        <text wx:elif="{{b.type === 'h4'}}" class="md-h4">{{b.text}}</text>
+        <view wx:elif="{{b.type === 'li'}}" class="md-li">
+          <text class="md-li-dot">•</text>
+          <text class="md-li-text">{{b.text}}</text>
+        </view>
+        <view wx:elif="{{b.type === 'quote'}}" class="md-quote">{{b.text}}</view>
+        <view wx:elif="{{b.type === 'img'}}" class="md-img-wrap">
+          <image class="md-img" src="{{b.src}}" mode="widthFix" lazy-load />
+        </view>
+        <text wx:elif="{{b.type === 'code'}}" class="md-code">{{b.text}}</text>
+        <view wx:elif="{{b.type === 'hr'}}" class="md-hr"></view>
+        <text wx:else class="md-p">{{b.text}}</text>
+      </view>
+
+      <block wx:if="{{!showAll && restBlocks.length}}">
+        <view class="dt-expand" bindtap="onToggleAll">展开全文（还有 {{restBlocks.length}} 段）</view>
+      </block>
+      <block wx:if="{{showAll && restBlocks.length}}">
+        <view wx:for="{{restBlocks}}" wx:key="index" wx:for-item="b">
+          <text wx:if="{{b.type === 'h1'}}" class="md-h1">{{b.text}}</text>
+          <text wx:elif="{{b.type === 'h2'}}" class="md-h2">{{b.text}}</text>
+          <text wx:elif="{{b.type === 'h3'}}" class="md-h3">{{b.text}}</text>
+          <text wx:elif="{{b.type === 'h4'}}" class="md-h4">{{b.text}}</text>
+          <view wx:elif="{{b.type === 'li'}}" class="md-li">
+            <text class="md-li-dot">•</text>
+            <text class="md-li-text">{{b.text}}</text>
+          </view>
+          <view wx:elif="{{b.type === 'quote'}}" class="md-quote">{{b.text}}</view>
+          <view wx:elif="{{b.type === 'img'}}" class="md-img-wrap">
+            <image class="md-img" src="{{b.src}}" mode="widthFix" lazy-load />
+          </view>
+          <text wx:elif="{{b.type === 'code'}}" class="md-code">{{b.text}}</text>
+          <view wx:elif="{{b.type === 'hr'}}" class="md-hr"></view>
+          <text wx:else class="md-p">{{b.text}}</text>
+        </view>
+      </block>
+    </block>
+  </view>
+
+  <view class="dt-foot">
+    <text class="dt-foot-text">收藏于 {{item.createdLabel}}</text>
+  </view>
+</view>
+
+<view wx:else class="page dt-loading">加载中…</view>

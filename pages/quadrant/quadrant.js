@@ -11,7 +11,6 @@ Page({
 
   onShow: function () {
     if (!app.globalData.token) { wx.reLaunch({ url: '/pages/login/login' }); return; }
-    if (this.getTabBar) this.getTabBar().setData({ active: 2 });
     var that = this;
     app.refreshState(function () { that.compute(); });
   },
@@ -26,7 +25,8 @@ Page({
   compute: function () {
     var gd = app.globalData;
     var pkgs = (gd.packages || []).map(function (p) { return helpers.decorate(p, gd.members); });
-    var pending = pkgs.filter(function (p) { return p.status === 'pending'; });
+    // 待读是个人维度内容，不进家庭四象限
+    var pending = pkgs.filter(function (p) { return p.status === 'pending' && p.type !== 'read'; });
     var quads = { q1: [], q2: [], q3: [], q4: [] };
     pending.forEach(function (p) {
       var important = (p.importance || 'medium') === 'high';

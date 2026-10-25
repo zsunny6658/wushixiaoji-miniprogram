@@ -39,9 +39,11 @@ Page({
   compute: function () {
     var gd = app.globalData;
     var pkgs = (gd.packages || []).map(function (p) { return helpers.decorate(p, gd.members); });
+    // 待读是个人阅读 Tab 的内容，不进概览的四象限与动态流
+    var homePkgs = pkgs.filter(function (p) { return p.type !== 'read'; });
 
     // 四象限统计
-    var quadPkgs = pkgs.filter(function (p) { return p.status === 'pending'; });
+    var quadPkgs = homePkgs.filter(function (p) { return p.status === 'pending'; });
     var counts = { q1: 0, q2: 0, q3: 0, q4: 0 };
     quadPkgs.forEach(function (p) {
       var important = (p.importance || 'medium') === 'high';
@@ -67,7 +69,7 @@ Page({
       return (t.getMonth() + 1) + '月' + t.getDate() + '日';
     }
     var acts = [];
-    pkgs.forEach(function (p) {
+    homePkgs.forEach(function (p) {
       if (p.createdAt && new Date(p.createdAt).getTime() >= cutoff.getTime()) {
         acts.push({ id: p.id + ':new', pkgId: p.id, time: p.createdAt, dayLabel: dayLabelOf(p.createdAt), iconName: p.type === 'pickup' ? 'box' : (p.type === 'debt' ? 'creditcard' : (p.type === 'medication' ? 'pill' : 'clipboard')),
           text: '新增「' + (p.summaryText || p.title || p.code || '') + '」', cls: 'act-new' });
@@ -150,7 +152,7 @@ Page({
     app.globalData._deepLinkFilter = { recordType: 'all', filter: 'ignored' };
     wx.switchTab({ url: '/pages/list/list' });
   },
-  onGoQuadrant: function () { wx.switchTab({ url: '/pages/quadrant/quadrant' }); },
+  onGoQuadrant: function () { wx.navigateTo({ url: '/pages/quadrant/quadrant' }); },
   onSearchInput: function (e) {
     this.setData({ searchKeyword: e.detail.value });
   },
@@ -165,7 +167,7 @@ Page({
   onGoQuadrantDetail: function (e) {
     var quad = e.currentTarget.dataset.quad;
     app.globalData._focusQuad = quad;
-    wx.switchTab({ url: '/pages/quadrant/quadrant' });
+    wx.navigateTo({ url: '/pages/quadrant/quadrant' });
   },
   onShareAppMessage: function () {
     return { title: '屋事小记 - 家庭快递取件码共享', path: '/pages/overview/overview' };

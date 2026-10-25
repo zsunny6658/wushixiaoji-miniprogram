@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "待读",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "ficon": "/components/ficon/index"
+  }
+}

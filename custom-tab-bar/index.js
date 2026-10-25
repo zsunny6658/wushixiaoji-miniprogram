@@ -21,7 +21,7 @@ Component({
       var urls = {
         0: '/pages/overview/overview',
         1: '/pages/list/list',
-        2: '/pages/quadrant/quadrant',
+        2: '/pages/read/read',
         3: '/pages/me/me'
       };
       var url = urls[idx];

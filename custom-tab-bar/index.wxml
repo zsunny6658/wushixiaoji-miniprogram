@@ -14,8 +14,8 @@
     </view>
   </view>
   <view class="tab-item {{active === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">
-    <ficon name="target" size="40" color="{{active === 2 ? '#1E5B3C' : '#9CA3AF'}}" />
-    <text class="tab-text">四象限</text>
+    <ficon name="book" size="40" color="{{active === 2 ? '#1E5B3C' : '#9CA3AF'}}" />
+    <text class="tab-text">待读</text>
   </view>
   <view class="tab-item {{active === 3 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="3">
     <ficon name="user" size="40" color="{{active === 3 ? '#1E5B3C' : '#9CA3AF'}}" />

@@ -262,6 +262,43 @@ var API = {
     this.request('GET', '/api/drugs/search', { name: name }, cb, errCb);
   },
 
+  // 待读 / 个人知识库（v0.18.0）
+  readList: function (params, cb, errCb) {
+    var p = params || {};
+    var qs = [];
+    ['status', 'platform', 'tag', 'q', 'sort', 'limit', 'offset'].forEach(function (k) {
+      if (p[k] !== undefined && p[k] !== null && p[k] !== '') qs.push(k + '=' + encodeURIComponent(p[k]));
+    });
+    this.request('GET', '/api/read' + (qs.length ? '?' + qs.join('&') : ''), null, cb, errCb);
+  },
+  readAdd: function (url, note, cb, errCb) {
+    this.request('POST', '/api/read', { url: url, note: note || '' }, cb, errCb);
+  },
+  readDetail: function (id, cb, errCb) {
+    this.request('GET', '/api/read/' + id, null, cb, errCb);
+  },
+  readContent: function (id, cb, errCb) {
+    this.request('GET', '/api/read/' + id + '/content', null, cb, errCb);
+  },
+  readPatch: function (id, data, cb, errCb) {
+    this.request('PATCH', '/api/read/' + id, data, cb, errCb);
+  },
+  readDelete: function (id, cb, errCb) {
+    this.request('DELETE', '/api/read/' + id, null, cb, errCb);
+  },
+  readRefetch: function (id, cb, errCb) {
+    this.request('POST', '/api/read/' + id + '/refetch', {}, cb, errCb);
+  },
+  readSearch: function (q, cb, errCb) {
+    this.request('GET', '/api/read/search?q=' + encodeURIComponent(q), null, cb, errCb);
+  },
+  readStats: function (cb, errCb) {
+    this.request('GET', '/api/read/stats', null, cb, errCb);
+  },
+  readTags: function (cb, errCb) {
+    this.request('GET', '/api/read/tags', null, cb, errCb);
+  },
+
   // 附件（v0.17.0）
   // 批量签发图片预览 URL（带过期签名，<image> 标签可直接引用）
   signFileUrls: function (ids, cb, errCb) {
