@@ -44,6 +44,7 @@ function decorateItems(list) {
 Page({
   data: {
     items: [],
+    displayItems: [],
     stats: { total: 0, unread: 0, reading: 0, done: 0, pending: 0, failed: 0 },
     filter: 'all',          // all | unread | done
     keyword: '',
@@ -125,6 +126,7 @@ Page({
         var items = reset ? incoming : that.data.items.concat(incoming);
         that.setData({
           items: items,
+          displayItems: that.data.searchResults ? that.data.searchResults : items,
           stats: data.stats || that.data.stats,
           offset: offset + (data.items || []).length,
           hasMore: !!data.hasMore,
@@ -152,7 +154,7 @@ Page({
   onFilter: function (e) {
     var f = e.currentTarget.dataset.filter;
     if (f === this.data.filter) return;
-    this.setData({ filter: f, items: [], offset: 0, keyword: '', searchResults: null });
+    this.setData({ filter: f, items: [], displayItems: [], offset: 0, keyword: '', searchResults: null });
     this.loadList(true);
   },
 
@@ -163,7 +165,7 @@ Page({
     if (this._timer) clearTimeout(this._timer);
     var that = this;
     if (!kw.trim()) {
-      this.setData({ searchResults: null, searching: false });
+      this.setData({ searchResults: null, searching: false, displayItems: this.data.items });
       return;
     }
     this._timer = setTimeout(function () {
@@ -180,14 +182,15 @@ Page({
     var that = this;
     this.setData({ searching: true });
     api.readSearch(kw, function (data) {
-      that.setData({ searching: false, searchResults: decorateItems(data.items) });
+      var results = decorateItems(data.items);
+      that.setData({ searching: false, searchResults: results, displayItems: results });
     }, function () {
       that.setData({ searching: false });
     });
   },
 
   onClearSearch: function () {
-    this.setData({ keyword: '', searchResults: null, searching: false });
+    this.setData({ keyword: '', searchResults: null, searching: false, displayItems: this.data.items });
   },
 
   /* ---------------- 添加 ---------------- */

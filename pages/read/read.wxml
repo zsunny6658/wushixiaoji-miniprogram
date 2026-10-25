@@ -46,10 +46,10 @@
   <!-- 列表 -->
   <view wx:if="{{loading}}" class="rd-loading">加载中…</view>
 
-  <block wx:elif="{{(searchResults || items).length}}">
+  <block wx:elif="{{displayItems.length}}">
     <view
       class="rd-card {{item.unread ? 'is-unread' : ''}}"
-      wx:for="{{searchResults || items}}"
+      wx:for="{{displayItems}}"
       wx:key="id"
       bindtap="onOpenItem"
       data-id="{{item.id}}"
