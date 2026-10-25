@@ -1,0 +1,76 @@
+<view class="qa-page">
+  <scroll-view class="qa-scroll" scroll-y scroll-into-view="{{scrollInto}}" scroll-with-animation>
+    <view class="qa-list">
+
+      <!-- 欢迎 & 建议 -->
+      <view class="qa-welcome">
+        <view class="qa-welcome-title">基于你的待读知识库回答</view>
+        <view class="qa-welcome-sub">只依据已收藏文章的正文内容，据实回答并标注来源；库里没有的会明说。</view>
+        <view class="qa-suggests">
+          <view class="qa-suggest" wx:for="{{suggestions}}" wx:key="*this" bindtap="onSuggestTap" data-q="{{item}}">{{item}}</view>
+        </view>
+      </view>
+
+      <!-- 消息 -->
+      <block wx:for="{{messages}}" wx:key="id">
+        <!-- 用户 -->
+        <view wx:if="{{item.role === 'user'}}" class="qa-row qa-row-user">
+          <view class="qa-bubble qa-bubble-user">{{item.text}}</view>
+        </view>
+
+        <!-- AI -->
+        <view wx:else class="qa-row qa-row-ai">
+          <view class="qa-bubble qa-bubble-ai">
+            <text>{{item.text}}</text>
+            <view wx:if="{{item.sources.length}}" class="qa-srcs">
+              <view class="qa-srcs-label">来源</view>
+              <view
+                wx:for="{{item.sources}}"
+                wx:for-item="s"
+                wx:key="no"
+                class="qa-src"
+                bindtap="onSourceTap"
+                data-id="{{s.id}}"
+              >
+                <text class="qa-src-no">[{{s.no}}]</text>
+                <text class="qa-src-title">{{s.title}}</text>
+                <text class="qa-src-plat">{{s.platformLabel}}</text>
+              </view>
+            </view>
+            <view wx:if="{{item.extractive}}" class="qa-note">（降级回答：未配置大模型或生成失败）</view>
+            <view class="qa-copy" bindtap="onCopy" data-text="{{item.text}}">复制回答</view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 思考中 -->
+      <view wx:if="{{sending}}" class="qa-row qa-row-ai">
+        <view class="qa-bubble qa-bubble-ai qa-thinking">
+          <text class="qa-dot"></text><text class="qa-dot qa-dot2"></text><text class="qa-dot qa-dot3"></text>
+          <text class="qa-thinking-text">正在检索知识库…</text>
+        </view>
+      </view>
+
+      <view id="qa-bottom" class="qa-bottom-anchor"></view>
+    </view>
+  </scroll-view>
+
+  <!-- 输入区 -->
+  <view class="qa-input-bar">
+    <input
+      class="qa-input"
+      value="{{input}}"
+      placeholder="问问知识库里的文章…"
+      placeholder-class="qa-input-ph"
+      confirm-type="send"
+      confirm-hold
+      bindinput="onInput"
+      bindconfirm="onSend"
+      disabled="{{sending}}"
+      maxlength="500"
+    />
+    <view class="qa-send {{canSend ? 'on' : ''}}" bindtap="onSend">
+      <ficon name="send" size="32" color="#FFFFFF" />
+    </view>
+  </view>
+</view>

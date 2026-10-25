@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "知识库问答",
+  "usingComponents": {
+    "ficon": "/components/ficon/index"
+  }
+}

@@ -202,6 +202,11 @@ Page({
     this.setData({ keyword: '', searchResults: null, searching: false, displayItems: this.data.items });
   },
 
+  /* ---------------- AI 问答 ---------------- */
+  onOpenAsk: function () {
+    wx.navigateTo({ url: '/pages/read-ask/read-ask' });
+  },
+
   /* ---------------- 添加 ---------------- */
   onOpenAdd: function () {
     var that = this;

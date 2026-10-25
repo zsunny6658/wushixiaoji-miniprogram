@@ -295,6 +295,9 @@ var API = {
   readSearch: function (q, cb, errCb) {
     this.request('GET', '/api/read/search?q=' + encodeURIComponent(q), null, cb, errCb);
   },
+  readAsk: function (question, cb, errCb) {
+    this.request('POST', '/api/read/ask', { question: question }, cb, errCb);
+  },
   readStats: function (cb, errCb) {
     this.request('GET', '/api/read/stats', null, cb, errCb);
   },

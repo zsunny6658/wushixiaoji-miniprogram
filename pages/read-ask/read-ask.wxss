@@ -1,0 +1,166 @@
+/* pages/read-ask/read-ask.wxss - 知识库问答 */
+.qa-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-page);
+  box-sizing: border-box;
+}
+
+.qa-scroll {
+  flex: 1;
+  overflow: hidden;
+  /* 底部输入条是 fixed，留出高度 */
+  padding-bottom: 20rpx;
+}
+
+.qa-list {
+  padding: var(--spacing-md);
+}
+
+.qa-bottom-anchor { height: 8rpx; }
+
+/* ---------- 欢迎区 ---------- */
+.qa-welcome {
+  background: var(--bg-card);
+  border: 2rpx solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+.qa-welcome-title {
+  font-size: var(--font-body);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+}
+.qa-welcome-sub {
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-sm);
+}
+.qa-suggests { display: flex; flex-direction: column; gap: 12rpx; }
+.qa-suggest {
+  font-size: var(--font-caption);
+  color: var(--color-primary);
+  background: rgba(30, 91, 60, 0.06);
+  border-radius: var(--radius-md);
+  padding: 16rpx 20rpx;
+}
+
+/* ---------- 消息 ---------- */
+.qa-row { display: flex; margin-bottom: var(--spacing-sm); }
+.qa-row-user { justify-content: flex-end; }
+.qa-row-ai { justify-content: flex-start; }
+
+.qa-bubble {
+  max-width: 86%;
+  padding: 20rpx 24rpx;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-body-sm);
+  line-height: 1.7;
+  word-break: break-all;
+}
+.qa-bubble-user {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border-bottom-right-radius: 8rpx;
+}
+.qa-bubble-ai {
+  background: var(--bg-card);
+  border: 2rpx solid var(--border);
+  color: var(--text-primary);
+  border-bottom-left-radius: 8rpx;
+}
+
+/* ---------- 来源 ---------- */
+.qa-srcs {
+  margin-top: 16rpx;
+  padding-top: 14rpx;
+  border-top: 2rpx solid var(--border);
+}
+.qa-srcs-label {
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+  margin-bottom: 8rpx;
+}
+.qa-src {
+  display: flex;
+  align-items: center;
+  padding: 10rpx 0;
+}
+.qa-src-no { flex-shrink: 0; font-size: var(--font-caption); color: var(--color-primary); margin-right: 10rpx; }
+.qa-src-title {
+  flex: 1;
+  font-size: var(--font-caption);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.qa-src-plat {
+  flex-shrink: 0;
+  font-size: 20rpx;
+  color: var(--text-tertiary);
+  margin-left: 12rpx;
+}
+
+.qa-note {
+  margin-top: 12rpx;
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+}
+.qa-copy {
+  margin-top: 12rpx;
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+}
+
+/* ---------- 思考动画 ---------- */
+.qa-thinking { display: flex; align-items: center; }
+.qa-thinking-text { margin-left: 14rpx; font-size: var(--font-caption); color: var(--text-tertiary); }
+.qa-dot {
+  width: 12rpx; height: 12rpx;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  opacity: 0.4;
+  animation: qa-blink 1.2s infinite;
+}
+.qa-dot2 { animation-delay: 0.2s; margin-left: 8rpx; }
+.qa-dot3 { animation-delay: 0.4s; margin-left: 8rpx; }
+@keyframes qa-blink {
+  0%, 80%, 100% { opacity: 0.25; }
+  40% { opacity: 1; }
+}
+
+/* ---------- 输入条 ---------- */
+.qa-input-bar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: var(--spacing-sm) var(--spacing-md) calc(var(--spacing-sm) + env(safe-area-inset-bottom));
+  background: var(--bg-card);
+  border-top: 2rpx solid var(--border);
+  box-sizing: border-box;
+}
+.qa-input {
+  flex: 1;
+  background: var(--bg-page);
+  border-radius: var(--radius-md);
+  padding: 18rpx 24rpx;
+  font-size: var(--font-body-sm);
+  color: var(--text-primary);
+}
+.qa-input-ph { color: var(--text-tertiary); }
+.qa-send {
+  flex-shrink: 0;
+  width: 72rpx; height: 72rpx;
+  border-radius: 50%;
+  background: var(--border);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.qa-send.on { background: var(--color-primary); }

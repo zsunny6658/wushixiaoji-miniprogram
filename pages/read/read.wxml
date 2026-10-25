@@ -5,6 +5,10 @@
       <text class="rd-title">待读</text>
       <text class="rd-sub">{{stats.unread}} 篇未读 · 共 {{stats.total}} 篇</text>
     </view>
+    <view class="rd-ask-btn" bindtap="onOpenAsk">
+      <ficon name="zap" size="30" color="#1E5B3C" />
+      <text class="rd-ask-btn-text">AI 问答</text>
+    </view>
     <view class="rd-add-btn" bindtap="onOpenAdd">
       <ficon name="plus" size="34" color="#FFFFFF" />
     </view>

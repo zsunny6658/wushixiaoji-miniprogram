@@ -261,3 +261,15 @@
   margin-top: var(--spacing-md);
 }
 .rd-sheet-actions .btn-sm { flex: 1; }
+
+/* AI 问答入口 */
+.rd-ask-btn {
+  display: flex; align-items: center; gap: 6rpx;
+  padding: 14rpx 20rpx;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-light);
+  flex-shrink: 0;
+  margin-right: 16rpx;
+}
+.rd-ask-btn:active { transform: scale(0.96); }
+.rd-ask-btn-text { font-size: var(--font-caption); color: var(--color-primary); font-weight: 500; }

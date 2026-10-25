@@ -4,6 +4,7 @@
     "pages/list/list",
     "pages/read/read",
     "pages/read-detail/read-detail",
+    "pages/read-ask/read-ask",
     "pages/quadrant/quadrant",
     "pages/me/me",
     "pages/login/login",
