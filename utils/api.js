@@ -4,6 +4,31 @@ function getApp_() {
   return getApp();
 }
 
+// ArrayBuffer → UTF-8 字符串（SSE 分块可能切断多字节字符，由调用方保留尾部残包）
+function utf8Decode(buf) {
+  if (typeof TextDecoder !== 'undefined') {
+    try { return new TextDecoder('utf-8').decode(buf); } catch (e) { /* 走手动解码 */ }
+  }
+  var u8 = new Uint8Array(buf);
+  var out = '';
+  var i = 0;
+  while (i < u8.length) {
+    var c = u8[i];
+    if (c < 0x80) { out += String.fromCharCode(c); i += 1; }
+    else if (c < 0xE0) { out += String.fromCharCode(((c & 0x1F) << 6) | (u8[i + 1] & 0x3F)); i += 2; }
+    else if (c < 0xF0) {
+      out += String.fromCharCode(((c & 0x0F) << 12) | ((u8[i + 1] & 0x3F) << 6) | (u8[i + 2] & 0x3F));
+      i += 3;
+    } else {
+      var cp = ((c & 0x07) << 18) | ((u8[i + 1] & 0x3F) << 12) | ((u8[i + 2] & 0x3F) << 6) | (u8[i + 3] & 0x3F);
+      cp -= 0x10000;
+      out += String.fromCharCode(0xD800 + (cp >> 10), 0xDC00 + (cp & 0x3FF));
+      i += 4;
+    }
+  }
+  return out;
+}
+
 var API = {
   baseUrl: '',
   token: '',
@@ -297,6 +322,84 @@ var API = {
   },
   readAsk: function (question, cb, errCb) {
     this.request('POST', '/api/read/ask', { question: question }, cb, errCb);
+  },
+  readAskMulti: function (question, history, cb, errCb) {
+    this.request('POST', '/api/read/ask', { question: question, history: history || [] }, cb, errCb);
+  },
+  // 手动补正文：粘贴全文 → 快照 + 索引 + ready
+  readSaveContent: function (id, content, cb, errCb) {
+    this.request('POST', '/api/read/' + id + '/content', { content: content }, cb, errCb);
+  },
+  // 流式问答（SSE over chunked）。onEvent('delta'|'done'|'error', dataObj)；onErr 请求级失败。
+  // 返回 RequestTask（可 abort）。环境不支持 chunked 时直接走 onErr({fallback:true})
+  readAskStream: function (question, history, onEvent, onErr) {
+    if (!this.baseUrl) this.setBaseUrl(getApp_().globalData.baseUrl);
+    if (!this.token) this.token = getApp_().globalData.token;
+    var header = { 'Content-Type': 'application/json' };
+    if (this.token) header['Authorization'] = 'Bearer ' + this.token;
+
+    var sseBuf = '';
+    var pend = []; // 尾部残包字节（分块可能切断多字节 UTF-8）
+    var task = wx.request({
+      url: this.baseUrl + '/api/read/ask/stream',
+      method: 'POST',
+      header: header,
+      data: { question: question, history: history || [] },
+      timeout: 150000,
+      enableChunked: true,
+      responseType: 'arraybuffer',
+      success: function () { /* 结束以事件为准 */ },
+      fail: function (e) { onErr && onErr(e && e.errMsg ? e : { fallback: true }); }
+    });
+    if (!(task && typeof task.onChunkReceived === 'function')) {
+      onErr && onErr({ fallback: true });
+      return task;
+    }
+    task.onChunkReceived(function (res) {
+      var u8 = new Uint8Array(res.data);
+      for (var k = 0; k < u8.length; k++) pend.push(u8[k]);
+      // 回退尾部不完整的多字节序列
+      var end = pend.length;
+      var back = 0;
+      while (back < 4 && end - 1 - back >= 0) {
+        var b = pend[end - 1 - back];
+        if (b < 0x80) break;
+        if (b >= 0xC0) { back += 1; break; }
+        back += 1;
+      }
+      var safe = end;
+      if (back > 0) {
+        // 检查尾部是否是未完成序列：最后一个起始字节到末尾的长度不足
+        var startIdx = end - back;
+        if (startIdx >= 0 && (pend[startIdx] & 0xC0) !== 0xC0) {
+          // startIdx 不是起始字节，继续回退找起始
+          while (startIdx >= 0 && (pend[startIdx] & 0xC0) === 0x80) startIdx--;
+        }
+        if (startIdx >= 0) {
+          var need = pend[startIdx] >= 0xF0 ? 4 : (pend[startIdx] >= 0xE0 ? 3 : (pend[startIdx] >= 0xC0 ? 2 : 1));
+          if (pend[startIdx] < 0x80) need = 1;
+          if (end - startIdx < need) safe = startIdx;
+        }
+      }
+      var chunkBytes = new Uint8Array(pend.slice(0, safe));
+      pend = pend.slice(safe);
+      sseBuf += utf8Decode(chunkBytes.buffer);
+      // SSE 事件以空行分隔
+      var idx;
+      while ((idx = sseBuf.indexOf('\n\n')) >= 0) {
+        var block = sseBuf.slice(0, idx);
+        sseBuf = sseBuf.slice(idx + 2);
+        var evName = 'message';
+        var dataLine = '';
+        block.split('\n').forEach(function (line) {
+          if (line.indexOf('event:') === 0) evName = line.slice(6).trim();
+          else if (line.indexOf('data:') === 0) dataLine += line.slice(5).trim();
+        });
+        if (!dataLine) continue;
+        try { onEvent && onEvent(evName, JSON.parse(dataLine)); } catch (e) { /* 忽略坏块 */ }
+      }
+    });
+    return task;
   },
   readStats: function (cb, errCb) {
     this.request('GET', '/api/read/stats', null, cb, errCb);

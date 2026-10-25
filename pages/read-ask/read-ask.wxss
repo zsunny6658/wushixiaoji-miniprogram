@@ -164,3 +164,8 @@
   transition: background 0.2s;
 }
 .qa-send.on { background: var(--color-primary); }
+
+/* 多轮 / 流式补充 */
+.qa-welcome-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8rpx; }
+.qa-clear { font-size: var(--font-caption); color: var(--text-tertiary); padding: 4rpx 8rpx; }
+.qa-thinking-inline { display: flex; align-items: center; margin-top: 8rpx; }

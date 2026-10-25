@@ -70,11 +70,17 @@
   <!-- 抓取状态提示 -->
   <view wx:if="{{item.contentStatus === 'failed'}}" class="dt-warn">
     <text class="dt-warn-text">正文抓取失败：{{item.contentError || '该站点可能反爬或需要登录'}}</text>
-    <text class="dt-warn-btn" bindtap="onRefetch">重新解析</text>
+    <view class="dt-warn-actions">
+      <text class="dt-warn-btn" bindtap="onRefetch">重新解析</text>
+      <text class="dt-warn-btn" bindtap="onOpenManual">补正文</text>
+    </view>
   </view>
   <view wx:elif="{{item.contentStatus === 'partial'}}" class="dt-warn is-info">
     <text class="dt-warn-text">{{item.contentError || '仅获取到文章摘要，全文可点「复制链接」阅读原文'}}</text>
-    <text class="dt-warn-btn" bindtap="onRefetch">重新解析</text>
+    <view class="dt-warn-actions">
+      <text class="dt-warn-btn" bindtap="onRefetch">重新解析</text>
+      <text class="dt-warn-btn" bindtap="onOpenManual">补正文</text>
+    </view>
   </view>
   <view wx:elif="{{item.contentStatus === 'pending' || item.contentStatus === 'fetching'}}" class="dt-warn is-info">
     <text class="dt-warn-text">正在抓取正文并建立索引，稍后下拉刷新查看</text>
@@ -163,3 +169,24 @@
 </view>
 
 <view wx:else class="page dt-loading">加载中…</view>
+
+<!-- 手动补正文弹层 -->
+<view wx:if="{{showManual}}" class="dt-manual-mask" bindtap="onCloseManual">
+  <view class="dt-manual-sheet" catchtap="noop">
+    <view class="dt-manual-title">补正文</view>
+    <view class="dt-manual-hint">把文章全文粘贴到下面（在微信/浏览器里全选复制），保存后自动重建检索索引，之后 AI 问答就能引用它。</view>
+    <textarea
+      class="dt-manual-input"
+      value="{{manualText}}"
+      bindinput="onManualInput"
+      maxlength="200000"
+      auto-height
+      placeholder="粘贴文章全文…"
+      placeholder-class="dt-manual-ph"
+    ></textarea>
+    <view class="dt-manual-actions">
+      <view class="dt-manual-btn" bindtap="onCloseManual">取消</view>
+      <view class="dt-manual-btn primary {{manualText.length >= 30 ? 'on' : ''}}" bindtap="onSaveManual">保存并建索引</view>
+    </view>
+  </view>
+</view>

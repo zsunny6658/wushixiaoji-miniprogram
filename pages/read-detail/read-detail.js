@@ -101,7 +101,9 @@ Page({
     restHitIdx: -1,    // 第一个命中块在 restBlocks 里的下标
     editingTags: false,
     newTag: '',
-    relatedItems: []
+    relatedItems: [],
+    showManual: false,
+    manualText: ''
   },
 
   onLoad: function (options) {
@@ -222,6 +224,43 @@ Page({
     wx.setClipboardData({
       data: url,
       success: function () { wx.showToast({ title: '链接已复制，可在浏览器打开', icon: 'none' }); }
+    });
+  },
+
+  noop: function () { /* 挡住冒泡 */ },
+
+  /* ---------------- 手动补正文 ---------------- */
+  onOpenManual: function () {
+    this.setData({ showManual: true, manualText: '' });
+  },
+  onCloseManual: function () {
+    this.setData({ showManual: false, manualText: '' });
+  },
+  onManualInput: function (e) {
+    this.setData({ manualText: e.detail.value || '' });
+  },
+  onSaveManual: function () {
+    var text = (this.data.manualText || '').trim();
+    if (text.length < 30) { wx.showToast({ title: '正文太短（至少 30 字）', icon: 'none' }); return; }
+    if (this._savingManual) return;
+    this._savingManual = true;
+    var that = this;
+    wx.showLoading({ title: '保存并建索引…' });
+    api.readSaveContent(this.data.id, text, function (res) {
+      wx.hideLoading();
+      that._savingManual = false;
+      that.setData({ showManual: false, manualText: '' });
+      if (res && res.ok) {
+        wx.showToast({ title: '已保存并重建索引', icon: 'success' });
+      } else {
+        wx.showToast({ title: (res && res.error) || '已保存，但索引失败', icon: 'none', duration: 2200 });
+      }
+      that.loadDetail();
+      if (that.loadRelated) that.loadRelated();
+    }, function () {
+      wx.hideLoading();
+      that._savingManual = false;
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' });
     });
   },
 
