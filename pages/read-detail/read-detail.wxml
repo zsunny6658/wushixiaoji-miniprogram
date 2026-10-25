@@ -72,6 +72,10 @@
     <text class="dt-warn-text">正文抓取失败：{{item.contentError || '该站点可能反爬或需要登录'}}</text>
     <text class="dt-warn-btn" bindtap="onRefetch">重新解析</text>
   </view>
+  <view wx:elif="{{item.contentStatus === 'partial'}}" class="dt-warn is-info">
+    <text class="dt-warn-text">{{item.contentError || '仅获取到文章摘要，全文可点「复制链接」阅读原文'}}</text>
+    <text class="dt-warn-btn" bindtap="onRefetch">重新解析</text>
+  </view>
   <view wx:elif="{{item.contentStatus === 'pending' || item.contentStatus === 'fetching'}}" class="dt-warn is-info">
     <text class="dt-warn-text">正在抓取正文并建立索引，稍后下拉刷新查看</text>
   </view>
