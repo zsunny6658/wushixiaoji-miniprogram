@@ -107,6 +107,7 @@
                     <text class="tag tag-warning" wx:if="{{item.type === 'todo'}}">备忘</text>
                     <text class="tag tag-debt" wx:if="{{item.type === 'debt'}}">待还</text>
                     <text class="tag tag-med" wx:if="{{item.type === 'medication'}}">用药</text>
+                    <text class="tag tag-success" wx:if="{{item.medCycleDone}}">已服 · 待开新盒</text>
                     <view class="tag tag-private" wx:if="{{item.isPrivate}}"><ficon style="vertical-align:-4rpx" name="lock" size="22" color="#64748B" /></view>
                   </view>
                   <view class="card-info-group">
@@ -123,7 +124,7 @@
                     <text class="meta-item bk-assignee" wx:if="{{item.assignee}}">@{{item.assignee}}</text>
                     <text class="meta-item bk-img-badge" wx:if="{{item.images.length}}">📷{{item.images.length}}</text>
                   </view>
-                  <view class="bk-act {{item.status === 'picked' ? 'bk-act-done' : ''}}" catchtap="onSwipePick" data-id="{{item.id}}">{{item.status === 'picked' ? '已完成 ✓' : (item.type === 'medication' ? '💊 打卡' : '✓ 完成')}}</view>
+                  <view class="bk-act {{item.status === 'picked' ? 'bk-act-done' : ''}}" catchtap="onSwipePick" data-id="{{item.id}}">{{item.status === 'picked' ? '已完成 ✓' : (item.medCycleDone ? '📦 开新盒' : (item.type === 'medication' ? '💊 打卡' : '✓ 完成'))}}</view>
                 </view>
               </view>
             </view>
@@ -159,6 +160,7 @@
                     <text class="tag tag-warning" wx:if="{{pkg.type === 'todo'}}">备忘</text>
                     <text class="tag tag-debt" wx:if="{{pkg.type === 'debt'}}">待还</text>
                     <text class="tag tag-med" wx:if="{{pkg.type === 'medication'}}">用药</text>
+                    <text class="tag tag-success" wx:if="{{pkg.medCycleDone}}">已服 · 待开新盒</text>
                     <view class="tag tag-private" wx:if="{{pkg.isPrivate}}"><ficon style="vertical-align:-4rpx" name="lock" size="22" color="#64748B" /></view>
                   </view>
                   <view class="card-info-group">
@@ -175,7 +177,7 @@
                     <text class="meta-item bk-assignee" wx:if="{{pkg.assignee}}">@{{pkg.assignee}}</text>
                     <text class="meta-item bk-img-badge" wx:if="{{pkg.images.length}}">📷{{pkg.images.length}}</text>
                   </view>
-                  <view class="bk-act {{pkg.status === 'picked' ? 'bk-act-done' : ''}}" catchtap="onSwipePick" data-id="{{pkg.id}}">{{pkg.status === 'picked' ? '已完成 ✓' : (pkg.type === 'medication' ? '💊 打卡' : '✓ 完成')}}</view>
+                  <view class="bk-act {{pkg.status === 'picked' ? 'bk-act-done' : ''}}" catchtap="onSwipePick" data-id="{{pkg.id}}">{{pkg.status === 'picked' ? '已完成 ✓' : (pkg.medCycleDone ? '📦 开新盒' : (pkg.type === 'medication' ? '💊 打卡' : '✓ 完成'))}}</view>
                 </view>
               </view>
             </view>

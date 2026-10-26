@@ -102,6 +102,8 @@
 }
 .filter-drawer .toolbar { margin-bottom: var(--spacing-sm); }
 .filter-drawer .toolbar:last-child { margin-bottom: 0; }
+/* 抽屉内范围行（全部/家庭/个人）与筛选项行之间的纵向间隔 */
+.filter-drawer .segmented { margin-bottom: var(--spacing-sm); }
 .filter-reset {
   display: flex;
   align-items: center;

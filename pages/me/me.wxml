@@ -49,6 +49,15 @@
 
   <!-- 功能菜单 -->
   <view class="menu-card">
+    <!-- 数据 -->
+    <text class="menu-group-title">数据</text>
+    <view class="cell" bindtap="onOpenAnnual" hover-class="cell-hover">
+      <view class="cell-left">
+        <ficon class="cell-icon-vec" name="target" size="36" />
+        <text class="cell-title">年度报告</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
     <!-- 账户 -->
     <text class="menu-group-title">账户</text>
     <view class="cell" bindtap="onChangePassword" hover-class="cell-hover">

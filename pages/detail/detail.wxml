@@ -62,7 +62,7 @@
     <view class="medboard-entry" wx:if="{{pkg.type === 'medication'}}" bindtap="onOpenMedboard">
       <view class="mb-entry-icon"><ficon name="pill" size="36" color="#10B981" /></view>
       <view class="mb-entry-text">
-        <text class="mb-entry-title">仿真药板 · 点击打卡</text>
+        <text class="mb-entry-title">{{pkg.medCycleDone ? '仿真药板 · 本盒已服完，点击开新盒' : '仿真药板 · 点击打卡'}}</text>
         <text class="mb-entry-sub" wx:if="{{pkg.scheduleLabel}}">每日 {{pkg.scheduleLabel}}</text>
       </view>
       <text class="mb-entry-arrow">›</text>

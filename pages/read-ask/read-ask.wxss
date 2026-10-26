@@ -5,6 +5,8 @@
   height: 100vh;
   background: var(--bg-page);
   box-sizing: border-box;
+  /* 底部输入条是 fixed 悬浮，整页留出其高度，避免最后一条消息被遮挡 */
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
 }
 
 .qa-scroll {
@@ -203,6 +205,28 @@
 .qa-welcome-acts { display: flex; align-items: center; }
 .qa-act { font-size: var(--font-caption); color: var(--color-primary); padding: 4rpx 10rpx; }
 .qa-act + .qa-act { color: var(--text-tertiary); }
+/* 新对话主入口：欢迎区高亮胶囊 */
+.qa-act-new {
+  color: #FFFFFF;
+  background: var(--color-primary);
+  border-radius: 999rpx;
+  padding: 8rpx 22rpx;
+  font-weight: 600;
+}
+/* 悬浮新对话按钮：随消息增多仍在输入条上方右下角，一步触达 */
+.qa-newbtn {
+  position: fixed;
+  right: 24rpx;
+  bottom: calc(150rpx + env(safe-area-inset-bottom));
+  z-index: 90;
+  font-size: var(--font-caption);
+  font-weight: 600;
+  color: #FFFFFF;
+  background: var(--color-primary);
+  border-radius: 999rpx;
+  padding: 14rpx 26rpx;
+  box-shadow: 0 6rpx 20rpx rgba(30, 91, 60, 0.35);
+}
 .qa-thinking-inline { display: flex; align-items: center; margin-top: 8rpx; }
 
 /* ---------- 对话记录管理面板 ---------- */

@@ -190,6 +190,10 @@ function decorate(p, members) {
   } else if (_type === 'medication') {
     bm = p.title || p.code || '';
     bs = d.scheduleLabel || p.note || '';
+    // 当前盒服完 → 副行提示待开新盒（状态展示，不改内部 status）
+    if (p.medCycle && p.medCycle.done && p.status !== 'picked') {
+      bs = (bs ? bs + ' · ' : '') + '本盒已服完，待开新盒';
+    }
   } else {
     bm = p.title || p.code || '';
     bs = p.note || '';
@@ -200,6 +204,7 @@ function decorate(p, members) {
   d.blockSub = bs;
   d.blockMainType = bmType;
   d.isPrivate = !!p.isPrivate;
+  d.medCycleDone = !!(p.medCycle && p.medCycle.done) && p.status !== 'picked';
   d.amount = p.amount || 0;
   d.amountLabel = p.amount ? formatAmount(p.amount) : '';
   d.institution = p.institution || '';

@@ -7,6 +7,7 @@
         <view class="qa-welcome-top">
           <view class="qa-welcome-title">基于你的待读知识库回答</view>
           <view class="qa-welcome-acts">
+            <view class="qa-act qa-act-new" bindtap="onNewSession">＋ 新对话</view>
             <view class="qa-act" bindtap="onOpenSessions">对话记录</view>
             <view wx:if="{{messages.length}}" class="qa-act" bindtap="onClearHistory">清空</view>
           </view>
@@ -67,6 +68,9 @@
       <view id="qa-bottom" class="qa-bottom-anchor"></view>
     </view>
   </scroll-view>
+
+  <!-- 悬浮新对话：有消息时始终可见，一步开新对话 -->
+  <view wx:if="{{messages.length}}" class="qa-newbtn" bindtap="onNewSession">＋ 新对话</view>
 
   <!-- 输入区 -->
   <view class="qa-input-bar">

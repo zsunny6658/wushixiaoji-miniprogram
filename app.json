@@ -14,7 +14,8 @@
     "pages/members/members",
     "pages/settings/settings",
     "pages/archive/archive",
-    "pages/medboard/medboard"
+    "pages/medboard/medboard",
+    "pages/stats/stats"
   ],
   "window": {
     "navigationBarBackgroundColor": "@navBgColor",

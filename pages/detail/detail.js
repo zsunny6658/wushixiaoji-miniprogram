@@ -54,6 +54,8 @@ Page({
       // 本地还是没有，走 API 直接查
       api.getPackage(id, function (data) {
         if (data && data.package) {
+          // 服务端随详情返回用药当前周期状态（当前盒服完 → 展示「已服 · 待开新盒」）
+          if (data.medCycle) data.package.medCycle = data.medCycle;
           that.applyDetail(data.package);
         } else {
           wx.showToast({ title: '记录不存在', icon: 'none' });

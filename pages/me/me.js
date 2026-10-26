@@ -461,6 +461,11 @@ Page({
     wx.navigateTo({ url: '/pages/archive/archive' });
   },
 
+  // 年度报告（聚合统计，隐私优先）
+  onOpenAnnual: function () {
+    wx.navigateTo({ url: '/pages/stats/stats' });
+  },
+
   // 忽略规则管理：查看 / 删除（长期忽略产生的自动忽略规则）
   onManageIgnoreRules: function () {
     this.loadIgnoreRules();

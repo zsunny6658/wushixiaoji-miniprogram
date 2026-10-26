@@ -5,6 +5,27 @@ var hl = require('../../utils/highlight');
 
 var PAGE_SIZE = 20;
 
+// 列表快照缓存（v0.22.6 秒开）：按筛选分组缓存首屏，进入页面先渲染缓存再后台刷新
+var LIST_CACHE_KEY = 'read_list_cache_v1';
+var LIST_CACHE_TTL = 3 * 86400000; // 3 天过期
+
+function loadListCache() {
+  try { return wx.getStorageSync(LIST_CACHE_KEY) || {}; } catch (e) { return {}; }
+}
+
+function saveListCache(filter, payload) {
+  try {
+    var all = loadListCache();
+    all[filter] = Object.assign({ ts: Date.now() }, payload);
+    wx.setStorageSync(LIST_CACHE_KEY, all);
+  } catch (e) { /* 存储满等异常忽略 */ }
+}
+
+function freshCacheEntry(entry) {
+  return !!(entry && entry.items && entry.items.length &&
+    Date.now() - (entry.ts || 0) < LIST_CACHE_TTL);
+}
+
 /** 时间标签：刚刚 / N分钟前 / 今天 HH:mm / 昨天 / M月D日 */
 function timeLabel(iso) {
   if (!iso) return '';
@@ -65,6 +86,21 @@ Page({
   onShow: function () {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ active: 2 });
+    }
+    // 秒开：首屏为空时先渲染上次缓存快照，再后台刷新替换
+    if (!this.data.items.length) {
+      var entry = loadListCache()[this.data.filter];
+      if (freshCacheEntry(entry)) {
+        this.setData({
+          items: entry.items,
+          displayItems: entry.items,
+          stats: entry.stats || this.data.stats,
+          offset: entry.items.length,
+          hasMore: !!entry.hasMore,
+          loading: false
+        });
+        this.schedulePoll();
+      }
     }
     this.loadList(true);
     this.loadTags();
@@ -134,6 +170,14 @@ Page({
           loading: false,
           loadingMore: false
         });
+        // 刷新成功后落缓存快照（仅首屏），供下次进入秒开
+        if (reset) {
+          saveListCache(that.data.filter, {
+            items: incoming,
+            stats: data.stats || that.data.stats,
+            hasMore: !!data.hasMore
+          });
+        }
         that.schedulePoll();
         done && done();
       },

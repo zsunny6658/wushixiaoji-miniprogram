@@ -1,0 +1,107 @@
+<view class="page">
+  <!-- 年份选择 -->
+  <view class="toolbar">
+    <picker mode="selector" range="{{years}}" bindchange="onYearChange">
+      <view class="year-pick">{{year}} 年 ▾</view>
+    </picker>
+  </view>
+
+  <!-- 加载 / 错误 -->
+  <view class="loading-box" wx:if="{{loading}}">
+    <text class="loading-text">统计中…</text>
+  </view>
+  <view class="empty-state" wx:elif="{{error}}">
+    <text class="empty-text">{{error}}</text>
+    <button class="btn-secondary retry-btn" bindtap="onRetry">重试</button>
+  </view>
+
+  <block wx:else>
+    <!-- 概览 -->
+    <view class="stat-grid">
+      <view class="stat-cell" wx:for="{{cards}}" wx:key="label">
+        <text class="stat-n">{{item.n}}</text>
+        <text class="stat-l">{{item.label}}</text>
+      </view>
+    </view>
+
+    <!-- 按月节奏 -->
+    <view class="card">
+      <text class="sec-title">按月节奏（新增 / 完成）</text>
+      <view class="bars">
+        <view class="bar-group" wx:for="{{monthly}}" wx:key="month">
+          <view class="bar-pair">
+            <view class="bar-col">
+              <text class="bar-n" wx:if="{{item.created}}">{{item.created}}</text>
+              <view class="bar bar-a" style="height:{{item.ch}}rpx"></view>
+            </view>
+            <view class="bar-col">
+              <text class="bar-n" wx:if="{{item.done}}">{{item.done}}</text>
+              <view class="bar bar-b" style="height:{{item.dh}}rpx"></view>
+            </view>
+          </view>
+          <text class="bar-month">{{item.month}}</text>
+        </view>
+      </view>
+      <view class="legend">
+        <view class="legend-item"><view class="dot dot-a"></view><text>新增</text></view>
+        <view class="legend-item"><view class="dot dot-b"></view><text>完成</text></view>
+      </view>
+    </view>
+
+    <!-- 类型分布 -->
+    <view class="card" wx:if="{{types.length}}">
+      <text class="sec-title">类型分布</text>
+      <view class="hrow" wx:for="{{types}}" wx:key="label">
+        <text class="hrow-label">{{item.label}}</text>
+        <view class="htrack"><view class="hbar hbar-a" style="width:{{item.count / (types[0].count || 1) * 100}}%"></view></view>
+        <text class="hrow-n">{{item.count}}</text>
+      </view>
+    </view>
+
+    <!-- 用药打卡 -->
+    <view class="card" wx:if="{{medTotal}}">
+      <text class="sec-title">服药打卡 {{medTotal}} 次 · 在管方案 {{medPlans}} 个</text>
+      <view class="bars">
+        <view class="bar-group" wx:for="{{medMonthly}}" wx:key="month">
+          <view class="bar-pair">
+            <view class="bar-col">
+              <text class="bar-n" wx:if="{{item.taken}}">{{item.taken}}</text>
+              <view class="bar bar-b" style="height:{{item.h}}rpx"></view>
+            </view>
+          </view>
+          <text class="bar-month">{{item.month}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 待读 -->
+    <view class="card" wx:if="{{readTotal}}">
+      <text class="sec-title">待读知识库 · 已读 {{readDone}} / {{readTotal}}</text>
+      <view class="hrow" wx:for="{{platforms}}" wx:key="label">
+        <text class="hrow-label">{{item.label}}</text>
+        <view class="htrack"><view class="hbar hbar-a" style="width:{{item.count / (platforms[0].count || 1) * 100}}%"></view></view>
+        <text class="hrow-n">{{item.count}}</text>
+      </view>
+    </view>
+
+    <!-- 年度关键词 -->
+    <view class="card" wx:if="{{tags.length}}">
+      <text class="sec-title">年度关键词</text>
+      <view class="tagwrap">
+        <text class="mini-tag" wx:for="{{tags}}" wx:key="tag">{{item.tag}} · {{item.count}}</text>
+      </view>
+    </view>
+
+    <!-- 成员活跃度 -->
+    <view class="card" wx:if="{{members.length}}">
+      <text class="sec-title">成员活跃度（新增记录数）</text>
+      <view class="hrow" wx:for="{{members}}" wx:key="name">
+        <text class="hrow-label">{{item.name}}</text>
+        <view class="htrack"><view class="hbar hbar-b" style="width:{{item.w}}%"></view></view>
+        <text class="hrow-n">{{item.count}}</text>
+      </view>
+    </view>
+
+    <view class="privacy-note">统计仅含聚合数字，不包含取件码、标题、备注等明细内容；个人记录按可见性口径过滤。</view>
+  </block>
+</view>
