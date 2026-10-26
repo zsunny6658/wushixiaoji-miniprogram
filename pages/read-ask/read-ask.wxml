@@ -11,10 +11,12 @@
             <view wx:if="{{messages.length}}" class="qa-act" bindtap="onClearHistory">清空</view>
           </view>
         </view>
-        <view class="qa-welcome-sub">只依据已收藏文章的正文内容，据实回答并标注来源；库里没有的会明说。支持多轮追问。</view>
-        <view class="qa-suggests">
-          <view class="qa-suggest" wx:for="{{suggestions}}" wx:key="*this" bindtap="onSuggestTap" data-q="{{item}}">{{item}}</view>
-        </view>
+        <block wx:if="{{!messages.length}}">
+          <view class="qa-welcome-sub">只依据已收藏文章的正文内容，据实回答并标注来源；库里没有的会明说。支持多轮追问。</view>
+          <view class="qa-suggests">
+            <view class="qa-suggest" wx:for="{{suggestions}}" wx:key="*this" bindtap="onSuggestTap" data-q="{{item}}">{{item}}</view>
+          </view>
+        </block>
       </view>
 
       <!-- 消息 -->
@@ -48,7 +50,7 @@
               </view>
             </view>
             <view wx:if="{{item.extractive}}" class="qa-note">（降级回答：未配置大模型或生成失败）</view>
-            <view class="qa-copy" bindtap="onCopy" data-text="{{item.text}}">复制回答</view>
+            <view wx:if="{{item.text}}" class="qa-copy" bindtap="onCopy" data-text="{{item.text}}">复制回答</view>
           </view>
         </view>
       </block>

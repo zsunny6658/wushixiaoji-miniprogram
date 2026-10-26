@@ -1,4 +1,4 @@
-/* pages/read-ask/read-ask.wxss - 知识库问答 */
+/* pages/read-ask/read-ask.wxss - 智能问答 */
 .qa-page {
   display: flex;
   flex-direction: column;

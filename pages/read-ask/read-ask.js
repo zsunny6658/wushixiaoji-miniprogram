@@ -319,7 +319,7 @@ Page({
       } else if (ev === 'done' && d) {
         finalize(d);
       } else if (ev === 'error' && d) {
-        failMsg('问答失败了：' + (d.error || '未知错误') + '，请稍后重试。');
+        failMsg('回答失败了：' + (d.error || '未知错误') + '，请稍后重试。');
       }
     }, function (err) {
       if (gotDelta) {
@@ -328,7 +328,7 @@ Page({
       }
       // 回退非流式（环境不支持 chunked 或请求级失败）
       api.readAskMulti(question, history, function (data) { finalize(data); }, function () {
-        failMsg('问答请求失败了，请稍后重试。');
+        failMsg('回答请求失败了，请稍后重试。');
       });
     });
   },
