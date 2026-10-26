@@ -26,14 +26,18 @@ Page({
     newWebhookName: '',
     newWebhookExpiry: '',
     newWebhookPerms: ['read', 'write'],
-    // 配置（mail/AI）
+    // 配置（mail/AI/备份）
     config: {
       smtpHost: '', smtpPort: '465', smtpSecure: true,
       smtpUser: '', smtpPass: '', smtpFrom: '', smtpFromName: '',
       aiProvider: '', aiModel: '', aiBaseUrl: '', aiApiKey: '',
       ignoreCleanupDays: 7,
-      reminderDays: 3
+      reminderDays: 3,
+      backupEnabled: false,
+      backupEndpoint: '', backupRegion: '', backupBucket: '', backupPrefix: 'fph-backup/',
+      backupAccessKey: '', backupSecretKey: '', backupKeep: '14'
     },
+    backupStateText: '',
     mailConfigured: false,
     testEmailTo: '',
     // 语音额度
@@ -128,6 +132,7 @@ Page({
         var c = (data && data.config) || {};
         var s = c.smtp || {};
         var a = c.ai || {};
+        var bk = c.backup || {};
         that.setData({
           config: {
             smtpHost: s.host || '',
@@ -142,10 +147,19 @@ Page({
             aiBaseUrl: a.baseURL || '',
             aiApiKey: '',
             ignoreCleanupDays: c.ignoreCleanupDays || 7,
-            reminderDays: (c.notify && c.notify.daysBefore) || 3
+            reminderDays: (c.notify && c.notify.daysBefore) || 3,
+            backupEnabled: !!bk.enabled,
+            backupEndpoint: bk.endpoint || '',
+            backupRegion: bk.region || '',
+            backupBucket: bk.bucket || '',
+            backupPrefix: bk.prefix || 'fph-backup/',
+            backupAccessKey: bk.accessKey || '',
+            backupSecretKey: '',
+            backupKeep: String(bk.keepRemote || 14)
           },
           mailConfigured: data && data.mailConfigured
         });
+        that.renderBackupState(bk.state || {});
       });
     }
   },
@@ -345,9 +359,21 @@ Page({
         textModel: c.aiModel
       },
       ignoreCleanupDays: Math.max(1, parseInt(c.ignoreCleanupDays, 10) || 7),
-      notify: { daysBefore: Math.max(1, parseInt(c.reminderDays, 10) || 3) }
+      notify: { daysBefore: Math.max(1, parseInt(c.reminderDays, 10) || 3) },
+      backup: {
+        enabled: c.backupEnabled,
+        endpoint: c.backupEndpoint,
+        region: c.backupRegion,
+        bucket: c.backupBucket,
+        prefix: c.backupPrefix || 'fph-backup/',
+        accessKey: c.backupAccessKey,
+        secretKey: c.backupSecretKey || undefined,
+        keepRemote: Math.max(1, parseInt(c.backupKeep, 10) || 14)
+      }
     };
-    api.updateConfig(patch, this.data.familyId, function () {
+    api.updateConfig(patch, this.data.familyId, function (res) {
+      var bk = (res && res.config && res.config.backup) || {};
+      that.renderBackupState(bk.state || {});
       app.globalData.ignoreCleanupDays = patch.ignoreCleanupDays;
       wx.setStorageSync('parcel.ignoreCleanupDays', String(patch.ignoreCleanupDays));
       wx.setStorageSync('parcel.reminderDays', String(patch.notify.daysBefore));
@@ -372,6 +398,49 @@ Page({
       wx.showToast({ title: data && data.ok ? '连通正常' : '连通失败', icon: 'none' });
     }, function () {
       wx.hideLoading();
+    });
+  },
+
+  renderBackupState: function (st) {
+    var text = '';
+    if (st && st.lastFile) {
+      text = '本地：' + st.lastFile;
+      if (st.lastRemoteKey) text += ' · 远端已上传';
+      else if (st.lastError) text += ' · 远端失败：' + st.lastError;
+    } else {
+      text = '尚未执行过备份（每天 03:30 自动执行）';
+    }
+    this.setData({ backupStateText: text });
+  },
+
+  onTestBackup: function () {
+    var that = this;
+    var c = this.data.config;
+    wx.showLoading({ title: '备份并上传中...' });
+    // 用界面当前填写值做「保存前测试」（SecretKey 留空表示沿用已保存值）
+    var override = {
+      enabled: true,
+      endpoint: c.backupEndpoint,
+      region: c.backupRegion,
+      bucket: c.backupBucket,
+      prefix: c.backupPrefix || 'fph-backup/',
+      accessKey: c.backupAccessKey,
+      keepRemote: Math.max(1, parseInt(c.backupKeep, 10) || 14)
+    };
+    if (c.backupSecretKey) override.secretKey = c.backupSecretKey;
+    api.testBackup({ override: override }, function (res) {
+      wx.hideLoading();
+      that.renderBackupState((res && res.state) || {});
+      if (res && res.ok && res.remote && res.remote.ok) {
+        wx.showToast({ title: '备份并上传成功', icon: 'success' });
+      } else if (res && res.ok && res.remote && res.remote.skipped) {
+        wx.showToast({ title: '本地成功，异地未启用/配置不全', icon: 'none' });
+      } else {
+        wx.showToast({ title: (res && ((res.remote && res.remote.error) || res.error)) || '失败', icon: 'none' });
+      }
+    }, function () {
+      wx.hideLoading();
+      wx.showToast({ title: '备份请求失败', icon: 'none' });
     });
   },
   onCopyICP: function () {

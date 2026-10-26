@@ -194,6 +194,10 @@ var API = {
   testAI: function (familyId, cb, errCb) {
     this.request('POST', '/api/config/test-ai' + (familyId ? '?familyId=' + familyId : ''), {}, cb, errCb);
   },
+  // 异地备份：立即执行一次（body.override 传界面未保存配置做保存前测试）
+  testBackup: function (data, cb, errCb) {
+    this.request('POST', '/api/config/test-backup', data || {}, cb, errCb);
+  },
 
   // CLI Token
   getCliTokens: function (cb, errCb) {

@@ -221,6 +221,48 @@
         <button class="btn-secondary" bindtap="onSaveConfig">保存配置</button>
       </view>
     </view>
+
+    <view class="section">
+      <text class="section-title">异地备份（S3 兼容）</text>
+      <text class="section-desc">每天 03:30 本地备份后自动上传到对象存储，支持阿里云 OSS / 百度云 BOS / 腾讯云 COS / MinIO 等 S3 兼容服务。上传失败不影响本地备份，异常随健康告警邮件提醒。</text>
+      <view class="form-item form-row">
+        <text class="form-label">启用异地备份</text>
+        <switch checked="{{config.backupEnabled}}" data-field="backupEnabled" bindchange="onConfigSwitch" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">Endpoint</text>
+        <input class="form-input" placeholder="https://oss-cn-hangzhou.aliyuncs.com" value="{{config.backupEndpoint}}" data-field="backupEndpoint" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">Region</text>
+        <input class="form-input" placeholder="oss-cn-hangzhou / bj / us-east-1" value="{{config.backupRegion}}" data-field="backupRegion" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">Bucket</text>
+        <input class="form-input" value="{{config.backupBucket}}" data-field="backupBucket" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">Key 前缀（可留空）</text>
+        <input class="form-input" placeholder="默认 fph-backup/" value="{{config.backupPrefix}}" data-field="backupPrefix" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">AccessKey</text>
+        <input class="form-input" value="{{config.backupAccessKey}}" data-field="backupAccessKey" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">SecretKey</text>
+        <input class="form-input" password="true" value="{{config.backupSecretKey}}" data-field="backupSecretKey" bindinput="onConfigInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">远端保留份数</text>
+        <input class="form-input" type="number" value="{{config.backupKeep}}" data-field="backupKeep" bindinput="onConfigInput" />
+      </view>
+      <view class="section-desc" wx:if="{{backupStateText}}">{{backupStateText}}</view>
+      <view class="btn-row">
+        <button class="btn-primary" bindtap="onTestBackup">立即备份测试</button>
+        <button class="btn-secondary" bindtap="onSaveConfig">保存配置</button>
+      </view>
+    </view>
   </block>
 
   <!-- ============ 默认：完整设置页 ============ -->
