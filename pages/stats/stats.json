@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "年度报告",
   "usingComponents": {
-    "ficon": "../components/ficon/index"
+    "ficon": "/components/ficon/index"
   }
 }
