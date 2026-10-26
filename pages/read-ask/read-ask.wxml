@@ -35,19 +35,28 @@
               <text class="qa-thinking-text">正在检索知识库…{{elapsed > 0 ? ' ' + elapsed + 's' : ''}}</text>
             </view>
             <view wx:if="{{item.sources.length}}" class="qa-srcs">
-              <view class="qa-srcs-label">来源</view>
-              <view
+              <view class="qa-srcs-label">来源（点标题看引用片段）</view>
+              <block
                 wx:for="{{item.sources}}"
                 wx:for-item="s"
+                wx:for-index="sidx"
                 wx:key="no"
-                class="qa-src"
-                bindtap="onSourceTap"
-                data-id="{{s.id}}"
               >
-                <text class="qa-src-no">[{{s.no}}]</text>
-                <text class="qa-src-title">{{s.title}}</text>
-                <text class="qa-src-plat">{{s.platformLabel}}</text>
-              </view>
+                <view
+                  class="qa-src"
+                  bindtap="onSourceTap"
+                  data-idx="{{index}}"
+                  data-no="{{s.no}}"
+                >
+                  <text class="qa-src-no">[{{s.no}}]</text>
+                  <text class="qa-src-title">{{s.title}}</text>
+                  <text class="qa-src-plat">{{s.platformLabel}}</text>
+                </view>
+                <view wx:if="{{item.openNo === s.no && s.snippet}}" class="qa-src-snippet">
+                  <text class="qa-src-snippet-text">{{s.snippet}}</text>
+                  <view class="qa-src-open" catchtap="onSourceOpen" data-id="{{s.id}}">查看全文 →</view>
+                </view>
+              </block>
             </view>
             <view wx:if="{{item.extractive}}" class="qa-note">（降级回答：未配置大模型或生成失败）</view>
             <view wx:if="{{item.text}}" class="qa-copy" bindtap="onCopy" data-text="{{item.text}}">复制回答</view>
@@ -61,10 +70,18 @@
 
   <!-- 输入区 -->
   <view class="qa-input-bar">
+    <view
+      class="qa-mic {{recording ? 'on' : ''}}"
+      bindtouchstart="onMicStart"
+      bindtouchend="onMicEnd"
+      bindtouchcancel="onMicEnd"
+    >
+      <ficon name="mic" size="36" color="{{recording ? '#FFFFFF' : '#8A94A6'}}" />
+    </view>
     <input
       class="qa-input"
       value="{{input}}"
-      placeholder="问问知识库里的文章…"
+      placeholder="{{recording ? '正在聆听，松开转写…' : (transcribing ? '正在转写…' : '问问知识库里的文章…')}}"
       placeholder-class="qa-input-ph"
       confirm-type="send"
       confirm-hold

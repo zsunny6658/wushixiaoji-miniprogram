@@ -88,6 +88,8 @@ Page({
     canSend: false,
     sending: false,
     elapsed: 0,      // 本轮已等待秒数
+    recording: false,   // 正在按住录音
+    transcribing: false, // 正在转写
     scrollInto: '',
     showSessions: false,
     sessions: [],    // 面板渲染用摘要列表
@@ -114,6 +116,109 @@ Page({
   },
 
   onHide: function () { this.flushCurrent(); },
+
+  /* ---------------- 语音提问 ---------------- */
+
+  ensureRecorder: function () {
+    if (this._recorder) return this._recorder;
+    var that = this;
+    var rec = wx.getRecorderManager();
+    rec.onStart(function () {
+      that._recStartAt = Date.now();
+      that.setData({ recording: true });
+    });
+    rec.onStop(function (res) {
+      that.setData({ recording: false });
+      var dur = Date.now() - (that._recStartAt || 0);
+      if (!res || !res.tempFilePath) return;
+      if (dur < 800) { wx.showToast({ title: '说话太短了', icon: 'none' }); return; }
+      that.transcribeFile(res.tempFilePath);
+    });
+    rec.onError(function () {
+      that.setData({ recording: false });
+      wx.showToast({ title: '录音失败了', icon: 'none' });
+    });
+    this._recorder = rec;
+    return rec;
+  },
+
+  transcribeFile: function (filePath) {
+    var that = this;
+    that.setData({ transcribing: true });
+    try {
+      var fs = wx.getFileSystemManager();
+      fs.readFile({
+        filePath: filePath,
+        encoding: 'base64',
+        success: function (r) {
+          api.voiceTranscribe(r.data, 'mp3', function (data) {
+            that.setData({ transcribing: false });
+            if (data && data.ok && data.text) {
+              that.setData({ input: data.text, canSend: true });
+              wx.showToast({ title: '已转写，确认后发送', icon: 'none' });
+            } else {
+              var err = data && data.error;
+              var msg = err === 'no_key' ? '语音服务未配置'
+                : err === 'quota_exhausted' ? '本月语音额度用完了'
+                : '没听清，再试一次';
+              wx.showToast({ title: msg, icon: 'none' });
+            }
+          }, function () {
+            that.setData({ transcribing: false });
+            wx.showToast({ title: '转写失败了，请重试', icon: 'none' });
+          });
+        },
+        fail: function () {
+          that.setData({ transcribing: false });
+          wx.showToast({ title: '录音文件读取失败', icon: 'none' });
+        }
+      });
+    } catch (e) {
+      that.setData({ transcribing: false });
+    }
+  },
+
+  onMicStart: function () {
+    if (this.data.sending || this.data.recording || this.data.transcribing) return;
+    var that = this;
+    wx.getSetting({
+      success: function (s) {
+        var auth = s.authSetting || {};
+        if (auth['scope.record'] === false) {
+          wx.showModal({
+            title: '需要麦克风权限',
+            content: '按住说话需要使用麦克风，请在设置中允许。',
+            confirmText: '去设置',
+            success: function (r) { if (r.confirm) wx.openSetting(); }
+          });
+          return;
+        }
+        var start = function () {
+          // 16kHz 单声道 mp3：识别够用、体积小（60s 约 700KB）
+          that.ensureRecorder().start({
+            format: 'mp3',
+            duration: 60000,
+            sampleRate: 16000,
+            numberOfChannels: 1,
+            encodeBitRate: 96000
+          });
+        };
+        if (auth['scope.record']) { start(); return; }
+        wx.authorize({
+          scope: 'scope.record',
+          success: start,
+          fail: function () { wx.showToast({ title: '未授权麦克风，无法说话', icon: 'none' }); }
+        });
+      },
+      fail: function () { wx.showToast({ title: '获取权限状态失败', icon: 'none' }); }
+    });
+  },
+
+  onMicEnd: function () {
+    if (this.data.recording && this._recorder) {
+      try { this._recorder.stop(); } catch (e) { /* ignore */ }
+    }
+  },
 
   onUnload: function () {
     if (this._task && this._task.abort) { try { this._task.abort(); } catch (e) { /* ignore */ } }
@@ -292,7 +397,7 @@ Page({
         text: (r && r.answer) || '（空回答）',
         streaming: false,
         sources: ((r && r.sources) || []).map(function (s) {
-          return { no: s.no, id: s.id, title: s.title, platformLabel: s.platformLabel };
+          return { no: s.no, id: s.id, title: s.title, platformLabel: s.platformLabel, snippet: s.snippet || '' };
         }),
         extractive: !!(r && r.extractive),
         refused: !!(r && r.refused)
@@ -334,9 +439,21 @@ Page({
   },
 
   onSourceTap: function (e) {
+    var idx = e.currentTarget.dataset.idx;
+    var no = e.currentTarget.dataset.no;
+    if (idx === undefined || idx === null || idx === '' ) return;
+    // 点来源：切换展开引用片段；再点或点片段里的「查看全文」跳详情
+    var msgs = this.data.messages;
+    var m = msgs[idx];
+    if (!m || m.role !== 'ai') return;
+    var upd = {};
+    upd['messages[' + idx + '].openNo'] = m.openNo === no ? '' : no;
+    this.setData(upd);
+  },
+
+  onSourceOpen: function (e) {
     var id = e.currentTarget.dataset.id;
-    if (!id) return;
-    wx.navigateTo({ url: '/pages/read-detail/read-detail?id=' + id });
+    if (id) wx.navigateTo({ url: '/pages/read-detail/read-detail?id=' + id });
   },
 
   onCopy: function (e) {

@@ -105,6 +105,24 @@
   color: var(--text-tertiary);
   margin-left: 12rpx;
 }
+.qa-src-snippet {
+  margin: 4rpx 0 10rpx 34rpx;
+  padding: 14rpx 18rpx;
+  background: var(--bg-page);
+  border-left: 6rpx solid var(--color-primary);
+  border-radius: 0 12rpx 12rpx 0;
+}
+.qa-src-snippet-text {
+  font-size: var(--font-caption);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  display: block;
+}
+.qa-src-open {
+  margin-top: 8rpx;
+  font-size: var(--font-caption);
+  color: var(--color-primary);
+}
 
 .qa-note {
   margin-top: 12rpx;
@@ -155,6 +173,21 @@
   color: var(--text-primary);
 }
 .qa-input-ph { color: var(--text-tertiary); }
+.qa-mic {
+  flex-shrink: 0;
+  width: 72rpx; height: 72rpx;
+  border-radius: 50%;
+  background: var(--bg-page);
+  display: flex; align-items: center; justify-content: center;
+}
+.qa-mic.on {
+  background: var(--color-primary);
+  animation: qa-mic-pulse 1.2s ease-in-out infinite;
+}
+@keyframes qa-mic-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.85; }
+}
 .qa-send {
   flex-shrink: 0;
   width: 72rpx; height: 72rpx;
