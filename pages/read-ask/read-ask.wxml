@@ -7,9 +7,7 @@
         <view class="qa-welcome-top">
           <view class="qa-welcome-title">基于你的待读知识库回答</view>
           <view class="qa-welcome-acts">
-            <view class="qa-act qa-act-new" bindtap="onNewSession">＋ 新对话</view>
             <view class="qa-act" bindtap="onOpenSessions">对话记录</view>
-            <view wx:if="{{messages.length}}" class="qa-act" bindtap="onClearHistory">清空</view>
           </view>
         </view>
         <block wx:if="{{!messages.length}}">

@@ -308,20 +308,6 @@ Page({
     });
   },
 
-  onClearHistory: function () {
-    var that = this;
-    wx.showModal({
-      title: '清空当前对话',
-      content: '只清空当前对话的消息（其他对话保留，不影响已收藏的文章）。',
-      confirmText: '清空',
-      success: function (res) {
-        if (!res.confirm) return;
-        that.setData({ messages: [], currentId: '', scrollInto: '' });
-        try { wx.removeStorageSync(CURRENT_KEY); } catch (e) { /* ignore */ }
-      }
-    });
-  },
-
   /* ---------------- 输入与发送 ---------------- */
 
   onInput: function (e) {

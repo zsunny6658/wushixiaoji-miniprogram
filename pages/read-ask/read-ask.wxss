@@ -204,15 +204,6 @@
 .qa-welcome-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8rpx; }
 .qa-welcome-acts { display: flex; align-items: center; }
 .qa-act { font-size: var(--font-caption); color: var(--color-primary); padding: 4rpx 10rpx; }
-.qa-act + .qa-act { color: var(--text-tertiary); }
-/* 新对话主入口：欢迎区高亮胶囊 */
-.qa-act-new {
-  color: #FFFFFF;
-  background: var(--color-primary);
-  border-radius: 999rpx;
-  padding: 8rpx 22rpx;
-  font-weight: 600;
-}
 /* 悬浮新对话按钮：随消息增多仍在输入条上方右下角，一步触达 */
 .qa-newbtn {
   position: fixed;
