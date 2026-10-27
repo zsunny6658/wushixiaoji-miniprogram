@@ -190,11 +190,11 @@ function decorate(p, members) {
   } else if (_type === 'medication') {
     bm = p.title || p.code || '';
     bs = d.scheduleLabel || p.note || '';
-    // 周期状态副行（状态展示，不改内部 status）：整盒服完 > 今日已服
+    // 周期状态副行（状态展示，不改内部 status）：整盒服完 > 当前周期已服
     if (p.medCycle && p.medCycle.done && p.status !== 'picked') {
       bs = (bs ? bs + ' · ' : '') + '本盒已服完，待开新盒';
     } else if (p.medCycle && p.medCycle.todayDone && p.status !== 'picked') {
-      bs = (bs ? bs + ' · ' : '') + '今日已服';
+      bs = (bs ? bs + ' · ' : '') + '本周期已服';
     }
   } else {
     bm = p.title || p.code || '';

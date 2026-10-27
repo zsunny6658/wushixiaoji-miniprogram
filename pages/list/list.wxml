@@ -108,7 +108,7 @@
                     <text class="tag tag-debt" wx:if="{{item.type === 'debt'}}">待还</text>
                     <text class="tag tag-med" wx:if="{{item.type === 'medication'}}">用药</text>
                     <text class="tag tag-success" wx:if="{{item.medCycleDone}}">已服 · 待开新盒</text>
-                    <text class="tag tag-success" wx:elif="{{item.medTodayDone}}">今日已服</text>
+                    <text class="tag tag-success" wx:elif="{{item.medTodayDone}}">已服</text>
                     <view class="tag tag-private" wx:if="{{item.isPrivate}}"><ficon style="vertical-align:-4rpx" name="lock" size="22" color="#64748B" /></view>
                   </view>
                   <view class="card-info-group">
@@ -162,7 +162,7 @@
                     <text class="tag tag-debt" wx:if="{{pkg.type === 'debt'}}">待还</text>
                     <text class="tag tag-med" wx:if="{{pkg.type === 'medication'}}">用药</text>
                     <text class="tag tag-success" wx:if="{{pkg.medCycleDone}}">已服 · 待开新盒</text>
-                    <text class="tag tag-success" wx:elif="{{pkg.medTodayDone}}">今日已服</text>
+                    <text class="tag tag-success" wx:elif="{{pkg.medTodayDone}}">已服</text>
                     <view class="tag tag-private" wx:if="{{pkg.isPrivate}}"><ficon style="vertical-align:-4rpx" name="lock" size="22" color="#64748B" /></view>
                   </view>
                   <view class="card-info-group">
