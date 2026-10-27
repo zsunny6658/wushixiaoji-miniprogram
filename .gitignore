@@ -1,3 +1,11 @@
-
 # 小程序上传密钥（敏感）
 private.key
+
+# 依赖
+node_modules/
+
+# 版本号由 scripts/upload.js 从本仓 package.json 自动同步生成
+version.js
+
+# 预览二维码
+preview-qrcode*

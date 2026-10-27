@@ -1,0 +1,13 @@
+{
+  "name": "wushixiaoji-miniprogram",
+  "version": "0.23.2",
+  "private": true,
+  "description": "屋事小记 微信小程序端（家庭包裹驿站 family-parcel-hub 客户端，独立仓库）",
+  "scripts": {
+    "upload": "node scripts/upload.js",
+    "preview": "node scripts/preview.js"
+  },
+  "devDependencies": {
+    "miniprogram-ci": "^2.1.31"
+  }
+}
