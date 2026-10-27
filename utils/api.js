@@ -61,10 +61,17 @@ var API = {
     if (this.token) {
       header['Authorization'] = 'Bearer ' + this.token;
     }
+    var body = data || {};
+    // 自托管接入码（v0.23.6 多租户）：登录/绑定类请求自动附带 hubCode，
+    // bridge 据此把请求路由到对应自托管 hub（详见 bridge 仓 PLAN-bridge-multitenant.md）
+    if (method !== 'GET' && /^\/api\/auth\//.test(path) && body && !body.hubCode) {
+      var hc = getApp_().globalData.hubCode;
+      if (hc) body.hubCode = hc;
+    }
     wx.request({
       url: this.baseUrl + path,
       method: method,
-      data: data || {},
+      data: body,
       header: header,
       // AI 生成类接口（问答等）可能超过 wx.request 默认 60s，调用方可用 opts.timeout 放宽
       timeout: opts.timeout || 60000,

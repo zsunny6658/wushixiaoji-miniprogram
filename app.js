@@ -6,6 +6,7 @@ App({
   globalData: {
     baseUrl: 'https://parcel.zsunny.top',
     serverConfigured: false, // true = 用户配置了自托管服务端
+    hubCode: '', // 自托管接入码（多租户网关，空=官方 hub）
     families: [],
     token: '',
     me: '',
@@ -46,10 +47,25 @@ App({
       this.globalData.baseUrl = saved.replace(/\/+$/, '');
       this.globalData.serverConfigured = true;
     }
+    // 自托管接入码（v0.23.6）：登录/绑定请求自动附带，由 bridge 路由到对应 hub
+    this.globalData.hubCode = (wx.getStorageSync('parcel.hubCode') || '').trim().toUpperCase();
     api.setBaseUrl(this.globalData.baseUrl);
     if (this.globalData.token) {
       this.refreshState();
     }
+  },
+
+  // 保存自托管接入码（'' 清除）；仅影响登录/绑定请求路由，不改当前登录态
+  saveHubCode: function (code) {
+    var c = String(code || '').trim().toUpperCase().replace(/[\s-]/g, '');
+    if (c) {
+      wx.setStorageSync('parcel.hubCode', c);
+      this.globalData.hubCode = c;
+    } else {
+      wx.removeStorageSync('parcel.hubCode');
+      this.globalData.hubCode = '';
+    }
+    return this.globalData.hubCode;
   },
 
   // 保存自托管服务端地址（'' 恢复默认官方 bridge）；切服务端后需重新登录

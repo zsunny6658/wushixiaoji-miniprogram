@@ -1,17 +1,19 @@
 <view class="login-page">
   <!-- 自托管服务端提示/配置条（v0.23.5） -->
   <view class="server-bar">
-    <text class="server-label" bindtap="onEditServer">服务端：{{serverUrl}}</text>
+    <text class="server-label" bindtap="onEditServer">服务端：{{serverUrl}}{{hubCode ? ' · 接入码 ' + hubCode : ''}}</text>
     <text class="server-edit" bindtap="onEditServer">{{serverEditing ? '收起' : '更换'}}</text>
   </view>
   <view class="server-edit-box" wx:if="{{serverEditing}}">
     <input class="server-input" placeholder="https://你的域名（留空恢复官方）" placeholder-class="login-placeholder"
            value="{{serverUrl}}" bindinput="onServerInput" />
+    <input class="server-input hub-code-input" placeholder="自托管接入码（选填，向服务方获取）" placeholder-class="login-placeholder"
+           value="{{hubCode}}" bindinput="onHubCodeInput" />
     <view class="server-edit-actions">
       <button class="server-btn" bindtap="onSaveServer">保存并连接</button>
       <button class="server-btn ghost" bindtap="onResetServer">恢复官方服务端</button>
     </view>
-    <view class="server-tip">自托管服务端不支持微信一键登录，请使用邮箱密码登录；数据只存在于你自己的服务端。域名需先加入小程序后台「服务器域名」白名单。</view>
+    <view class="server-tip">自托管数据同样经由官方统一接入：填接入码即可连你自己的服务端，无需改地址、无需域名白名单；仅直连自建网关时才需要改上方地址。</view>
   </view>
   <view class="server-status" wx:if="{{serverProbing}}">正在探测服务端…</view>
   <view class="server-status err" wx:if="{{probeFail && !serverProbing}}">服务端连接失败，请检查地址或网络</view>

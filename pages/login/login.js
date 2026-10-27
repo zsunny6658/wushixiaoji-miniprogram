@@ -17,6 +17,8 @@ Page({
     serverUrl: '',
     serverEditing: false,
     serverInput: '',
+    hubCode: '',
+    hubInput: '',
     serverProbing: false,
     wxLoginSupported: true,
     emailCodeSupported: true,
@@ -24,7 +26,7 @@ Page({
   },
 
   onLoad: function () {
-    this.setData({ serverUrl: app.globalData.baseUrl });
+    this.setData({ serverUrl: app.globalData.baseUrl, hubCode: app.globalData.hubCode || '' });
     this.probeCapabilities();
   },
 
@@ -58,20 +60,23 @@ Page({
 
   // === 服务端地址编辑 ===
   onEditServer: function () {
-    this.setData({ serverEditing: !this.data.serverEditing, serverInput: this.data.serverUrl });
+    this.setData({ serverEditing: !this.data.serverEditing, serverInput: this.data.serverUrl, hubInput: this.data.hubCode });
   },
   onServerInput: function (e) { this.setData({ serverInput: e.detail.value }); },
+  onHubCodeInput: function (e) { this.setData({ hubInput: e.detail.value }); },
   onSaveServer: function () {
     var that = this;
     var url = app.saveServerUrl(this.data.serverInput);
-    this.setData({ serverEditing: false, serverUrl: url, view: 'wx', email: '', emailPass: '', emailCode: '' });
-    wx.showToast({ title: '已切换服务端', icon: 'none' });
+    var hc = app.saveHubCode(this.data.hubInput);
+    this.setData({ serverEditing: false, serverUrl: url, hubCode: hc, view: 'wx', email: '', emailPass: '', emailCode: '' });
+    wx.showToast({ title: hc ? '已切换服务端（接入码 ' + hc + '）' : '已切换服务端', icon: 'none' });
     this.probeCapabilities();
   },
   onResetServer: function () {
     var that = this;
     var url = app.saveServerUrl('');
-    this.setData({ serverEditing: false, serverUrl: url, view: 'wx', email: '', emailPass: '', emailCode: '' });
+    var hc = app.saveHubCode('');
+    this.setData({ serverEditing: false, serverUrl: url, hubCode: hc, view: 'wx', email: '', emailPass: '', emailCode: '' });
     this.probeCapabilities();
   },
 
