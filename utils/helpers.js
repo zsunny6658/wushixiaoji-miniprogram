@@ -190,9 +190,11 @@ function decorate(p, members) {
   } else if (_type === 'medication') {
     bm = p.title || p.code || '';
     bs = d.scheduleLabel || p.note || '';
-    // 当前盒服完 → 副行提示待开新盒（状态展示，不改内部 status）
+    // 周期状态副行（状态展示，不改内部 status）：整盒服完 > 今日已服
     if (p.medCycle && p.medCycle.done && p.status !== 'picked') {
       bs = (bs ? bs + ' · ' : '') + '本盒已服完，待开新盒';
+    } else if (p.medCycle && p.medCycle.todayDone && p.status !== 'picked') {
+      bs = (bs ? bs + ' · ' : '') + '今日已服';
     }
   } else {
     bm = p.title || p.code || '';
@@ -205,6 +207,8 @@ function decorate(p, members) {
   d.blockMainType = bmType;
   d.isPrivate = !!p.isPrivate;
   d.medCycleDone = !!(p.medCycle && p.medCycle.done) && p.status !== 'picked';
+  // 今日周期：当天（服药日）计划时段全部打卡 → true，次日自动回 false（v0.23.1）
+  d.medTodayDone = !!(p.medCycle && p.medCycle.todayDone) && p.status !== 'picked';
   d.amount = p.amount || 0;
   d.amountLabel = p.amount ? formatAmount(p.amount) : '';
   d.institution = p.institution || '';
