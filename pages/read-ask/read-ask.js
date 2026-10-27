@@ -91,6 +91,7 @@ Page({
     recording: false,   // 正在按住录音
     transcribing: false, // 正在转写
     scrollInto: '',
+    kbHeight: 0,     // 键盘高度（px），抬起输入条与消息区
     showSessions: false,
     sessions: [],    // 面板渲染用摘要列表
     currentId: ''
@@ -113,6 +114,16 @@ Page({
       var that = this;
       setTimeout(function () { that.setData({ scrollInto: 'qa-bottom' }); }, 200);
     }
+    // 键盘高度监听：输入条 fixed，默认 adjust-position 上推对 fixed 元素不生效，
+    // 改为手动抬起输入条/悬浮按钮 + 消息区补齐留白（键盘收起自动还原）
+    var self = this;
+    this._kbHandler = function (res) {
+      var h = (res && res.height) || 0;
+      if (h === self.data.kbHeight) return;
+      self.setData({ kbHeight: h });
+      if (h > 0 && self.data.messages.length) self.scrollBottom();
+    };
+    if (wx.onKeyboardHeightChange) wx.onKeyboardHeightChange(this._kbHandler);
   },
 
   onHide: function () { this.flushCurrent(); },
@@ -221,6 +232,9 @@ Page({
   },
 
   onUnload: function () {
+    if (wx.offKeyboardHeightChange && this._kbHandler) {
+      try { wx.offKeyboardHeightChange(this._kbHandler); } catch (e) { /* ignore */ }
+    }
     if (this._task && this._task.abort) { try { this._task.abort(); } catch (e) { /* ignore */ } }
     this.flushCurrent();
     this.stopTimer();

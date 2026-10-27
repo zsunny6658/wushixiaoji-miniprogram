@@ -1,5 +1,11 @@
 <view class="qa-page">
-  <scroll-view class="qa-scroll" scroll-y scroll-into-view="{{scrollInto}}" scroll-with-animation>
+  <scroll-view
+    class="qa-scroll"
+    scroll-y
+    scroll-into-view="{{scrollInto}}"
+    scroll-with-animation
+    style="{{kbHeight ? 'padding-bottom:' + kbHeight + 'px' : ''}}"
+  >
     <view class="qa-list">
 
       <!-- 欢迎 & 建议 -->
@@ -68,10 +74,18 @@
   </scroll-view>
 
   <!-- 悬浮新对话：有消息时始终可见，一步开新对话 -->
-  <view wx:if="{{messages.length}}" class="qa-newbtn" bindtap="onNewSession">＋ 新对话</view>
+  <view
+    wx:if="{{messages.length}}"
+    class="qa-newbtn"
+    style="{{kbHeight ? 'transform: translateY(-' + kbHeight + 'px)' : ''}}"
+    bindtap="onNewSession"
+  >＋ 新对话</view>
 
   <!-- 输入区 -->
-  <view class="qa-input-bar">
+  <view
+    class="qa-input-bar"
+    style="{{kbHeight ? 'transform: translateY(-' + kbHeight + 'px)' : ''}}"
+  >
     <view
       class="qa-mic {{recording ? 'on' : ''}}"
       bindtouchstart="onMicStart"
@@ -87,6 +101,7 @@
       placeholder-class="qa-input-ph"
       confirm-type="send"
       confirm-hold
+      adjust-position="{{false}}"
       bindinput="onInput"
       bindconfirm="onSend"
       disabled="{{sending}}"
