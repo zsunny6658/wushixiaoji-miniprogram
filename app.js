@@ -5,6 +5,7 @@ var helpers = require('./utils/helpers');
 App({
   globalData: {
     baseUrl: 'https://parcel.zsunny.top',
+    serverConfigured: false, // true = 用户配置了自托管服务端
     families: [],
     token: '',
     me: '',
@@ -39,10 +40,37 @@ App({
     this.globalData.group = wx.getStorageSync('parcel.group') || 'type';
     this.globalData.ignoreCleanupDays = parseInt(wx.getStorageSync('parcel.ignoreCleanupDays'), 10) || 7;
     this.globalData.ignoreCleanupMode = wx.getStorageSync('parcel.ignoreCleanupMode') === 'archive' ? 'archive' : 'delete';
+    // 自托管服务端地址（v0.23.5，Bitwarden 式）：storage 优先，默认官方 bridge
+    var saved = (wx.getStorageSync('parcel.serverUrl') || '').trim();
+    if (saved) {
+      this.globalData.baseUrl = saved.replace(/\/+$/, '');
+      this.globalData.serverConfigured = true;
+    }
     api.setBaseUrl(this.globalData.baseUrl);
     if (this.globalData.token) {
       this.refreshState();
     }
+  },
+
+  // 保存自托管服务端地址（'' 恢复默认官方 bridge）；切服务端后需重新登录
+  saveServerUrl: function (url) {
+    var b = String(url || '').trim().replace(/\/+$/, '');
+    if (b && !/^https?:\/\//i.test(b)) b = 'https://' + b; // 小程序合法域名必须 https
+    if (b) {
+      wx.setStorageSync('parcel.serverUrl', b);
+      this.globalData.baseUrl = b;
+      this.globalData.serverConfigured = true;
+    } else {
+      wx.removeStorageSync('parcel.serverUrl');
+      this.globalData.baseUrl = 'https://parcel.zsunny.top';
+      this.globalData.serverConfigured = false;
+    }
+    api.setBaseUrl(this.globalData.baseUrl);
+    // 服务端变了，本地登录态作废
+    this.globalData.token = '';
+    wx.removeStorageSync('parcel.token');
+    api.setToken('');
+    return this.globalData.baseUrl;
   },
 
   refreshState: function (cb, opts) {

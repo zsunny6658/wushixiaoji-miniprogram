@@ -1,4 +1,21 @@
 <view class="login-page">
+  <!-- 自托管服务端提示/配置条（v0.23.5） -->
+  <view class="server-bar">
+    <text class="server-label" bindtap="onEditServer">服务端：{{serverUrl}}</text>
+    <text class="server-edit" bindtap="onEditServer">{{serverEditing ? '收起' : '更换'}}</text>
+  </view>
+  <view class="server-edit-box" wx:if="{{serverEditing}}">
+    <input class="server-input" placeholder="https://你的域名（留空恢复官方）" placeholder-class="login-placeholder"
+           value="{{serverUrl}}" bindinput="onServerInput" />
+    <view class="server-edit-actions">
+      <button class="server-btn" bindtap="onSaveServer">保存并连接</button>
+      <button class="server-btn ghost" bindtap="onResetServer">恢复官方服务端</button>
+    </view>
+    <view class="server-tip">自托管服务端不支持微信一键登录，请使用邮箱密码登录；数据只存在于你自己的服务端。域名需先加入小程序后台「服务器域名」白名单。</view>
+  </view>
+  <view class="server-status" wx:if="{{serverProbing}}">正在探测服务端…</view>
+  <view class="server-status err" wx:if="{{probeFail && !serverProbing}}">服务端连接失败，请检查地址或网络</view>
+
   <!-- 微信登录视图 -->
   <view class="login-header" wx:if="{{view === 'wx'}}">
     <view class="login-icon"><ficon name="box" size="96" color="#fff" /></view>
@@ -7,8 +24,8 @@
   </view>
 
   <view class="login-card">
-    <!-- 微信一键登录 -->
-    <button class="wx-login-btn" wx:if="{{view === 'wx'}}" bindtap="onWxLogin">
+    <!-- 微信一键登录（仅当端点支持 wxLogin，v0.23.5 capabilities 探测） -->
+    <button class="wx-login-btn" wx:if="{{view === 'wx' && wxLoginSupported}}" bindtap="onWxLogin">
       <text>{{wxLoading ? '登录中...' : '微信一键登录'}}</text>
     </button>
 
@@ -22,7 +39,7 @@
       <!-- 密码/验证码 Tab -->
       <view class="auth-tabs">
         <view class="auth-tab {{emailTab === 'password' ? 'active' : ''}}" bindtap="onEmailTab" data-tab="password">密码登录</view>
-        <view class="auth-tab {{emailTab === 'code' ? 'active' : ''}}" bindtap="onEmailTab" data-tab="code">验证码登录</view>
+        <view class="auth-tab {{emailTab === 'code' ? 'active' : ''}}" wx:if="{{emailCodeSupported}}" bindtap="onEmailTab" data-tab="code">验证码登录</view>
       </view>
 
       <view class="input-label">邮箱</view>
@@ -36,8 +53,8 @@
                password cursor-spacing="20" bindinput="onEmailPassInput" />
       </block>
 
-      <!-- 验证码登录 -->
-      <block wx:if="{{emailTab === 'code'}}">
+      <!-- 验证码登录（端点支持时才展示，capabilities.emailCode） -->
+      <block wx:if="{{emailTab === 'code' && emailCodeSupported}}">
         <view class="input-label">验证码</view>
         <view class="code-row">
           <input class="login-input code-input" placeholder="6 位验证码" placeholder-class="login-placeholder"
@@ -49,7 +66,7 @@
       </block>
 
       <button class="login-btn" bindtap="onEmailLogin">登录</button>
-      <view class="login-back" bindtap="onBackToWx">← 返回微信登录</view>
+      <view class="login-back" wx:if="{{wxLoginSupported}}" bindtap="onBackToWx">← 返回微信登录</view>
     </view>
 
     <!-- 微信视图底部：切换到邮箱登录 -->
@@ -58,8 +75,11 @@
       <text class="login-divider-text">其他登录方式</text>
       <view class="login-divider-line"></view>
     </view>
-    <view class="login-alt" wx:if="{{view === 'wx'}}" bindtap="onShowEmail">
+    <view class="login-alt" wx:if="{{view === 'wx' && wxLoginSupported}}" bindtap="onShowEmail">
       <text>用邮箱密码登录 →</text>
+    </view>
+    <view class="login-alt" wx:if="{{view === 'wx' && !wxLoginSupported}}">
+      <text class="login-alt-muted">当前服务端不支持微信一键登录，请使用邮箱登录</text>
     </view>
   </view>
 </view>

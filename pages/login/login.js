@@ -12,7 +12,67 @@ Page({
     emailTab: 'password', // password | code
     codeSending: false,
     codeSent: false,
-    countdown: 0
+    countdown: 0,
+    // 自托管服务端（v0.23.5，Bitwarden 式）
+    serverUrl: '',
+    serverEditing: false,
+    serverInput: '',
+    serverProbing: false,
+    wxLoginSupported: true,
+    emailCodeSupported: true,
+    probeFail: false
+  },
+
+  onLoad: function () {
+    this.setData({ serverUrl: app.globalData.baseUrl });
+    this.probeCapabilities();
+  },
+
+  // === 服务端能力探测：wxLogin=false 时隐藏微信一键、默认邮箱登录 ===
+  probeCapabilities: function () {
+    var that = this;
+    this.setData({ serverProbing: true, probeFail: false });
+    wx.request({
+      url: app.globalData.baseUrl + '/api/auth/capabilities',
+      method: 'GET',
+      timeout: 8000,
+      success: function (res) {
+        var caps = (res.data && res.data.ok) ? res.data : null;
+        that.setData({
+          serverProbing: false,
+          wxLoginSupported: !!(caps && caps.wxLogin),
+          emailCodeSupported: !!(caps && caps.emailCode),
+          // 自托管端点无微信登录时，默认展示邮箱登录
+          view: (caps && !caps.wxLogin) ? 'email' : that.data.view
+        });
+        if (caps && !caps.emailCode && that.data.emailTab === 'code') {
+          that.setData({ emailTab: 'password' });
+        }
+      },
+      fail: function () {
+        // 探测失败：保留默认 UI，顶部提示
+        that.setData({ serverProbing: false, probeFail: true });
+      }
+    });
+  },
+
+  // === 服务端地址编辑 ===
+  onEditServer: function () {
+    this.setData({ serverEditing: !this.data.serverEditing, serverInput: this.data.serverUrl });
+  },
+  onServerInput: function (e) { this.setData({ serverInput: e.detail.value }); },
+  onSaveServer: function () {
+    var that = this;
+    var url = app.saveServerUrl(this.data.serverInput);
+    this.setData({ serverEditing: false, serverUrl: url, view: 'wx', email: '', emailPass: '', emailCode: '' });
+    wx.showToast({ title: '已切换服务端', icon: 'none' });
+    this.probeCapabilities();
+  },
+  onResetServer: function () {
+    var that = this;
+    var url = app.saveServerUrl('');
+    this.setData({ serverEditing: false, serverUrl: url, view: 'wx', email: '', emailPass: '', emailCode: '' });
+    this.probeCapabilities();
   },
 
   // === 微信一键登录 ===
@@ -50,7 +110,10 @@ Page({
 
   // === 切换到邮箱登录 ===
   onShowEmail: function () { this.setData({ view: 'email' }); },
-  onBackToWx: function () { this.setData({ view: 'wx', email: '', emailPass: '', emailCode: '' }); },
+  onBackToWx: function () {
+    if (!this.data.wxLoginSupported) return;
+    this.setData({ view: 'wx', email: '', emailPass: '', emailCode: '' });
+  },
 
   // === 邮箱 Tab 切换 ===
   onEmailTab: function (e) { this.setData({ emailTab: e.currentTarget.dataset.tab, emailPass: '', emailCode: '' }); },
