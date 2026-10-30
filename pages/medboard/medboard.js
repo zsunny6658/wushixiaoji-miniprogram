@@ -599,14 +599,34 @@ Page({
     // 不过滤 boxNo 会把旧盒同版号流水误判为已吃 → 明明还有药却报“无未吃药丸”）
     var boardNo = this.data.boardNo;
     var cap = this.pi.rows * this.pi.cols;
-    var pillIndex = -1;
-    for (var i = 0; i < cap; i++) {
-      var used = this.allLogs.some(function (l) { return (l.boxNo || 1) === boxCur && l.boardNo === boardNo && l.pillIndex === i; });
-      if (!used) { pillIndex = i; break; }
-    }
+    var self = this;
+    var findFree = function (bNo) {
+      for (var i = 0; i < cap; i++) {
+        var used = self.allLogs.some(function (l) { return (l.boxNo || 1) === boxCur && l.boardNo === bNo && l.pillIndex === i; });
+        if (!used) return i;
+      }
+      return -1;
+    };
+    var pillIndex = findFree(boardNo);
     if (pillIndex < 0) {
-      wx.showToast({ title: '当前版已无未吃药丸，请先切版', icon: 'none' });
-      return;
+      // 当前版全部有记录 → 自动扫描其余版找剩余药丸（自动切换视图使用），全盒都满才提示
+      var viewBoardFull = boardNo;
+      var boards = this.pi.boards || 1;
+      for (var b = 1; b <= boards && pillIndex < 0; b++) {
+        if (b === boardNo) continue;
+        var freeIdx = findFree(b);
+        if (freeIdx >= 0) {
+          boardNo = b;
+          pillIndex = freeIdx;
+          this.setData({ boardNo: b });
+          this.buildBoard();
+          wx.showToast({ title: '第 ' + viewBoardFull + ' 版已记录满，自动使用第 ' + b + ' 版药丸', icon: 'none', duration: 2200 });
+        }
+      }
+      if (pillIndex < 0) {
+        wx.showToast({ title: '当前盒药丸已全部有记录 ✓', icon: 'none' });
+        return;
+      }
     }
     var that = this;
     var pick = function (slotIndex) {
