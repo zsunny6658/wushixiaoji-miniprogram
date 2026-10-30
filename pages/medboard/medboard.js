@@ -585,7 +585,8 @@ Page({
     if (wd && wd.label) dayLabel = wd.label;
     var sched = (this.pkg && this.pkg.schedule) || {};
     var times = this.times || (sched.times || []);
-    var yLogs = this.allLogs.filter(function (l) { return l.date === date; });
+    var boxCur = this.pi.boxNo || 1;
+    var yLogs = this.allLogs.filter(function (l) { return l.date === date && (l.boxNo || 1) === boxCur; });
     var untaken = [];
     times.forEach(function (t, i) {
       if (!yLogs.some(function (l) { return l.slotIndex === i; })) untaken.push({ index: i, time: t });
@@ -594,12 +595,13 @@ Page({
       wx.showToast({ title: dayLabel + '已全部记录 ✓', icon: 'none' });
       return;
     }
-    // 药位：当前版第一个未吃的位置（补记 = 那颗药该日实际已吃掉）
+    // 药位：当前盒当前版第一个未吃的位置（与 buildBoard 渲染同口径：该位置在当前盒有任意日期 log 即视为已用，
+    // 不过滤 boxNo 会把旧盒同版号流水误判为已吃 → 明明还有药却报“无未吃药丸”）
     var boardNo = this.data.boardNo;
     var cap = this.pi.rows * this.pi.cols;
     var pillIndex = -1;
     for (var i = 0; i < cap; i++) {
-      var used = this.allLogs.some(function (l) { return l.boardNo === boardNo && l.pillIndex === i && l.date <= date; });
+      var used = this.allLogs.some(function (l) { return (l.boxNo || 1) === boxCur && l.boardNo === boardNo && l.pillIndex === i; });
       if (!used) { pillIndex = i; break; }
     }
     if (pillIndex < 0) {
