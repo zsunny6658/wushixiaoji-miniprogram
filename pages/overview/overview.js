@@ -1,6 +1,7 @@
 // pages/overview/overview.js
 var api = require('../../utils/api');
 var helpers = require('../../utils/helpers');
+var heatmap = require('../../utils/heatmap');
 var app = getApp();
 
 Page({
@@ -10,7 +11,11 @@ Page({
     todayStr: '',
     quadrantCounts: { q1: 0, q2: 0, q3: 0, q4: 0 },
     todayActs: [],
-    searchKeyword: ''
+    searchKeyword: '',
+    heatWeeks: [],
+    heatMonths: [],
+    activeDays: 0,
+    heatTotal: 0
   },
 
   onLoad: function () {
@@ -34,6 +39,30 @@ Page({
     app.refreshState(function () {
       that.compute();
     });
+    this.loadHeat();
+  },
+
+  // 使用活跃度热力图（当年，轻量接口；失败静默隐藏，不打扰首页）
+  loadHeat: function () {
+    var that = this;
+    var y = new Date().getFullYear();
+    api.request('GET', '/api/stats/activity?year=' + y, {}, function (data) {
+      var heat = heatmap.buildHeatmap((data && data.activity) || [], y);
+      that.setData({
+        heatWeeks: heat.weeks,
+        heatMonths: heat.months,
+        activeDays: heat.activeDays,
+        heatTotal: heat.total
+      });
+    }, function () {});
+  },
+
+  onHeatTap: function (e) {
+    var ds = e.currentTarget.dataset.date;
+    var c = parseInt(e.currentTarget.dataset.count, 10) || 0;
+    if (!ds) return;
+    var label = parseInt(ds.slice(5, 7), 10) + '月' + parseInt(ds.slice(8, 10), 10) + '日';
+    wx.showToast({ title: c ? label + ' · ' + c + ' 条动态' : label + ' · 未使用', icon: 'none' });
   },
 
   compute: function () {

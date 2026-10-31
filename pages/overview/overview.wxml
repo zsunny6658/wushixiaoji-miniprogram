@@ -89,6 +89,44 @@
     </view>
   </view>
 
+  <!-- 使用活跃度热力图（GitHub 风格，当年） -->
+  <view class="section" wx:if="{{heatWeeks.length}}">
+    <view class="section-head">
+      <view class="section-title"><ficon style="vertical-align:-6rpx;margin-right:8rpx" name="check-circle" size="30" color="#718096" /> 使用活跃度 · {{activeDays}} 天 · 共 {{heatTotal}} 条</view>
+    </view>
+    <view class="heat-card">
+      <scroll-view scroll-x class="hm-scroll" enhanced show-scrollbar="{{false}}">
+        <view class="hm-inner">
+          <view class="hm-months">
+            <text class="hm-month" wx:for="{{heatMonths}}" wx:key="label" style="left:{{item.left}}rpx">{{item.label}}</text>
+          </view>
+          <view class="hm-cols">
+            <view class="hm-col" wx:for="{{heatWeeks}}" wx:for-index="wi" wx:key="wi">
+              <view
+                wx:for="{{item}}"
+                wx:for-item="cell"
+                wx:key="key"
+                class="hm-cell hm-l{{cell.level}}{{cell.future ? ' hm-future' : ''}}{{cell.blank ? ' hm-blank' : ''}}"
+                data-date="{{cell.date}}"
+                data-count="{{cell.count}}"
+                bindtap="onHeatTap">
+              </view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="hm-legend">
+        <text>少</text>
+        <view class="hm-cell hm-l0"></view>
+        <view class="hm-cell hm-l1"></view>
+        <view class="hm-cell hm-l2"></view>
+        <view class="hm-cell hm-l3"></view>
+        <view class="hm-cell hm-l4"></view>
+        <text>多</text>
+      </view>
+    </view>
+  </view>
+
   <!-- 最近动态 -->
   <view class="section">
     <view class="section-head">

@@ -88,30 +88,6 @@
   color: var(--text-secondary);
 }
 
-/* 活跃度热力图（GitHub 风格） */
-.hm-scroll { width: 100%; }
-.hm-inner { padding: 4rpx 4rpx 8rpx; }
-.hm-months { position: relative; height: 26rpx; margin-bottom: 6rpx; }
-.hm-month { position: absolute; top: 0; font-size: 18rpx; color: var(--text-tertiary); white-space: nowrap; }
-.hm-cols { display: flex; gap: 4rpx; }
-.hm-col { display: flex; flex-direction: column; gap: 4rpx; flex-shrink: 0; }
-.hm-cell { width: 14rpx; height: 14rpx; border-radius: 3rpx; flex-shrink: 0; }
-.hm-l0 { background: var(--bg-page); border: 1rpx solid var(--border); }
-.hm-l1 { background: #9be9a8; }
-.hm-l2 { background: #40c463; }
-.hm-l3 { background: #30a14e; }
-.hm-l4 { background: #216e39; }
-.hm-future { opacity: 0.3; }
-.hm-blank { background: transparent; border: none; }
-.hm-legend {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  margin-top: 16rpx;
-  font-size: 20rpx;
-  color: var(--text-tertiary);
-}
-
 .privacy-note {
   margin: 8rpx var(--spacing-md) var(--spacing-lg);
   font-size: 20rpx;
