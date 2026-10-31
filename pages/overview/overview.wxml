@@ -95,7 +95,7 @@
       <view class="section-title"><ficon style="vertical-align:-6rpx;margin-right:8rpx" name="check-circle" size="30" color="#718096" /> 使用活跃度 · {{activeDays}} 天 · 共 {{heatTotal}} 条</view>
     </view>
     <view class="heat-card">
-      <scroll-view scroll-x class="hm-scroll" enhanced show-scrollbar="{{false}}">
+      <scroll-view scroll-x class="hm-scroll" enhanced show-scrollbar="{{false}}" scroll-left="{{heatScrollLeft}}" scroll-with-animation>
         <view class="hm-inner">
           <view class="hm-months">
             <text class="hm-month" wx:for="{{heatMonths}}" wx:key="label" style="left:{{item.left}}rpx">{{item.label}}</text>

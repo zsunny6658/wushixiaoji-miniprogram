@@ -15,7 +15,8 @@ Page({
     heatWeeks: [],
     heatMonths: [],
     activeDays: 0,
-    heatTotal: 0
+    heatTotal: 0,
+    heatScrollLeft: 0
   },
 
   onLoad: function () {
@@ -48,11 +49,16 @@ Page({
     var y = new Date().getFullYear();
     api.request('GET', '/api/stats/activity?year=' + y, {}, function (data) {
       var heat = heatmap.buildHeatmap((data && data.activity) || [], y);
+      // 默认滚动到今天所在列（居中），而不是停在年初
+      var win = (wx.getWindowInfo) ? wx.getWindowInfo() : wx.getSystemInfoSync();
+      var todayPx = (heat.todayLeft || 0) / 750 * win.windowWidth; // rpx -> px
+      var scrollLeft = Math.max(0, todayPx - win.windowWidth / 2);
       that.setData({
         heatWeeks: heat.weeks,
         heatMonths: heat.months,
         activeDays: heat.activeDays,
-        heatTotal: heat.total
+        heatTotal: heat.total,
+        heatScrollLeft: scrollLeft
       });
     }, function () {});
   },

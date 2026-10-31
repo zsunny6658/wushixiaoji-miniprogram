@@ -48,6 +48,7 @@ function buildHeatmap(activity, year) {
   };
   var lead = new Date(year, 0, 1).getDay(); // 1月1日是周几（0=周日）
   for (var i = 0; i < lead; i++) col.push({ blank: true, key: 'b' + (seq++) });
+  var todayCol = -1; // 今天所在列（0-based，供默认滚动定位）
   activity.forEach(function (a) {
     col.push({
       key: 'd' + (seq++),
@@ -56,6 +57,7 @@ function buildHeatmap(activity, year) {
       level: levelOf(a.count),
       future: a.date > today
     });
+    if (a.date === today && todayCol < 0) todayCol = weeks.length; // 当前正在构建的列即将成为第 weeks.length 列
     if (col.length === 7) flush();
   });
   if (col.length) {
@@ -63,7 +65,8 @@ function buildHeatmap(activity, year) {
     flush();
   }
   var total = activity.reduce(function (s, a) { return s + a.count; }, 0);
-  return { weeks: weeks, months: months, activeDays: counts.length, total: total };
+  var todayLeft = todayCol > 0 ? todayCol * (CELL + GAP) : 0; // 今天列左缘（rpx）
+  return { weeks: weeks, months: months, activeDays: counts.length, total: total, todayLeft: todayLeft };
 }
 
 module.exports = { buildHeatmap: buildHeatmap, todayStr: todayStr };
