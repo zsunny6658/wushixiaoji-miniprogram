@@ -38,6 +38,12 @@
     <text class="run-entry-count">{{pendingPickupCount > 0 ? pendingPickupCount + ' 件待取 ›' : '暂无待取件 ›'}}</text>
   </view>
 
+  <!-- 智能排序引导条 -->
+  <view class="smart-hint" wx:if="{{sortMode === 'smart' && hasFlagged && !smartHintOff}}">
+    <text class="smart-hint-text">🚩 标红旗（即「重要·高」）的事项会置顶显示；筛选里切「最新优先」可严格按时间排序</text>
+    <text class="smart-hint-x" bindtap="onDismissSmartHint">✕</text>
+  </view>
+
   <!-- 筛选抽屉 -->
   <view class="filter-drawer" wx:if="{{showFilter}}">
     <view class="segmented segmented-fill">

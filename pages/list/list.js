@@ -13,9 +13,11 @@ Page({
     urgencyFilter: 'all',
     group: 'type',
     search: '',
-    sortOptions: ['最新优先', '按到期日', '按重要度'],
+    sortOptions: ['智能排序', '最新优先', '按到期日', '按重要度'],
     sortIndex: 0,
-    sortMode: 'newest',
+    sortMode: 'smart',
+    smartHintOff: false,
+    hasFlagged: false,
     list: [],
     groups: [],
     impOptions: ['重要·全部', '重要·高', '重要·中', '重要·低'],
@@ -60,10 +62,12 @@ Page({
       groupIndex: ['none', 'owner', 'type'].indexOf(app.globalData.group || 'type'),
       pxToRpx: 750 / sys.windowWidth
     });
-    // 恢复上次选择的排序方式（默认最近添加，红旗始终置顶）
+    // 恢复上次选择的排序方式（默认智能排序：红旗置顶；选「最新优先」则严格按时间）
     var savedSort = wx.getStorageSync('fph_sortMode');
-    var sortIdx = ['newest', 'due', 'importance'].indexOf(savedSort);
+    var vals = ['smart', 'newest', 'due', 'importance'];
+    var sortIdx = vals.indexOf(savedSort);
     if (sortIdx > 0) this.setData({ sortMode: savedSort, sortIndex: sortIdx });
+    this.setData({ smartHintOff: !!wx.getStorageSync('fph_smartHintOff') });
     // SSE 连接状态黄条（首页列表最常看，断线要有感知）
     var that = this;
     this._unsubRt = realtime.subscribe(function () {}, function (st) {
@@ -151,6 +155,8 @@ Page({
     else if (this.data.filter === 'ignored') pkgs = pkgs.filter(function (p) { return p.status === 'ignored'; });
     // 待取件数（供「按驿站顺序取件」入口展示）
     var pendingPickupCount = basePkgs.filter(function (p) { return p.type === 'pickup' && p.status === 'pending'; }).length;
+    // 智能排序引导条：有待办红旗件时提示排序规则（红旗即重要·高）
+    var hasFlagged = basePkgs.some(function (p) { return p.status === 'pending' && (p.importance || 'medium') === 'high'; });
     pkgs = helpers.sortPackages(pkgs, this.data.sortMode);
 
     var groups = [];
@@ -168,7 +174,12 @@ Page({
     var emptyMap = { all: ['📋', '当前没有记录', '点击右下角 + 添加'], pending: ['⏳', '没有待办', '做得不错'], picked: ['✅', '没有已完成', '完成后点击 ✓ 归档'], overdue: ['⚠️', '没有逾期', '没有需要处理的'], ignored: ['🚫', '没有已忽略的记录', '点击卡片进入详情可忽略'], debt: ['💳', '没有待还款项', '点击右下角 + 添加'] };
     var em = emptyMap[this.data.filter] || emptyMap.all;
 
-    this.setData({ list: pkgs, groups: groups, counts: counts, pendingPickupCount: pendingPickupCount, loading: false, emptyEmoji: em[0], emptyTitle: em[1], emptyDesc: em[2] });
+    this.setData({ list: pkgs, groups: groups, counts: counts, pendingPickupCount: pendingPickupCount, hasFlagged: hasFlagged, loading: false, emptyEmoji: em[0], emptyTitle: em[1], emptyDesc: em[2] });
+  },
+
+  onDismissSmartHint: function () {
+    this.setData({ smartHintOff: true });
+    try { wx.setStorageSync('fph_smartHintOff', 1); } catch (err) { }
   },
 
   onGoPickupRun: function () {
@@ -322,8 +333,8 @@ Page({
   },
   onSortChange: function (e) {
     var idx = parseInt(e.detail.value, 10);
-    var vals = ['newest', 'due', 'importance'];
-    var mode = vals[idx] || 'newest';
+    var vals = ['smart', 'newest', 'due', 'importance'];
+    var mode = vals[idx] || 'smart';
     this.setData({ sortIndex: idx, sortMode: mode });
     try { wx.setStorageSync('fph_sortMode', mode); } catch (err) { }
     this.computeList();

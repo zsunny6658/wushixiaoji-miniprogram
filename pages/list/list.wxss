@@ -576,3 +576,27 @@
 .run-entry-count { font-size: var(--font-caption); color: #1E5B3C; font-weight: 600; }
 .run-entry-empty { background: var(--bg-card); border-color: var(--border); }
 .run-entry-empty .run-entry-text, .run-entry-empty .run-entry-count, .run-entry-empty .run-entry-icon { color: var(--text-tertiary); }
+
+/* 智能排序引导条 */
+.smart-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  margin: 0 var(--spacing-md) 16rpx;
+  padding: 16rpx 20rpx;
+  background: rgba(245, 158, 11, 0.1);
+  border: 2rpx solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-md);
+}
+.smart-hint-text {
+  flex: 1;
+  font-size: var(--font-caption);
+  color: #92400E;
+  line-height: 1.6;
+}
+.smart-hint-x {
+  flex-shrink: 0;
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+  padding: 0 8rpx;
+}

@@ -113,16 +113,19 @@ function urgLabel(urg) {
 // 注意：isOverdue 的口径是 arrivedAt 早于当前时间（到店/事项已发生），
 //       pending 记录几乎全部为 overdue=true，故 newest 模式不能用 overdue 插队（会把最新记录压到列表尾）
 function sortPackages(pkgs, mode) {
-  var m = mode || 'newest';
+  // smart（默认）：逾期 > 红旗(重要·高) > 时间，重要事项置顶；
+  // newest/due/importance：用户明确选择的排序条件，严格按条件执行，红旗不插队（v0.23.14 用户反馈）
+  var m = mode || 'smart';
   pkgs.sort(function (a, b) {
     if (a.status !== b.status) return a.status === 'pending' ? -1 : 1;
-    if (m !== 'newest') {
+    if (m === 'smart' || m === 'due') {
       if (!!a.overdue !== !!b.overdue) return a.overdue ? -1 : 1;
     }
-    var fa = (a.importance || 'medium') === 'high' ? 0 : 1;
-    var fb = (b.importance || 'medium') === 'high' ? 0 : 1;
-    if (fa !== fb) return fa - fb;
-    if (m === 'importance') {
+    if (m === 'smart') {
+      var fa0 = (a.importance || 'medium') === 'high' ? 0 : 1;
+      var fb0 = (b.importance || 'medium') === 'high' ? 0 : 1;
+      if (fa0 !== fb0) return fa0 - fb0;
+    } else if (m === 'importance') {
       var ai = IMP_RANK[a.importance], bi = IMP_RANK[b.importance];
       var au = URG_RANK[a.urgency], bu = URG_RANK[b.urgency];
       if (au !== bu) return au - bu;
@@ -131,6 +134,11 @@ function sortPackages(pkgs, mode) {
       var ad = a.dueDate || '', bd = b.dueDate || '';
       if (!!ad !== !!bd) return ad ? -1 : 1;
       if (ad && ad !== bd) return ad.localeCompare(bd);
+    } else if (m === 'newest') {
+      // 严格时间序：按 更新时间 > 到达 > 创建（刚编辑的会浮到最上面）
+      var an = a.updatedAt || a.arrivedAt || a.createdAt || '';
+      var bn = b.updatedAt || b.arrivedAt || b.createdAt || '';
+      if (an !== bn) return bn.localeCompare(an);
     }
     var at = a.arrivedAt || a.createdAt || '';
     var bt = b.arrivedAt || b.createdAt || '';
