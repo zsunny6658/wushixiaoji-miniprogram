@@ -574,3 +574,5 @@
 .run-entry-icon { font-size: 32rpx; }
 .run-entry-text { flex: 1; font-size: var(--font-body-sm); font-weight: 600; color: #1E5B3C; }
 .run-entry-count { font-size: var(--font-caption); color: #1E5B3C; font-weight: 600; }
+.run-entry-empty { background: var(--bg-card); border-color: var(--border); }
+.run-entry-empty .run-entry-text, .run-entry-empty .run-entry-count, .run-entry-empty .run-entry-icon { color: var(--text-tertiary); }

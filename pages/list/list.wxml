@@ -31,11 +31,11 @@
     </view>
   </view>
 
-  <!-- 按序取件入口（有待取件时显示） -->
-  <view class="run-entry" wx:if="{{pendingPickupCount > 0 && (recordType === 'all' || recordType === 'pickup') && (filter === 'all' || filter === 'pending')}}" hover-class="hover-press" bindtap="onGoPickupRun">
+  <!-- 按序取件入口：取件 Tab 常驻（无待取件置灰），其他 Tab 有待取件才显示 -->
+  <view class="run-entry {{pendingPickupCount === 0 ? 'run-entry-empty' : ''}}" wx:if="{{recordType === 'pickup' || (pendingPickupCount > 0 && recordType === 'all' && (filter === 'all' || filter === 'pending'))}}" hover-class="hover-press" bindtap="onGoPickupRun">
     <text class="run-entry-icon">📐</text>
     <text class="run-entry-text">按驿站顺序取件</text>
-    <text class="run-entry-count">{{pendingPickupCount}} 件待取 ›</text>
+    <text class="run-entry-count">{{pendingPickupCount > 0 ? pendingPickupCount + ' 件待取 ›' : '暂无待取件 ›'}}</text>
   </view>
 
   <!-- 筛选抽屉 -->
