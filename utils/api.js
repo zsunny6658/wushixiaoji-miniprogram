@@ -145,8 +145,8 @@ var API = {
   parse: function (text, type, cb, errCb) {
     this.request('POST', '/api/parse', { text: text, type: type || 'auto' }, cb, errCb);
   },
-  parseImage: function (images, type, cb, errCb) {
-    this.request('POST', '/api/parse/image', { images: images, type: type || 'auto' }, cb, errCb);
+  parseImage: function (images, type, cb, errCb, opts) {
+    this.request('POST', '/api/parse/image', { images: images, type: type || 'auto' }, cb, errCb, opts);
   },
   parseAudio: function (audio, cb, errCb) {
     this.request('POST', '/api/parse/audio', { audio: audio }, cb, errCb);

@@ -529,7 +529,7 @@ Page({
         }, function () {
           wx.hideLoading();
           wx.showToast({ title: '识别失败，请手动设置', icon: 'none' });
-        });
+        }, { timeout: 120000 });
       },
       fail: function () {
         wx.hideLoading();
@@ -686,7 +686,8 @@ Page({
       return;
     }
     this.setData({ imageParsing: true });
-    wx.showLoading({ title: '识别中...' });
+    wx.showLoading({ title: '识别中...', mask: true });
+    // 多图大模型解析可能超过 60s，放宽到 120s；失败必须给出明确提示（v0.23.15 排查"识别后没反应"）
     api.parseImage(this.data.imageBase64List, 'auto', function (data) {
       wx.hideLoading();
       that.setData({ imageParsing: false });
@@ -708,10 +709,11 @@ Page({
       }
       var r = records[0];
       that.promptParsedType(r);
-    }, function () {
+    }, function (msg) {
       wx.hideLoading();
       that.setData({ imageParsing: false });
-    });
+      wx.showToast({ title: '识别失败：' + (msg || '网络异常，请重试'), icon: 'none', duration: 4000 });
+    }, { timeout: 120000 });
   },
 
   onSave: function () {
