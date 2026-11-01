@@ -15,7 +15,8 @@
     "pages/settings/settings",
     "pages/archive/archive",
     "pages/medboard/medboard",
-    "pages/stats/stats"
+    "pages/stats/stats",
+    "pages/pickup-run/pickup-run"
   ],
   "window": {
     "navigationBarBackgroundColor": "@navBgColor",

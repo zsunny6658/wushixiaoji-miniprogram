@@ -559,3 +559,18 @@
 .bk-img-badge {
   color: var(--text-tertiary, #94A3B8);
 }
+
+/* 按序取件入口 */
+.run-entry {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin: 0 var(--spacing-md) 16rpx;
+  padding: 20rpx 24rpx;
+  background: rgba(30, 91, 60, 0.08);
+  border: 2rpx solid rgba(30, 91, 60, 0.25);
+  border-radius: var(--radius-md);
+}
+.run-entry-icon { font-size: 32rpx; }
+.run-entry-text { flex: 1; font-size: var(--font-body-sm); font-weight: 600; color: #1E5B3C; }
+.run-entry-count { font-size: var(--font-caption); color: #1E5B3C; font-weight: 600; }

@@ -1,0 +1,63 @@
+<view class="page">
+  <!-- 选驿站 -->
+  <block wx:if="{{!stationName}}">
+    <view class="hint">选择要去的驿站，按取件码顺序排列，逐个到货架取件</view>
+    <view class="station-list" wx:if="{{stations.length}}">
+      <view class="station-row" wx:for="{{stations}}" wx:key="name" hover-class="hover-press" bindtap="onSelectStation" data-name="{{item.name}}">
+        <view class="station-icon">🏪</view>
+        <view class="station-info">
+          <text class="station-name">{{item.name}}</text>
+          <text class="station-sub">{{item.count}} 件待取</text>
+        </view>
+        <text class="station-go">开始取件 ›</text>
+      </view>
+    </view>
+    <view class="empty-state" wx:else>
+      <text class="empty-icon">📦</text>
+      <text class="empty-text">没有待取的快递</text>
+      <text class="empty-desc">有新包裹后再来吧</text>
+    </view>
+  </block>
+
+  <!-- 取件执行 -->
+  <block wx:else>
+    <!-- 顶部进度栏 -->
+    <view class="run-head">
+      <view class="run-station" bindtap="onSwitchStation">
+        <text class="run-station-name">🏪 {{stationName}}</text>
+        <text class="run-switch">换驿站</text>
+      </view>
+      <view class="run-progress">
+        <view class="run-progress-bar">
+          <view class="run-progress-fill" style="width:{{total ? doneCount / total * 100 : 0}}%"></view>
+        </view>
+        <text class="run-progress-text">{{doneCount}}/{{total}}</text>
+      </view>
+    </view>
+
+    <!-- 完成 -->
+    <view class="run-finished" wx:if="{{finished}}">
+      <text class="run-finished-icon">🎉</text>
+      <text class="run-finished-text">本站 {{total}} 件全部取完</text>
+      <button class="btn-back" bindtap="onBackToList">完成，返回列表</button>
+    </view>
+
+    <!-- 货架分组 -->
+    <view class="shelf" wx:for="{{groups}}" wx:for-item="g" wx:key="key">
+      <view class="shelf-head">
+        <text class="shelf-title">{{g.key}}</text>
+        <text class="shelf-count">{{g.items.length}} 件</text>
+      </view>
+      <view class="run-row {{item.done ? 'row-done' : ''}}" wx:for="{{g.items}}" wx:for-item="item" wx:key="id">
+        <view class="seq {{item.done ? 'seq-done' : ''}}">{{item.done ? '✓' : item.seq}}</view>
+        <view class="row-main" bindtap="onCopyCode" data-code="{{item.code}}">
+          <text class="row-code {{item.done ? 'code-done' : ''}}">{{item.code}}</text>
+          <text class="row-sub" wx:if="{{item.sub}}">{{item.sub}}</text>
+        </view>
+        <view class="row-act {{item.done ? 'act-undo' : ''}}" catchtap="{{item.done ? 'onUndo' : 'onPick'}}" data-id="{{item.id}}">{{item.done ? '↩ 撤销' : '已取'}}</view>
+      </view>
+    </view>
+
+    <view class="bottom-tip" wx:if="{{!finished}}">点取件码可复制 · 已取的会划线，点「撤销」可反悔</view>
+  </block>
+</view>

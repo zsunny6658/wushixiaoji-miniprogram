@@ -28,6 +28,7 @@ Page({
     scopeIndex: 0,
     groupIndex: 0,
     counts: { all: 0, pending: 0, picked: 0, overdue: 0, ignored: 0 },
+    pendingPickupCount: 0,
     emptyEmoji: '📋',
     emptyTitle: '当前没有记录',
     emptyDesc: '点击右下角 + 添加',
@@ -148,6 +149,8 @@ Page({
     else if (this.data.filter === 'picked') pkgs = pkgs.filter(function (p) { return p.status === 'picked'; });
     else if (this.data.filter === 'overdue') pkgs = pkgs.filter(function (p) { return p.overdue && p.status === 'pending'; });
     else if (this.data.filter === 'ignored') pkgs = pkgs.filter(function (p) { return p.status === 'ignored'; });
+    // 待取件数（供「按驿站顺序取件」入口展示）
+    var pendingPickupCount = basePkgs.filter(function (p) { return p.type === 'pickup' && p.status === 'pending'; }).length;
     pkgs = helpers.sortPackages(pkgs, this.data.sortMode);
 
     var groups = [];
@@ -165,7 +168,11 @@ Page({
     var emptyMap = { all: ['📋', '当前没有记录', '点击右下角 + 添加'], pending: ['⏳', '没有待办', '做得不错'], picked: ['✅', '没有已完成', '完成后点击 ✓ 归档'], overdue: ['⚠️', '没有逾期', '没有需要处理的'], ignored: ['🚫', '没有已忽略的记录', '点击卡片进入详情可忽略'], debt: ['💳', '没有待还款项', '点击右下角 + 添加'] };
     var em = emptyMap[this.data.filter] || emptyMap.all;
 
-    this.setData({ list: pkgs, groups: groups, counts: counts, loading: false, emptyEmoji: em[0], emptyTitle: em[1], emptyDesc: em[2] });
+    this.setData({ list: pkgs, groups: groups, counts: counts, pendingPickupCount: pendingPickupCount, loading: false, emptyEmoji: em[0], emptyTitle: em[1], emptyDesc: em[2] });
+  },
+
+  onGoPickupRun: function () {
+    wx.navigateTo({ url: '/pages/pickup-run/pickup-run' });
   },
 
   switchScope: function (e) {

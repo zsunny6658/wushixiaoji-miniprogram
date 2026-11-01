@@ -31,6 +31,13 @@
     </view>
   </view>
 
+  <!-- 按序取件入口（有待取件时显示） -->
+  <view class="run-entry" wx:if="{{pendingPickupCount > 0 && (recordType === 'all' || recordType === 'pickup') && (filter === 'all' || filter === 'pending')}}" hover-class="hover-press" bindtap="onGoPickupRun">
+    <text class="run-entry-icon">📐</text>
+    <text class="run-entry-text">按驿站顺序取件</text>
+    <text class="run-entry-count">{{pendingPickupCount}} 件待取 ›</text>
+  </view>
+
   <!-- 筛选抽屉 -->
   <view class="filter-drawer" wx:if="{{showFilter}}">
     <view class="segmented segmented-fill">
