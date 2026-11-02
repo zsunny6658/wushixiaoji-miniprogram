@@ -33,6 +33,10 @@
         </view>
         <text class="run-progress-text">{{doneCount}}/{{total}}</text>
       </view>
+      <view class="run-actions" wx:if="{{!batchMode && !finished}}">
+        <text class="run-act-btn" bindtap="onToggleBatch">批量选择</text>
+        <text class="run-act-btn" bindtap="onPickAll">全部已取</text>
+      </view>
     </view>
 
     <!-- 完成 -->
@@ -48,16 +52,26 @@
         <text class="shelf-title">{{g.key}}</text>
         <text class="shelf-count">{{g.items.length}} 件</text>
       </view>
-      <view class="run-row {{item.done ? 'row-done' : ''}}" wx:for="{{g.items}}" wx:for-item="item" wx:key="id">
+      <view class="run-row {{item.done ? 'row-done' : ''}} {{batchMode && item.batchSelected ? 'row-selected' : ''}}" wx:for="{{g.items}}" wx:for-item="item" wx:key="id">
         <view class="seq {{item.done ? 'seq-done' : ''}}">{{item.done ? '✓' : item.seq}}</view>
-        <view class="row-main" bindtap="onCopyCode" data-code="{{item.code}}">
+        <view class="row-main" bindtap="onRowTap" data-id="{{item.id}}" data-code="{{item.code}}">
           <text class="row-code {{item.done ? 'code-done' : ''}}">{{item.code}}</text>
           <text class="row-sub" wx:if="{{item.sub}}">{{item.sub}}</text>
         </view>
-        <view class="row-act {{item.done ? 'act-undo' : ''}}" catchtap="{{item.done ? 'onUndo' : 'onPick'}}" data-id="{{item.id}}">{{item.done ? '↩ 撤销' : '已取'}}</view>
+        <block wx:if="{{batchMode && !item.done}}">
+          <view class="row-check {{item.batchSelected ? 'checked' : ''}}">✓</view>
+        </block>
+        <view wx:else class="row-act {{item.done ? 'act-undo' : ''}}" catchtap="{{item.done ? 'onUndo' : 'onPick'}}" data-id="{{item.id}}">{{item.done ? '↩ 撤销' : '已取'}}</view>
       </view>
     </view>
 
-    <view class="bottom-tip" wx:if="{{!finished}}">点取件码可复制 · 已取的会划线，点「撤销」可反悔</view>
+    <!-- 批量操作栏 -->
+    <view class="run-batch-bar" wx:if="{{batchMode}}">
+      <text class="bb-all" bindtap="onSelectAllRun">{{allSelected ? '取消全选' : '全选'}}</text>
+      <button class="bb-pick {{batchCount ? '' : 'bb-disabled'}}" bindtap="onBatchPickRun">已取所选 {{batchCount}} 件</button>
+      <text class="bb-exit" bindtap="onToggleBatch">退出</text>
+    </view>
+
+    <view class="bottom-tip" wx:if="{{!finished && !batchMode}}">点取件码可复制 · 「批量选择」可勾选多件一次核销</view>
   </block>
 </view>

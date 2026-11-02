@@ -142,3 +142,60 @@
   font-size: 20rpx;
   color: var(--text-tertiary);
 }
+
+/* 批量/全量操作（v0.23.16） */
+.run-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+.run-act-btn {
+  font-size: var(--font-caption);
+  color: #4f6ef7;
+  background: rgba(79, 110, 247, 0.08);
+  border: 2rpx solid rgba(79, 110, 247, 0.3);
+  border-radius: 999rpx;
+  padding: 10rpx 24rpx;
+}
+.run-row.row-selected { border-color: #4f6ef7; background: rgba(79, 110, 247, 0.06); }
+.row-check {
+  flex-shrink: 0;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  border: 2rpx solid var(--border);
+  background: var(--bg-page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  color: transparent;
+}
+.row-check.checked { background: #4f6ef7; border-color: #4f6ef7; color: #fff; }
+
+.run-batch-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 20rpx calc(env(safe-area-inset-bottom) + 24rpx);
+  background: var(--bg-card);
+  border-top: 2rpx solid var(--border);
+  z-index: 10;
+}
+.bb-all { font-size: var(--font-body-sm); color: var(--text-secondary); font-weight: 600; }
+.bb-pick {
+  flex: 1;
+  background: #1E5B3C;
+  color: #fff;
+  font-size: var(--font-body-sm);
+  font-weight: 600;
+  border-radius: 999rpx;
+  line-height: 2.6;
+  padding: 0;
+}
+.bb-pick.bb-disabled { opacity: 0.45; }
+.bb-exit { font-size: var(--font-body-sm); color: var(--text-tertiary); }

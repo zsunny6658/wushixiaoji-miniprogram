@@ -33,7 +33,10 @@ Page({
     groups: [],          // [{key, items:[{id, seq, code, sub, owner, done}]}]
     total: 0,
     doneCount: 0,
-    finished: false
+    finished: false,
+    batchMode: false,
+    batchCount: 0,
+    allSelected: false
   },
 
   onLoad: function () {
@@ -146,6 +149,122 @@ Page({
       total: seq,
       doneCount: doneCount,
       finished: seq > 0 && doneCount === seq
+    });
+  },
+
+  // —— 批量 / 全量核销（v0.23.16）——
+
+  onToggleBatch: function () {
+    var entering = !this.data.batchMode;
+    if (entering) {
+      var groups = (this.data.groups || []).map(function (g) {
+        return Object.assign({}, g, { items: g.items.map(function (it) { return Object.assign({}, it, { batchSelected: false }); }) });
+      });
+      this.setData({ batchMode: true, groups: groups, batchCount: 0 });
+    } else {
+      this.setData({ batchMode: false, batchCount: 0 });
+      this.buildRun(this.data.stationName);
+    }
+  },
+
+  // 批量模式下点行 = 选中/取消；非批量 = 复制取件码
+  onRowTap: function (e) {
+    if (!this.data.batchMode) {
+      this.onCopyCode(e);
+      return;
+    }
+    var id = e.currentTarget.dataset.id;
+    var count = 0;
+    var groups = (this.data.groups || []).map(function (g) {
+      return Object.assign({}, g, { items: g.items.map(function (it) {
+        var c = Object.assign({}, it);
+        if (c.id === id && !c.done) c.batchSelected = !c.batchSelected;
+        if (c.batchSelected) count++;
+        return c;
+      }) });
+    });
+    this.setData({ groups: groups, batchCount: count, allSelected: this._allSelected() });
+  },
+
+  onSelectAllRun: function () {
+    var allSelected = this._allSelected();
+    var newVal = !allSelected;
+    var count = 0;
+    var groups = (this.data.groups || []).map(function (g) {
+      return Object.assign({}, g, { items: g.items.map(function (it) {
+        var c = Object.assign({}, it);
+        if (!c.done) c.batchSelected = newVal;
+        if (c.batchSelected) count++;
+        return c;
+      }) });
+    });
+    this.setData({ groups: groups, batchCount: count, allSelected: newVal });
+  },
+
+  _allSelected: function () {
+    var items = [];
+    (this.data.groups || []).forEach(function (g) { items = items.concat(g.items); });
+    var pickable = items.filter(function (it) { return !it.done; });
+    return pickable.length > 0 && pickable.every(function (it) { return it.batchSelected; });
+  },
+
+  _pickIds: function (ids) {
+    var doneIds = this._doneIds;
+    var now = new Date().toISOString();
+    var me = app.globalData.me;
+    var that = this;
+    ids.forEach(function (id) {
+      var pkg = (app.globalData.packages || []).find(function (p) { return p.id === id; });
+      if (!pkg || pkg.status !== 'pending') return;
+      doneIds[id] = true;
+      var patch = { status: 'picked', pickedAt: now, pickedBy: me };
+      that.patchLocal(id, patch);
+      api.updatePackage(id, patch, null, function () {
+        delete doneIds[id];
+        that.patchLocal(id, { status: 'pending', pickedAt: '', pickedBy: '' });
+        wx.showToast({ title: '操作失败', icon: 'none' });
+        that.build();
+      });
+    });
+  },
+
+  onBatchPickRun: function () {
+    var ids = [];
+    (this.data.groups || []).forEach(function (g) {
+      g.items.forEach(function (it) { if (it.batchSelected && !it.done) ids.push(it.id); });
+    });
+    if (!ids.length) { wx.showToast({ title: '先勾选要取的件', icon: 'none' }); return; }
+    var that = this;
+    wx.showModal({
+      title: '批量已取',
+      content: '将选中的 ' + ids.length + ' 件标记为已取？',
+      success: function (res) {
+        if (!res.confirm) return;
+        that._pickIds(ids);
+        that.setData({ batchMode: false, batchCount: 0 });
+        that.buildRun(that.data.stationName);
+        var left = that.data.total - that.data.doneCount;
+        wx.showToast({ title: left > 0 ? '已取 ' + ids.length + ' 件，还剩 ' + left + ' 件' : '本站全部取完 🎉', icon: left > 0 ? 'none' : 'success' });
+      }
+    });
+  },
+
+  onPickAll: function () {
+    var ids = [];
+    (this.data.groups || []).forEach(function (g) {
+      g.items.forEach(function (it) { if (!it.done) ids.push(it.id); });
+    });
+    if (!ids.length) { wx.showToast({ title: '没有待取件', icon: 'none' }); return; }
+    var that = this;
+    wx.showModal({
+      title: '全部已取',
+      content: '将本站剩余 ' + ids.length + ' 件全部标记为已取？',
+      success: function (res) {
+        if (!res.confirm) return;
+        that._pickIds(ids);
+        that.buildRun(that.data.stationName);
+        wx.showToast({ title: '本站全部取完 🎉', icon: 'success' });
+      }
     });
   },
 
