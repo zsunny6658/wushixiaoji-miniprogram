@@ -185,7 +185,8 @@ function decorate(p, members) {
   if (_type === 'pickup') {
     bm = p.code || '';
     bmType = 'code';
-    bs = p.note || '';
+    // 副行：驿站优先（v0.23.17 补显示，驿站是取件关键信息），备注跟后
+    bs = [p.station, p.note].filter(Boolean).join(' · ');
   } else if (_type === 'debt') {
     if (p.amount) {
       bm = '¥' + formatAmount(p.amount);
