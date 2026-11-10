@@ -177,7 +177,7 @@ Page({
 
   normalizePillForm: function (pi) {
     var dft = { color: 'white', shape: 'round', rows: 2, cols: 5, boards: 2, boardNo: 1 };
-    if (!pi || typeof pi !== 'object') return dft;
+    if (!pi || typeof pi !== 'object') { dft.stockBoxes = undefined; return dft; }
     var clamp = function (v, min, max, d) { var n = parseInt(v, 10); return isNaN(n) ? d : Math.max(min, Math.min(max, n)); };
     return {
       color: this.data.pillColorOptions.indexOf(pi.color) >= 0 ? pi.color : dft.color,
@@ -185,7 +185,9 @@ Page({
       rows: clamp(pi.rows, 1, 4, 2),
       cols: clamp(pi.cols, 1, 8, 5),
       boards: clamp(pi.boards, 1, 6, 2),
-      boardNo: clamp(pi.boardNo, 1, clamp(pi.boards, 1, 6, 2), 1)
+      boardNo: clamp(pi.boardNo, 1, clamp(pi.boards, 1, 6, 2), 1),
+      // 储备盒数（药物储备）：未设置保持 undefined（不管理），设置后保留 0-99
+      stockBoxes: (pi.stockBoxes === undefined || pi.stockBoxes === null || pi.stockBoxes === '') ? undefined : clamp(pi.stockBoxes, 0, 99, 0)
     };
   },
 
@@ -273,6 +275,20 @@ Page({
   onPillStep: function (e) {
     var field = e.currentTarget.dataset.field;
     var delta = parseInt(e.currentTarget.dataset.delta, 10);
+    // 储备盒数特殊语义（v0.23.18 药物储备）：undefined/null = 未管理；
+    // 未管理点＋ → 0（明确无库存）；0 再点− → 回到未管理；范围 0-99
+    if (field === 'stockBoxes') {
+      var curS = this.data.pillInfo.stockBoxes;
+      if (curS === undefined || curS === null) {
+        if (delta > 0) this.setData({ 'pillInfo.stockBoxes': 0 });
+        return;
+      }
+      var nextS = curS + delta;
+      if (nextS < 0) nextS = null; // 减到头 = 取消管理
+      if (nextS > 99) nextS = 99;
+      this.setData({ 'pillInfo.stockBoxes': nextS });
+      return;
+    }
     var limits = { rows: [1, 4], cols: [1, 8], boards: [1, 6] };
     var lim = limits[field] || [1, 8];
     var cur = this.data.pillInfo[field] || 1;

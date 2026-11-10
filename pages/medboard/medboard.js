@@ -89,6 +89,8 @@ Page({
     dueToday: true,
     todayPercent: 0,
     boxRemaining: 0,
+    stockBoxes: -1,
+    stockLow: false,
     compare: 'current',
     compareRows: [],
     compareBefore: 0,
@@ -320,7 +322,10 @@ Page({
       todayPercent: todayTotal ? Math.round(todayTaken * 100 / todayTotal) : 0,
       boxNo: box,
       boxRemaining: pi.boards * pi.rows * pi.cols - this.boxLogs.length,
-      boxFinished: this.boxLogs.length >= pi.boards * pi.rows * pi.cols
+      boxFinished: this.boxLogs.length >= pi.boards * pi.rows * pi.cols,
+      // 家中储备盒数（v0.23.18 药物储备）：-1 = 未启用管理
+      stockBoxes: (pi.stockBoxes === undefined || pi.stockBoxes === null) ? -1 : pi.stockBoxes,
+      stockLow: (pi.stockBoxes !== undefined && pi.stockBoxes !== null && pi.stockBoxes <= 1)
     });
     this.buildBoard();
     // 详情页「初始化药板」入口直达：加载完成后自动进入初始化模式（默认停在当前版）
@@ -403,28 +408,68 @@ Page({
   onNewBox: function () {
     var that = this;
     if (this._newBoxBusy) return;
+    var stockTip = (this.data.stockBoxes >= 0)
+      ? '开封新盒将自动扣减 1 盒储备（当前储备 ' + this.data.stockBoxes + ' 盒）。'
+      : '';
     wx.showModal({
       title: '开新盒',
-      content: '将开始第 ' + ((this.pi.boxNo || 1) + 1) + ' 盒：版号重置为第 1 版，历史打卡流水全部保留。新盒已吃过的位置可在初始化时标记。',
+      content: '将开始第 ' + ((this.pi.boxNo || 1) + 1) + ' 盒：版号重置为第 1 版，历史打卡流水全部保留。' + stockTip + '新盒已吃过的位置可在初始化时标记。',
       confirmText: '开新盒',
       success: function (r) {
         if (!r.confirm) return;
         that._newBoxBusy = true;
         wx.showLoading({ title: '开启中…', mask: true });
-        api.openMedBox(that.pkgId, function () {
+        api.openMedBox(that.pkgId, function (res) {
           that._newBoxBusy = false;
           wx.hideLoading();
           wx.vibrateShort({ type: 'light' });
           that._selfAction = Date.now();
           that._autoInit = true; // load 完成后自动进入初始化模式
           that.load();
-          wx.showToast({ title: '已开新盒，请标记新盒已吃位置', icon: 'none', duration: 2500 });
+          var used = res && res.stockUsed;
+          var left = res && res.stockBoxes;
+          var msg = '已开新盒，请标记新盒已吃位置';
+          if (used && left !== undefined && left !== null) msg = '已开新盒 · 储备剩 ' + left + ' 盒，请标记新盒已吃位置';
+          wx.showToast({ title: msg, icon: 'none', duration: 2500 });
         }, function () {
           that._newBoxBusy = false;
           wx.hideLoading();
           wx.showToast({ title: '操作失败，请重试', icon: 'none' });
         });
       }
+    });
+  },
+
+  // 调整家中储备盒数（±1）：-1 哨兵 = 未启用管理，点＋启用（0 盒 = 明确无库存）
+  onStockStep: function (e) {
+    var that = this;
+    var delta = parseInt(e.currentTarget.dataset.delta, 10) || 0;
+    var cur = this.data.stockBoxes;
+    var next;
+    if (cur < 0) {
+      if (delta <= 0) return; // 未管理时点−无操作
+      next = 0;
+    } else {
+      next = Math.max(-1, Math.min(99, cur + delta)); // 减到 -1 = 取消管理
+    }
+    var pi = this.pi;
+    if (!pi) return;
+    var newPi = Object.assign({}, pi);
+    if (next < 0) delete newPi.stockBoxes;
+    else newPi.stockBoxes = next;
+    wx.showLoading({ title: '保存中…', mask: true });
+    api.updatePackage(this.pkgId, { pillInfo: newPi }, function () {
+      wx.hideLoading();
+      that.pi = newPi;
+      that.setData({
+        stockBoxes: next < 0 ? -1 : next,
+        stockLow: next >= 0 && next <= 1
+      });
+      var msg = next < 0 ? '已关闭储备管理' : (next === 0 ? '储备 0 盒 · 不足时将提醒配药' : '储备 ' + next + ' 盒');
+      wx.showToast({ title: msg, icon: 'none' });
+    }, function () {
+      wx.hideLoading();
+      wx.showToast({ title: '操作失败，请重试', icon: 'none' });
     });
   },
 

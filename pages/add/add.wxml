@@ -172,9 +172,13 @@
               <text class="pl-label">版数</text>
               <view class="stepper"><view class="step-btn" bindtap="onPillStep" data-field="boards" data-delta="-1">−</view><text class="step-val">{{pillInfo.boards}}</text><view class="step-btn" bindtap="onPillStep" data-field="boards" data-delta="1">＋</view></view>
             </view>
+            <view class="pill-layout-item">
+              <text class="pl-label">储备(盒)</text>
+              <view class="stepper"><view class="step-btn" bindtap="onPillStep" data-field="stockBoxes" data-delta="-1">−</view><text class="step-val {{pillInfo.stockBoxes === undefined || pillInfo.stockBoxes === null ? 'step-na' : ''}}">{{pillInfo.stockBoxes === undefined || pillInfo.stockBoxes === null ? '未管理' : pillInfo.stockBoxes}}</text><view class="step-btn" bindtap="onPillStep" data-field="stockBoxes" data-delta="1">＋</view></view>
+            </view>
           </view>
           </block>
-          <text class="field-hint">一版 {{pillInfo.rows}}×{{pillInfo.cols}} 共 {{pillInfo.rows * pillInfo.cols}} 颗，一盒 {{pillInfo.boards}} 版；详情页打开仿真药板打卡</text>
+          <text class="field-hint">一版 {{pillInfo.rows}}×{{pillInfo.cols}} 共 {{pillInfo.rows * pillInfo.cols}} 颗，一盒 {{pillInfo.boards}} 版；详情页打开仿真药板打卡。储备=家中未开封备用盒数：点＋开始管理，开新盒自动扣 1 盒，储备不足会推送配药提醒（点−减到 0 后再减恢复「未管理」）</text>
         </view>
       </block>
 
