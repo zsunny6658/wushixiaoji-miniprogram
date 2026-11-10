@@ -528,29 +528,25 @@ Page({
 
   readAndParsePillPhoto: function (path) {
     var that = this;
-    var fs = wx.getFileSystemManager();
-    fs.readFile({
-      filePath: path,
-      encoding: 'base64',
-      success: function (res) {
-        var dataUrl = 'data:image/jpeg;base64,' + res.data;
-        api.parseImage([dataUrl], 'medication', function (data) {
-          wx.hideLoading();
-          if (data.fallback || !data.records || !data.records.length) {
-            wx.showToast({ title: '未能识别药板，请手动设置', icon: 'none' });
-            return;
-          }
-          that.applyMedicationRecord(data.records[0]);
-          wx.showToast({ title: '已识别药板', icon: 'success' });
-        }, function () {
-          wx.hideLoading();
-          wx.showToast({ title: '识别失败，请手动设置', icon: 'none' });
-        }, { timeout: 120000 });
-      },
-      fail: function () {
+    // 限长边 1600px（与智能识别同压缩策略，防 413），药板文字仍清晰
+    this._compressForParse(path, 1600, 70, function (b64) {
+      if (!b64) {
         wx.hideLoading();
         wx.showToast({ title: '读取图片失败', icon: 'none' });
+        return;
       }
+      api.parseImage([b64], 'medication', function (data) {
+        wx.hideLoading();
+        if (data.fallback || !data.records || !data.records.length) {
+          wx.showToast({ title: '未能识别药板，请手动设置', icon: 'none' });
+          return;
+        }
+        that.applyMedicationRecord(data.records[0]);
+        wx.showToast({ title: '已识别药板', icon: 'success' });
+      }, function () {
+        wx.hideLoading();
+        wx.showToast({ title: '识别失败，请手动设置', icon: 'none' });
+      }, { timeout: 120000 });
     });
   },
 
@@ -603,49 +599,70 @@ Page({
 
   loadImagesAsBase64: function (paths) {
     var that = this;
-    var fs = wx.getFileSystemManager();
     var base64List = [];
     var loaded = 0;
     var total = paths.length;
-    paths.forEach(function (path) {
-      // 先压缩图片再读 base64，减少内存占用和传输体积
-      wx.compressImage({
-        src: path,
-        quality: 80,
-        success: function (compRes) {
-          fs.readFile({
-            filePath: compRes.tempFilePath,
-            encoding: 'base64',
-            success: function (res) {
-              base64List.push('data:image/jpeg;base64,' + res.data);
-              loaded++;
-              if (loaded === total) that.setData({ imageBase64List: base64List });
-            },
-            fail: function () {
-              loaded++;
-              if (loaded === total) that.setData({ imageBase64List: base64List });
-            }
-          });
-        },
-        fail: function () {
-          // 压缩失败，降级读原图
-          fs.readFile({
-            filePath: path,
-            encoding: 'base64',
-            success: function (res) {
-              var ext = path.match(/\.(\w+)$/);
-              var mime = ext && ext[1] === 'jpg' ? 'image/jpeg' : 'image/png';
-              base64List.push('data:' + mime + ';base64,' + res.data);
-              loaded++;
-              if (loaded === total) that.setData({ imageBase64List: base64List });
-            },
-            fail: function () {
-              loaded++;
-              if (loaded === total) that.setData({ imageBase64List: base64List });
-            }
-          });
-        }
+    paths.forEach(function (path, idx) {
+      that._compressForParse(path, 1600, 80, function (b64) {
+        base64List[idx] = b64; // 按 index 放置，保证顺序与预览一致
+        loaded++;
+        if (loaded === total) that.setData({ imageBase64List: base64List.filter(Boolean) });
       });
+    });
+  },
+
+  // 识别用图片压缩：限制长边分辨率（compressImage 的 quality 只压质量不压尺寸，
+  // 手机原图/截图动辄 3000px+，base64 体积超服务端 16mb 上限报 413）。仍过大时降级再压。
+  _compressForParse: function (path, maxSide, quality, cb, _depth) {
+    var that = this;
+    var depth = _depth || 0;
+    var readB64 = function (src, mime, ok) {
+      var fs = wx.getFileSystemManager();
+      fs.readFile({
+        filePath: src,
+        encoding: 'base64',
+        success: function (res) { ok('data:' + mime + ';base64,' + res.data, res.data.length); },
+        fail: function () { ok('', 0); }
+      });
+    };
+    var onB64 = function (b64, len) {
+      // base64 后 >2MB（约 1.5MB 原图）且未深压过 → 降分辨率/质量再压一轮
+      if (len > 2 * 1024 * 1024 && depth < 2 && b64) {
+        that._compressForParse(path, Math.max(640, Math.round(maxSide / 2)), Math.max(45, quality - 25), cb, depth + 1);
+        return;
+      }
+      cb(b64);
+    };
+    wx.getImageInfo({
+      src: path,
+      success: function (info) {
+        var long = Math.max(info.width, info.height);
+        var doCompress = function (width) {
+          var finish = function (src) { readB64(src, 'image/jpeg', onB64); };
+          if (width) {
+            wx.compressImage({
+              src: path,
+              quality: quality,
+              compressedWidth: width,
+              success: function (c) { finish(c.tempFilePath); },
+              fail: function () { readB64(path, (/\.png$/i).test(path) ? 'image/png' : 'image/jpeg', onB64); }
+            });
+          } else {
+            // 尺寸已达标，仍压质量（转 jpeg 减小体积）
+            wx.compressImage({
+              src: path,
+              quality: quality,
+              success: function (c) { finish(c.tempFilePath); },
+              fail: function () { readB64(path, (/\.png$/i).test(path) ? 'image/png' : 'image/jpeg', onB64); }
+            });
+          }
+        };
+        doCompress(long > maxSide ? Math.round(info.width * maxSide / long) : 0);
+      },
+      fail: function () {
+        // 拿不到尺寸直接读原图（保留原 mime）
+        readB64(path, (/\.png$/i).test(path) ? 'image/png' : 'image/jpeg', onB64);
+      }
     });
   },
 
@@ -699,6 +716,12 @@ Page({
     var that = this;
     if (!this.data.imageBase64List.length) {
       wx.showToast({ title: '请先选择图片', icon: 'none' });
+      return;
+    }
+    // 总量预检：base64 请求体 >12MB 会被服务端拒（413），提前提示删减
+    var totalBytes = this.data.imageBase64List.reduce(function (s, b) { return s + (b ? b.length : 0); }, 0);
+    if (totalBytes > 12 * 1024 * 1024) {
+      wx.showToast({ title: '图片过大，请删减几张再识别', icon: 'none', duration: 3000 });
       return;
     }
     this.setData({ imageParsing: true });
